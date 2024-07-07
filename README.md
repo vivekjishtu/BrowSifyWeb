@@ -5,7 +5,7 @@
 
 <img src="app/src/main/ic_launcher-web.png" width="192" height="192">
 
-BrowSifyWeb browser is a fork of [!Yuzu browser](https://github.com/hazuki0x0/YuzuBrowser) which was an open source power full web browser.
+BrowSifyWeb browser is a fork of [Yuzu browser](https://github.com/hazuki0x0/YuzuBrowser) which was an open source power full web browser.
 
 You can create your own browser using custom UI and custom buttons.
 
