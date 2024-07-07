@@ -1,4 +1,4 @@
-# Yuzu browser
+# BrowSifyWeb Browser
 [![license](https://img.shields.io/github/license/hazuki0x0/YuzuBrowser.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 &nbsp;Stable: [![GitHub release](https://img.shields.io/github/release/hazuki0x0/YuzuBrowser.svg)](https://play.google.com/store/apps/details?id=jp.hazuki.yuzubrowser)
 &nbsp;Latest: [![GitHub release](https://img.shields.io/github/v/release/hazuki0x0/YuzuBrowser?include_prereleases)](https://github.com/hazuki0x0/YuzuBrowser/releases)
