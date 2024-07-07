@@ -5,24 +5,24 @@
 
 <img src="app/src/main/ic_launcher-web.png" width="192" height="192">
 
-Yuzu browser is an open source power full web browser.
+BrowSifyWeb browser is a fork of [!Yuzu browser](https://github.com/hazuki0x0/YuzuBrowser) which was an open source power full web browser.
 
 You can create your own browser using custom UI and custom buttons.
 
-This browser based on Mikan Browser.
+Yuzu Browser in turn was based on Mikan Browser.
 
 ## Download and install
 **Android 6.0 or higher is required.**
 
-<a href="https://play.google.com/store/apps/details?id=jp.hazuki.yuzubrowser">
+<a href="https://play.google.com/store/apps/details?id=com.vivekjishtu.browsifyweb">
 <img src="https://cloud.githubusercontent.com/assets/15681348/25552469/9d87214c-2cd5-11e7-8ada-6cf0c69df419.png" width="200px"></a>
 
 Or prebuilt apk file is here
 
-https://github.com/Hazuki0x0/YuzuBrowser/releases
+https://github.com/vivekjishtu/BrowSifyWeb/releases
 
 ## Theme
-Yuzu Browser supports custom theme.
+BrowSifyWeb Browser supports custom theme.
 
 You can create custom theme with [theme creator app](https://play.google.com/store/apps/details?id=jp.hazuki.yuzubrowser.themecreator).
 
