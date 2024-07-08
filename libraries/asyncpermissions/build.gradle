@@ -18,13 +18,22 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion Integer.parseInt(project.android_compile_sdk_version)
-    buildToolsVersion project.android_build_tools_version
+    compileSdk Integer.parseInt(project.android_compile_sdk_version)
+//    buildToolsVersion project.android_build_tools_version
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 
     defaultConfig {
         minSdkVersion Integer.parseInt(project.android_min_sdk_version)
         targetSdkVersion Integer.parseInt(project.android_target_sdk_version)
     }
+    namespace 'jp.hazuki.asyncpermissions'
 }
 
 dependencies {

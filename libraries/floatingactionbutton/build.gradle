@@ -2,25 +2,22 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion Integer.parseInt(project.android_compile_sdk_version)
-    buildToolsVersion project.android_build_tools_version
+//    buildToolsVersion project.android_build_tools_version
 
     defaultConfig {
         minSdkVersion Integer.parseInt(project.android_min_sdk_version)
         targetSdkVersion Integer.parseInt(project.android_target_sdk_version)
-        versionCode Integer.parseInt(project.VERSION_CODE)
-        versionName project.VERSION_NAME
     }
     buildTypes {
         release {
             minifyEnabled false
-            debuggable false
         }
 
         debug {
             minifyEnabled false
-            debuggable true
         }
     }
+    namespace 'com.github.clans.fab'
 }
 
 dependencies {

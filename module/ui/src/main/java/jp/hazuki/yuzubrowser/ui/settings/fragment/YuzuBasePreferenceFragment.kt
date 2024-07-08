@@ -39,7 +39,7 @@ abstract class YuzuBasePreferenceFragment : PreferenceFragmentCompat() {
         onCreateYuzuPreferences(savedInstanceState, rootKey)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return try {
             super.onCreateView(inflater, container, savedInstanceState)
         } finally {

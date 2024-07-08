@@ -19,16 +19,22 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
 android {
-    compileSdkVersion Build.compile_sdk_version
-    buildToolsVersion Build.build_tools_version
+    compileSdk Build.compile_sdk_version
+//    buildToolsVersion Build.build_tools_version
 
     defaultConfig {
         minSdkVersion Build.min_sdk_version
         targetSdkVersion Build.target_sdk_version
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 
     buildTypes {
@@ -37,6 +43,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'jp.hazuki.yuzubrowser.browser.connecter'
 }
 
 dependencies {

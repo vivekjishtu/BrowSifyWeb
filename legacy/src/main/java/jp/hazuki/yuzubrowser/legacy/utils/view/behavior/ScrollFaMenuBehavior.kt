@@ -74,12 +74,12 @@ class ScrollFaMenuBehavior(context: Context, attrs: AttributeSet) : FloatingActi
     }
 
     private val animateListener = object : AnimatorListenerAdapter() {
-        override fun onAnimationEnd(animation: Animator?) {
+        override fun onAnimationEnd(animation: Animator) {
             super.onAnimationEnd(animation)
             isAnimating = false
         }
 
-        override fun onAnimationStart(animation: Animator?) {
+        override fun onAnimationStart(animation: Animator) {
             super.onAnimationStart(animation)
             isAnimating = true
         }

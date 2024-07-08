@@ -45,7 +45,9 @@ private fun ContentResolver.savePictureAsPngQ(fileName: String, bitmap: Bitmap):
 
     return try {
         openOutputStream(uri).use {
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+            if (it != null) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
         }
 
         values.apply {

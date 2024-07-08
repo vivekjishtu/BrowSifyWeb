@@ -29,7 +29,7 @@ class SoftButtonActionViewModel(
         private val actionNames: ActionNameMap,
         private val actionIcons: ActionIconMap,
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
             return SoftButtonActionViewModel(actionNames, actionIcons) as T
         }

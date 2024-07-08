@@ -22,13 +22,11 @@ apply plugin: 'dagger.hilt.android.plugin'
 
 android {
     compileSdkVersion Build.compile_sdk_version
-    buildToolsVersion Build.build_tools_version
+//    buildToolsVersion Build.build_tools_version
 
     defaultConfig {
         minSdkVersion Build.min_sdk_version
         targetSdkVersion Build.target_sdk_version
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -56,6 +54,7 @@ android {
     buildFeatures {
         dataBinding true
     }
+    namespace 'jp.hazuki.yuzubrowser.adblock'
 }
 
 dependencies {

@@ -26,8 +26,6 @@ android {
     defaultConfig {
         minSdkVersion Build.min_sdk_version
         targetSdkVersion Build.target_sdk_version
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,13 +51,14 @@ android {
         }
     }
 
-    lintOptions {
-        disable 'MissingTranslation', 'GoogleAppIndexingWarning', 'ClickableViewAccessibility'
-    }
 
     buildFeatures {
         dataBinding true
         viewBinding true
+    }
+    namespace 'jp.hazuki.yuzubrowser.legacy'
+    lint {
+        disable 'MissingTranslation', 'GoogleAppIndexingWarning', 'ClickableViewAccessibility'
     }
 }
 

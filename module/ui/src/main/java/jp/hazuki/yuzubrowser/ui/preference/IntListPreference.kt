@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.TypedArray
 import android.util.AttributeSet
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.DialogPreference
 import androidx.preference.Preference
 import jp.hazuki.yuzubrowser.ui.R
@@ -34,7 +35,7 @@ class IntListPreference(context: Context, attrs: AttributeSet) : DialogPreferenc
     }
 
 
-    override fun onGetDefaultValue(a: TypedArray?, index: Int): Any {
+    override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {
         return a!!.getInt(index, -1)
     }
 
@@ -46,7 +47,7 @@ class IntListPreference(context: Context, attrs: AttributeSet) : DialogPreferenc
 
         private var mClickedItemIndex = -1
 
-        override fun onPrepareDialogBuilder(builder: androidx.appcompat.app.AlertDialog.Builder?) {
+        override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
             val pref = getParentPreference<IntListPreference>()
             mClickedItemIndex = pref.valueIndex
             builder!!.setPositiveButton(null, null)

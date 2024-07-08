@@ -81,7 +81,10 @@ class MainSettingsActivity : ThemeActivity(), PreferenceFragmentCompat.OnPrefere
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onPreferenceStartScreen(caller: PreferenceFragmentCompat?, pref: PreferenceScreen): Boolean {
+    override fun onPreferenceStartScreen(
+        caller: PreferenceFragmentCompat,
+        pref: PreferenceScreen
+    ): Boolean {
         return if (caller is YuzuPreferenceFragment) {
             if (!caller.onPreferenceStartScreen(pref)) {
                 replaceFragment(PreferenceScreenFragment.newInstance(caller.preferenceResId, pref.key), pref.key)
@@ -98,4 +101,5 @@ class MainSettingsActivity : ThemeActivity(), PreferenceFragmentCompat.OnPrefere
             .addToBackStack(key)
             .commit()
     }
+
 }

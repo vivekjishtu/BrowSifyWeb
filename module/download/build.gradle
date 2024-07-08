@@ -26,8 +26,6 @@ android {
     defaultConfig {
         minSdkVersion Build.min_sdk_version
         targetSdkVersion Build.target_sdk_version
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -51,6 +49,7 @@ android {
     buildFeatures {
         dataBinding true
     }
+    namespace 'jp.hazuki.yuzubrowser.download'
 }
 
 dependencies {

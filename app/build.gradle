@@ -26,10 +26,9 @@ def gitHash = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.tri
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm:ssXXX")
 
 android {
-    compileSdkVersion Build.compile_sdk_version
-    buildToolsVersion Build.build_tools_version
+    compileSdk Build.compile_sdk_version
     defaultConfig {
-        applicationId "jp.hazuki.yuzubrowser"
+        applicationId "com.vivekjishtu.bswbrowser"
         minSdkVersion Build.min_sdk_version
         targetSdkVersion Build.target_sdk_version
         versionCode AppVersions.version_code
@@ -70,9 +69,9 @@ android {
         }
     }
     packagingOptions {
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/CHANGES'
-        exclude 'META-INF/README.md'
+        resources {
+            excludes += ['META-INF/LICENSE', 'META-INF/CHANGES', 'META-INF/README.md']
+        }
     }
 
     applicationVariants.all { variant ->
@@ -92,6 +91,7 @@ android {
     buildFeatures {
         dataBinding true
     }
+    namespace 'jp.hazuki.yuzubrowser'
 }
 
 // must be after the plugin is applied otherwise no tasks will be found
@@ -152,7 +152,7 @@ dependencies {
     kapt Dagger.hiltCompiler
 
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:26.5.0')
+    implementation platform('com.google.firebase:firebase-bom:33.1.1')
 
     // Declare the dependencies for the Crashlytics and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies

@@ -19,6 +19,7 @@ package jp.hazuki.yuzubrowser.ui.preference
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.DialogPreference
 import androidx.preference.Preference
 import jp.hazuki.yuzubrowser.core.utility.utils.ArrayUtils
@@ -47,7 +48,7 @@ class MultiListIntPreference(context: Context, attrs: AttributeSet) : DialogPref
         persistInt(ArrayUtils.getBitsInt(value))
     }
 
-    override fun onGetDefaultValue(a: TypedArray?, index: Int): Any {
+    override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {
         return a!!.getInt(index, -1)
     }
 
@@ -57,7 +58,7 @@ class MultiListIntPreference(context: Context, attrs: AttributeSet) : DialogPref
 
     class PrefernceDialog : YuzuPreferenceDialog() {
 
-        override fun onPrepareDialogBuilder(builder: androidx.appcompat.app.AlertDialog.Builder?) {
+        override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
             val pref = getParentPreference<MultiListIntPreference>()
             if (pref.mValue == null) {
                 pref.mValue = BooleanArray(pref.mMax)

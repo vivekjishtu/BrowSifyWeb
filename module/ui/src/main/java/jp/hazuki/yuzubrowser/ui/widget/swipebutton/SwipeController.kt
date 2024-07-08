@@ -50,8 +50,13 @@ open class SwipeController(context: Context) {
 
     init {
         detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-                val rangeX = (e2.rawX - e1.rawX).toInt()
+             override fun onScroll(
+                 e1: MotionEvent?,
+                 e2: MotionEvent,
+                 distanceX: Float,
+                 distanceY: Float
+             ): Boolean {
+                val rangeX = (e2.rawX - e1!!.rawX).toInt()
                 val rangeY = (e2.rawY - e1.rawY).toInt()
 
                 var check = 0

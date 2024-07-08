@@ -67,7 +67,7 @@ class SearchUrlPreference(context: Context, attrs: AttributeSet) : DialogPrefere
             }
         }
 
-        override fun onCreateDialogView(context: Context?): View {
+        override fun onCreateDialogView(context: Context): View? {
             val activity = activity ?: throw IllegalStateException()
 
             provider = SearchSuggestProviders(manager.load())

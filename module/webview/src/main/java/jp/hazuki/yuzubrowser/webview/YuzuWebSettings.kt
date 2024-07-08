@@ -24,11 +24,14 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import jp.hazuki.yuzubrowser.webview.utility.trimForHttpHeader
 
+
 class YuzuWebSettings(private val origin: WebSettings) {
 
     var appCacheEnabled = false
         set(flag) {
-            origin.setAppCacheEnabled(flag)
+            //origin.setAppCacheEnabled(flag)
+            if(flag) origin.cacheMode = WebSettings.LOAD_CACHE_ONLY
+            else origin.cacheMode = WebSettings.LOAD_NO_CACHE
             field = flag
         }
     var geolocationEnabled = false
@@ -322,13 +325,37 @@ class YuzuWebSettings(private val origin: WebSettings) {
     }
 
     fun setAppCachePath(appCachePath: String) {
-        origin.setAppCachePath(appCachePath)
+       // origin.setAppCachePath(appCachePath)
+        try {
+            // public abstract void setAppCachePath(String appCachePath);
+            val webSettingsClazz = Class.forName("android.webkit.WebSettings")
+            val setAppCachePathMethod = webSettingsClazz.getDeclaredMethod(
+                "setAppCachePath",
+                String::class.java
+            )
+            setAppCachePathMethod.isAccessible = true
+            setAppCachePathMethod.invoke(origin, appCachePath)
+        } catch (e: Throwable) {
+            //ignore
+        }
     }
 
     @Suppress("DEPRECATION")
     @Deprecated("")
     fun setAppCacheMaxSize(appCacheMaxSize: Long) {
-        origin.setAppCacheMaxSize(appCacheMaxSize)
+        try {
+            // public abstract void setAppCachePath(String appCachePath);
+            val webSettingsClazz = Class.forName("android.webkit.WebSettings")
+            val setAppCacheMaxSizeMethod = webSettingsClazz.getDeclaredMethod(
+                "setAppCacheMaxSize",
+                String::class.java
+            )
+            setAppCacheMaxSizeMethod.isAccessible = true
+            setAppCacheMaxSizeMethod.invoke(origin, appCacheMaxSize)
+        } catch (e: Throwable) {
+            //ignore
+        }
+        //origin.setAppCacheMaxSize(appCacheMaxSize)
     }
 
     fun setNeedInitialFocus(flag: Boolean) {

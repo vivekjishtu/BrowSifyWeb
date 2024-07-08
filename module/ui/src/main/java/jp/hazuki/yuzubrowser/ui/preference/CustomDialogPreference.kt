@@ -7,7 +7,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.preference.DialogPreference
 import androidx.preference.Preference
 
-abstract class CustomDialogPreference @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null) : DialogPreference(context, attrs) {
+abstract class CustomDialogPreference @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null) : DialogPreference(
+    context!!, attrs) {
     fun show(manager: FragmentManager?) {
         crateCustomDialog().show(manager!!, key)
     }

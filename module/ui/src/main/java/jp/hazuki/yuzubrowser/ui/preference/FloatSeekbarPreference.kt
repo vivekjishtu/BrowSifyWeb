@@ -36,7 +36,7 @@ class FloatSeekbarPreference(context: Context, attrs: AttributeSet) : DialogPref
         a.recycle()
     }
 
-    override fun onGetDefaultValue(a: TypedArray?, index: Int): Any {
+    override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {
         return a!!.getFloat(index, -1f)
     }
 
