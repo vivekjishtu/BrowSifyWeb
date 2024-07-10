@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
 
 android {
     compileSdk Integer.parseInt(project.android_compile_sdk_version)
-//    buildToolsVersion project.android_build_tools_version
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

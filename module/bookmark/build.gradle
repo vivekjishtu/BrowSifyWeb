@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'dagger.hilt.android.plugin'
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'com.google.devtools.ksp'
+}
 
 android {
     compileSdk Build.compile_sdk_version
@@ -78,7 +81,7 @@ dependencies {
 
     implementation Libs.okio
     implementation Libs.moshi
-    kapt Libs.moshiCodeGen
+    ksp Libs.moshiCodeGen
 
     implementation project(':module:ui')
     implementation project(':module:core')
@@ -91,7 +94,7 @@ dependencies {
     implementation Libs.kotlin_coroutines_android
 
     implementation Dagger.hilt
-    kapt Dagger.hiltCompiler
+    ksp Dagger.hiltCompiler
 
     implementation Libs.jsoup
 }

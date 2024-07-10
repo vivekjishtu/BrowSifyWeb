@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-parcelize'
-apply plugin: 'dagger.hilt.android.plugin'
+//apply plugin: 'com.android.library'
+//apply plugin: 'kotlin-android'
+//apply plugin: 'kotlin-kapt'
+//apply plugin: 'kotlin-parcelize'
+//apply plugin: 'dagger.hilt.android.plugin'
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-parcelize'
+    id 'dagger.hilt.android.plugin'
+    id 'com.google.devtools.ksp'
+}
 
 android {
-    compileSdkVersion Build.compile_sdk_version
+    compileSdk Build.compile_sdk_version
 
     defaultConfig {
         minSdkVersion Build.min_sdk_version
@@ -117,14 +126,14 @@ dependencies {
     implementation Libs.kotlin_coroutines_android
 
     implementation Dagger.hilt
-    kapt Dagger.hiltCompiler
+    ksp Dagger.hiltCompiler
 
     implementation AndroidX.room
     implementation AndroidX.roomKtx
-    kapt AndroidX.roomCompiler
+    ksp AndroidX.roomCompiler
 
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:26.5.0')
+    implementation platform('com.google.firebase:firebase-bom:33.1.1')
 
     // Declare the dependencies for the Crashlytics and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase li

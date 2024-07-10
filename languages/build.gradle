@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
+//apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+}
 
 android {
-    compileSdkVersion Build.compile_sdk_version
+    compileSdk Build.compile_sdk_version
 
     defaultConfig {
         minSdkVersion Build.min_sdk_version

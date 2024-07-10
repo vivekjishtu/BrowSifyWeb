@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/*
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
@@ -21,6 +22,31 @@ apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'com.cookpad.android.plugin.license-tools'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+*/
+
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://plugins.gradle.org/m2/" }
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.31.2'
+        classpath 'gradle.plugin.com.cookpad.android.plugin:plugin:1.2.6'
+    }
+}
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'com.cookpad.android.plugin.license-tools' version '1.2.6'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.devtools.ksp'
+}
 
 def gitHash = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm:ssXXX")
@@ -90,6 +116,7 @@ android {
 
     buildFeatures {
         dataBinding true
+        buildConfig = true
     }
     namespace 'jp.hazuki.yuzubrowser'
 }
@@ -100,18 +127,7 @@ android.applicationVariants.all { variant ->
     googleTask.enabled = "debug" != variant.name
 }
 
-buildscript {
-    repositories {
-        maven { url 'https://maven.fabric.io/public' }
-        maven { url "https://plugins.gradle.org/m2/" }
-        jcenter()
-    }
 
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.31.2'
-        classpath 'gradle.plugin.com.cookpad.android.plugin:plugin:1.2.6'
-    }
-}
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -124,7 +140,7 @@ dependencies {
     androidTestImplementation Libs.espressoCore
 
     implementation Libs.moshi
-    kapt Libs.moshiCodeGen
+    ksp Libs.moshiCodeGen
     implementation Libs.okhttp
 
     implementation AndroidX.appcompat

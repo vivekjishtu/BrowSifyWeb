@@ -1,8 +1,9 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+}
 
 android {
-    compileSdkVersion Integer.parseInt(project.android_compile_sdk_version)
-//    buildToolsVersion project.android_build_tools_version
+    compileSdk Integer.parseInt(project.android_compile_sdk_version)
 
     defaultConfig {
         minSdkVersion Integer.parseInt(project.android_min_sdk_version)
