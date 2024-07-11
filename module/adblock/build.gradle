@@ -17,10 +17,10 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'kotlin-parcelize'
     id 'dagger.hilt.android.plugin'
     id 'com.google.devtools.ksp'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -78,14 +78,14 @@ dependencies {
     implementation AndroidX.roomKtx
     implementation AndroidX.fix_preference
     implementation AndroidX.fragmentKtx
-    kapt AndroidX.roomCompiler
+    ksp AndroidX.roomCompiler
 
     implementation Libs.kotlin_stdlib
     implementation Libs.kotlin_coroutines
     implementation Libs.kotlin_coroutines_android
 
     implementation Dagger.hilt
-    kapt Dagger.hiltCompiler
+    ksp Dagger.hiltCompiler
 
     implementation Libs.kvs_schema
     kapt Libs.kvs_schema_compiler
