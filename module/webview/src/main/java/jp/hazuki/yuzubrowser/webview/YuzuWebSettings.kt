@@ -30,9 +30,22 @@ class YuzuWebSettings(private val origin: WebSettings) {
     var appCacheEnabled = false
         set(flag) {
             //origin.setAppCacheEnabled(flag)
-            if(flag) origin.cacheMode = WebSettings.LOAD_CACHE_ONLY
-            else origin.cacheMode = WebSettings.LOAD_NO_CACHE
-            field = flag
+            // if(flag) origin.cacheMode = WebSettings.LOAD_DEFAULT //LOAD_CACHE_ELSE_NETWORK
+            // else origin.cacheMode = WebSettings.LOAD_CACHE_ONLY
+            // field = flag
+
+            try {
+                // public abstract void setAppCachePath(String appCachePath);
+                val webSettingsClazz = Class.forName("android.webkit.WebSettings")
+                val setAppCacheEnabledMethod = webSettingsClazz.getDeclaredMethod(
+                    "setAppCacheEnabled",
+                    String::class.java
+                )
+                setAppCacheEnabledMethod.isAccessible = true
+                setAppCacheEnabledMethod.invoke(origin, flag)
+            } catch (e: Throwable) {
+                //ignore
+            }
         }
     var geolocationEnabled = false
         set(flag) {
