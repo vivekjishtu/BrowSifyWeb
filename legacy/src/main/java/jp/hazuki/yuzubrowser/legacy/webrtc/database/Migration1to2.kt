@@ -20,8 +20,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 internal class Migration1to2 : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.apply {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.apply {
             execSQL(CREATE_TABLE)
 
             execSQL("""
