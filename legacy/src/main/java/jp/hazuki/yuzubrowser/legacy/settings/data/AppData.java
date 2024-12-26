@@ -221,6 +221,7 @@ public class AppData {
 
         int prefVersionCode = AppPrefs.lastLaunchPrefVersion.get();
 
+        /*
         if (lastLaunch >= 0 && (lastLaunch < 410010 || prefVersionCode < PREF_VERSION)) {
             //version up code
             if (lastLaunch < 410010) {
@@ -243,6 +244,8 @@ public class AppData {
             AppPrefs.lastLaunchPrefVersion.set(PREF_VERSION);
             modified = true;
         }
+        */
+
 
         int versionCode = (int) ContextExtensionsKt.getVersionCode(context);
 
