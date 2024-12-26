@@ -47,7 +47,7 @@ class FileEditViewModel(
         }
     }
 
-    class Factory(val file: File) : ViewModelProvider.Factory {
+    class Factory(val file: File) :ViewModelProvider.AndroidViewModelFactory(){
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return FileEditViewModel(file) as T

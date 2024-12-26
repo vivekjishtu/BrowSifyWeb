@@ -176,7 +176,7 @@ class AbpFilterDecoder {
                     option = option.substring(1)
                 }
 
-                option = option.toLowerCase(Locale.ENGLISH)
+                option = option.lowercase(Locale.ENGLISH)
                 val type = option.getOptionBit()
                 if (type == -1) return
 
@@ -335,7 +335,7 @@ class AbpFilterDecoder {
         val comment = split(':')
         if (comment.size < 2) return null
 
-        when (comment[0].substring(1).trim().toLowerCase(Locale.getDefault())) {
+        when (comment[0].substring(1).trim().lowercase(Locale.getDefault())) {
             "title" -> info.title = comment[1].trim()
             "homepage" -> info.homePage = comment[1].trim()
             "last updated" -> info.lastUpdate = comment[1].trim()

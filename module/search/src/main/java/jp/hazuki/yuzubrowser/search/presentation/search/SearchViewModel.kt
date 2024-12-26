@@ -117,7 +117,7 @@ internal class SearchViewModel @Inject constructor(
     class Factory(
         private val application: Application,
         private val useCase: SearchViewUseCase
-    ) : ViewModelProvider.Factory {
+    ) :ViewModelProvider.AndroidViewModelFactory(){
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")

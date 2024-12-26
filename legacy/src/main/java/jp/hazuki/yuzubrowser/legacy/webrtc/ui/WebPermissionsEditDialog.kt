@@ -19,12 +19,14 @@ package jp.hazuki.yuzubrowser.legacy.webrtc.ui
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Spinner
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.webrtc.core.PermissionState
 import jp.hazuki.yuzubrowser.legacy.webrtc.core.WebPermissions
+
 
 class WebPermissionsEditDialog : androidx.fragment.app.DialogFragment() {
 
@@ -39,7 +41,13 @@ class WebPermissionsEditDialog : androidx.fragment.app.DialogFragment() {
         val midi: Spinner = view.findViewById(R.id.midiSpinner)
         val mediaId: Spinner = view.findViewById(R.id.mediaIdSpinner)
 
-        val permissions = arguments.getSerializable(ARG_PERMISSION) as WebPermissions
+
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments.getSerializable(ARG_PERMISSION, WebPermissions::class.java) as WebPermissions
+        } else {
+            @Suppress("DEPRECATION")
+            arguments.getSerializable(ARG_PERMISSION) as WebPermissions
+        }
 
         camera.setSelection(permissions.camera.state)
         mic.setSelection(permissions.microphone.state)

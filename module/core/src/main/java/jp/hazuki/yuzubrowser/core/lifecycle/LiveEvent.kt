@@ -49,13 +49,13 @@ class LiveEvent<T> {
 
         private var isActive = true
 
-        override fun onStateChanged(owner: LifecycleOwner, event: Lifecycle.Event) {
-            if (owner.lifecycle.currentState == Lifecycle.State.DESTROYED) {
+        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+            if (source.lifecycle.currentState == Lifecycle.State.DESTROYED) {
                 remove(this)
                 return
             }
 
-            isActive = isActive(owner)
+            isActive = isActive(source)
         }
 
         fun notify(data: T) {

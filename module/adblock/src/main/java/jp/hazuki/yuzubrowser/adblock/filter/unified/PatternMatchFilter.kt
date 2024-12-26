@@ -112,7 +112,7 @@ class PatternMatchFilter(
                             continue@loop
                         }
                         '^' -> if (!nu.checkSeparator()) continue@loop
-                        else -> if (!ignoreCase || nu.toUpperCase() != np.toUpperCase()) {
+                        else -> if (!ignoreCase || nu.uppercaseChar() != np.uppercaseChar()) {
                             if (isStartWith) {
                                 val next = url.nextPoint(i)
                                 if (next < 0) return false
@@ -133,14 +133,14 @@ class PatternMatchFilter(
         for (i in start until length) {
             val c2 = this[i]
             if (c == c2) return i
-            if (ignoreCase && c.toUpperCase() == c2.toUpperCase()) return i
+            if (ignoreCase && c.uppercaseChar() == c2.uppercaseChar()) return i
         }
         return -1
     }
 
     private fun String.searchSeparator(start: Int): Int {
         for (i in start until length) {
-            val it = this[i].toInt()
+            val it = this[i].code
             if (it in 0..0x24 || it in 0x26..0x2c || it == 0x2f || it in 0x3a..0x40 ||
                 it in 0x5b..0x5e || it == 0x60 || it in 0x7b..0x7f) {
                 return i

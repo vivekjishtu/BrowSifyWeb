@@ -16,6 +16,7 @@
 
 package jp.hazuki.yuzubrowser.legacy.action
 
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import com.squareup.moshi.JsonReader
@@ -42,7 +43,12 @@ class Action : ArrayList<SingleAction>, Parcelable, JsonConvertable {
     constructor(actions: Collection<SingleAction>) : super(actions)
 
     constructor(source: Parcel) : super() {
-        source.readList(this, SingleAction::class.java.classLoader)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            source.readList(this, SingleAction::class.java.classLoader, SingleAction::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            source.readList(this, SingleAction::class.java.classLoader)
+        }
     }
 
     override fun describeContents(): Int {

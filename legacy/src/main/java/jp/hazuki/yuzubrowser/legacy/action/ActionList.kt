@@ -16,6 +16,7 @@
 
 package jp.hazuki.yuzubrowser.legacy.action
 
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import com.squareup.moshi.JsonEncodingException
@@ -36,7 +37,12 @@ class ActionList : ArrayList<Action>, Parcelable, JsonConvertable {
     }
 
     constructor(source: Parcel) : super() {
-        source.readList(this, Action::class.java.classLoader)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            source.readList(this, Action::class.java.classLoader, Action::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            source.readList(this, Action::class.java.classLoader)
+        }
     }
 
     override fun describeContents(): Int {

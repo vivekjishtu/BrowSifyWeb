@@ -49,7 +49,7 @@ class OverflowMenuViewModel @Inject constructor(
     class Factory(
         private val application: Application,
         private val repository: HideMenuRepository
-    ) : ViewModelProvider.Factory {
+    ) :ViewModelProvider.AndroidViewModelFactory(){
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")

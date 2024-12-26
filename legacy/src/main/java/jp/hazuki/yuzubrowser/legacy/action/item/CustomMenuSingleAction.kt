@@ -16,11 +16,13 @@
 
 package jp.hazuki.yuzubrowser.legacy.action.item
 
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import jp.hazuki.yuzubrowser.legacy.R
+import jp.hazuki.yuzubrowser.legacy.action.Action
 import jp.hazuki.yuzubrowser.legacy.action.ActionList
 import jp.hazuki.yuzubrowser.legacy.action.SingleAction
 import jp.hazuki.yuzubrowser.legacy.action.view.ActionActivity
@@ -70,7 +72,12 @@ class CustomMenuSingleAction : SingleAction, Parcelable {
     }
 
     private constructor(source: Parcel) : super(source.readInt()) {
-        actionList = source.readParcelable(ActionList::class.java.classLoader)!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            actionList = source.readParcelable(ActionList::class.java.classLoader, ActionList::class.java)!!
+        } else {
+            @Suppress("DEPRECATION")
+            actionList = source.readParcelable(ActionList::class.java.classLoader)!!
+        }
     }
 
     override fun showMainPreference(context: ActionActivity): StartActivityInfo? {

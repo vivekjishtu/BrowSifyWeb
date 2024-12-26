@@ -16,6 +16,7 @@
 
 package jp.hazuki.yuzubrowser.legacy.action.item
 
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import com.squareup.moshi.JsonReader
@@ -74,7 +75,12 @@ class CloseTabSingleAction : SingleAction, Parcelable {
     }
 
     private constructor(source: Parcel) : super(source.readInt()) {
-        defaultAction = source.readParcelable(Action::class.java.classLoader)!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            defaultAction = source.readParcelable(Action::class.java.classLoader, Action::class.java)!!
+        } else {
+            @Suppress("DEPRECATION")
+            defaultAction = source.readParcelable(Action::class.java.classLoader)!!
+        }
     }
 
     override fun showSubPreference(context: ActionActivity): StartActivityInfo? {

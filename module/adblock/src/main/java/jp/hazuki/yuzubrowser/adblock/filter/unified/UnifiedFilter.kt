@@ -62,7 +62,7 @@ abstract class UnifiedFilter(
     }
 
     protected fun Char.checkSeparator(): Boolean {
-        val it = this.toInt()
+        val it = this.code
         return it in 0..0x24 || it in 0x26..0x2c || it == 0x2f || it in 0x3a..0x40 ||
             it in 0x5b..0x5e || it == 0x60 || it in 0x7b..0x7f
     }

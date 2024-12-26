@@ -71,7 +71,7 @@ private fun WebResourceRequest.getContentType(pageUri: Uri): Int {
     val path = url.path ?: url.toString()
     val lastDot = path.lastIndexOf('.')
     if (lastDot >= 0) {
-        when (val extension = path.substring(lastDot + 1).toLowerCase(Locale.ENGLISH)) {
+        when (val extension = path.substring(lastDot + 1).lowercase(Locale.ENGLISH)) {
             "js" -> return type or ContentRequest.TYPE_SCRIPT
             "css" -> return type or ContentRequest.TYPE_STYLE_SHEET
             "otf", "ttf", "ttc", "woff", "woff2" -> return type or ContentRequest.TYPE_FONT

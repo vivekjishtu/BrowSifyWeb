@@ -20,7 +20,7 @@ import java.util.*
 
 object Tag {
     fun create(url: String): List<String> {
-        return url.toLowerCase(Locale.ENGLISH).getTagCandidates().also {
+        return url.lowercase(Locale.ENGLISH).getTagCandidates().also {
             it += ""
         }
     }
@@ -29,7 +29,7 @@ object Tag {
         var maxLength = 0
         var tag = ""
 
-        val candidates = pattern.toLowerCase(Locale.ENGLISH).getTagCandidates()
+        val candidates = pattern.lowercase(Locale.ENGLISH).getTagCandidates()
         for (i in 0 until candidates.size) {
             val candidate = candidates[i]
             if (candidate.length > maxLength) {
