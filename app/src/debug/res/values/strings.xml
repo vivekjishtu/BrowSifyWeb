@@ -16,5 +16,5 @@
   -->
 
 <resources>
-    <string name="browser_app_name">Yuzu Browser[debug]</string>
+    <string name="browser_app_name">Browsify[debug]</string>
 </resources>
