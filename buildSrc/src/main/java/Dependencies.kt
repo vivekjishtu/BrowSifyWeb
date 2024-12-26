@@ -44,7 +44,7 @@ object Versions {
     const val moshi = "1.15.0"
     const val okhttp = "4.9.1"
     const val okio = "3.2.0" //"2.10.0"
-    const val kvs_schema = "5.1.0"
+    const val kvs_schema = "5.0.1"
     const val kotlin = "1.9.24"
     const val kotlin_coroutines = "1.8.1"
     const val junit = "4.13.2"
@@ -102,8 +102,8 @@ object Libs {
     const val kotlin_coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlin_coroutines}"
     const val kotlin_coroutines_android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.kotlin_coroutines}"
 
-    const val kvs_schema = "com.rejasupotaro:kvs-schema:${Versions.kvs_schema}"
-    const val kvs_schema_compiler = "com.rejasupotaro:kvs-schema-compiler:${Versions.kvs_schema}"
+    const val kvs_schema = "com.github.rejasupotaro.kvs-schema:kvs-schema:${Versions.kvs_schema}"
+    const val kvs_schema_compiler = "com.github.rejasupotaro.kvs-schema:kvs-schema-compiler:${Versions.kvs_schema}"
 
     //Test
     const val junit = "junit:junit:${Versions.junit}"
@@ -128,7 +128,7 @@ object Dependencies {
 }
 
 object Dagger {
-    private const val hiltVersion = "2.51.1"
+    const val hiltVersion = "2.51.1"
 
     const val hiltPlugin = "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
     const val hilt = "com.google.dagger:hilt-android:$hiltVersion"
