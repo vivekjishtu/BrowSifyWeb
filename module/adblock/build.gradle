@@ -87,8 +87,8 @@ dependencies {
     implementation Dagger.hilt
     ksp Dagger.hiltCompiler
 
-    implementation Libs.kvs_schema
-    kapt Libs.kvs_schema_compiler
+    //implementation Libs.kvs_schema
+    //kapt Libs.kvs_schema_compiler
 
     implementation project(':module:core')
     implementation project(':module:ui')

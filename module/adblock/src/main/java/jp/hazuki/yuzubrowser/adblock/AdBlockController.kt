@@ -32,6 +32,7 @@ import jp.hazuki.yuzubrowser.core.utility.extensions.getNoCacheResponse
 import jp.hazuki.yuzubrowser.core.utility.utils.IOUtils
 import jp.hazuki.yuzubrowser.core.utility.utils.getMimeType
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
