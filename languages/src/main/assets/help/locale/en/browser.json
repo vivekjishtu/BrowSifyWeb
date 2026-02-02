@@ -9,7 +9,7 @@
   "res_interrupt": "Resource interrupt settings",
   "res_interrupt_info": "check the URL and block images, external scripts, etc.<br>It can also be used for ad block",
   "home_page": "homepage",
-  "home_page_info": "open the specified URL when opening a new tab etc.<br>The default is speed dial(yuzu:speeddial)",
+  "home_page_info": "open the specified URL when opening a new tab etc.<br>The default is speed dial(bsw:speeddial)",
   "download": "Download action",
   "download_type_info": "You can change the behavior when downloading files etc.",
   "download_type_none": "Do nothing",

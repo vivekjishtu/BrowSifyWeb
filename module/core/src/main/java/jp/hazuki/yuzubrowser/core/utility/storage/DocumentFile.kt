@@ -25,7 +25,7 @@ import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import java.io.File
 
-const val DEFAULT_DOWNLOAD_PATH = "yuzu://download"
+const val DEFAULT_DOWNLOAD_PATH = "bsw://download"
 
 fun Uri.toDocumentFile(context: Context): DocumentFile {
     if (toString() == DEFAULT_DOWNLOAD_PATH) {

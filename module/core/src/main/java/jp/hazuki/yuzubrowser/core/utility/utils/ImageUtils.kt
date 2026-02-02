@@ -25,7 +25,7 @@ import android.provider.MediaStore
 import java.io.File
 import java.io.IOException
 
-private const val DIRECTORY_NAME = "YuzuBrowser"
+private const val DIRECTORY_NAME = "BSWBrowser"
 
 fun ContentResolver.savePictureAsPng(fileName: String, bitmap: Bitmap): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

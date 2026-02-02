@@ -9,7 +9,7 @@
   "res_interrupt": "Configurações de interrupção de recurso",
   "res_interrupt_info": "Verifique URL, bloqueie imagens, scripts externos, etc.<br>Isto também pode ser usado para bloqueio de anúncio",
   "home_page": "Página inicial",
-  "home_page_info": "Abra URL especificado ao abrir uma nova guia etc.<br>O padrão é acesso rápido(yuzu:speeddial)",
+  "home_page_info": "Abra URL especificado ao abrir uma nova guia etc.<br>O padrão é acesso rápido(bsw:speeddial)",
   "download": "Ação de download",
   "download_type_info": "Você pode alterar o comportamento ao baixar arquivos etc.",
   "download_type_none": "Fazer nada",

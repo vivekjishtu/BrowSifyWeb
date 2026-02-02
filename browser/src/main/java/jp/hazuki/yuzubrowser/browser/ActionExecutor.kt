@@ -789,7 +789,7 @@ class ActionExecutor(
                 val intent = Intent(controller.applicationContextInfo, MainSettingsActivity::class.java)
                 controller.startActivity(intent, BrowserController.REQUEST_SETTING)
             }
-            SingleAction.OPEN_SPEED_DIAL -> controller.loadUrl(controller.getTab(actionTarget), "yuzu:speeddial")
+            SingleAction.OPEN_SPEED_DIAL -> controller.loadUrl(controller.getTab(actionTarget), "bsw:speeddial")
             SingleAction.ADD_BOOKMARK -> controller.addBookmark(controller.getTab(actionTarget))
             SingleAction.ADD_SPEED_DIAL -> {
                 val tab = controller.getTab(actionTarget)

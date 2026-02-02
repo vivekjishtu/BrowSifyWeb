@@ -102,7 +102,7 @@ class SpeedDialHtml(context: Context) {
         for ((id, url, title, updateTime) in index) {
             builder.append("<div class=\"box\"><a href=\"")
                     .append(url)
-                    .append("\"><img src=\"yuzu:speeddial/img/")
+                    .append("\"><img src=\"bsw:speeddial/img/")
                 .append(id)
                 .append("?")
                 .append(updateTime)

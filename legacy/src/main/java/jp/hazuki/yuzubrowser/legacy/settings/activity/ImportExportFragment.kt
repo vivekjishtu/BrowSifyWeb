@@ -116,7 +116,7 @@ class ImportExportFragment : YuzuPreferenceFragment() {
         findPreference<Preference>("backup_settings")!!.setOnPreferenceClickListener {
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 type = "*/*"
-                putExtra(Intent.EXTRA_TITLE, "yuzu_backup_${FileUtils.getTimeFileName()}$EXT")
+                putExtra(Intent.EXTRA_TITLE, "bsw_backup_${FileUtils.getTimeFileName()}$EXT")
             }
             backupSettingsLauncher.launch(intent)
             false

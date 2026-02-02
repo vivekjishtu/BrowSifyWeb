@@ -179,7 +179,7 @@ public class BrowserHistoryManager {
     }
 
     private static boolean checkUrl(String url) {
-        return (!TextUtils.isEmpty(url) && !url.regionMatches(true, 0, "about:", 0, 6) && !url.regionMatches(true, 0, "yuzu:", 0, 5) && !url.regionMatches(true, 0, "data:", 0, 5));
+        return (!TextUtils.isEmpty(url) && !url.regionMatches(true, 0, "about:", 0, 6) && !url.regionMatches(true, 0, "bsw:", 0, 5) && !url.regionMatches(true, 0, "data:", 0, 5));
     }
 
     private static final class MyOpenHelper extends SQLiteOpenHelper {

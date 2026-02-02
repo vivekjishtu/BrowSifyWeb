@@ -9,7 +9,7 @@
   "res_interrupt": "リソース割り込み設定",
   "res_interrupt_info": "URLでチェックして画像や外部スクリプトなどをブロックすることができる<br>広告ブロックにも使用できる",
   "home_page": "ホームページ",
-  "home_page_info": "新しいタブを開いた時や、[ホーム]アクションを使用した時に指定のURLを開ける<br>既定はスピードダイアル(yuzu:speeddial)",
+  "home_page_info": "新しいタブを開いた時や、[ホーム]アクションを使用した時に指定のURLを開ける<br>既定はスピードダイアル(bsw:speeddial)",
   "download": "ダウンロード時の挙動",
   "download_type_info": "ファイル等をダウンロードするときの挙動を変更することができる",
   "download_type_none": "何もしない",

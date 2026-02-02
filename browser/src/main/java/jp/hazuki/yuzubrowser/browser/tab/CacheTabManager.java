@@ -370,7 +370,7 @@ public class CacheTabManager implements TabManager, TabCache.OnCacheOverFlowList
     }
 
     private void setIcon(View view, TabIndexData indexData) {
-        if (indexData.getOriginalUrl() == null || indexData.getOriginalUrl().startsWith("yuzu:")) {
+        if (indexData.getOriginalUrl() == null || indexData.getOriginalUrl().startsWith("bsw:")) {
             return;
         }
 

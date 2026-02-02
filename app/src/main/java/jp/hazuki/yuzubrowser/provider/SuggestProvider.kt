@@ -366,7 +366,7 @@ class SuggestProvider : ContentProvider() {
             sUriMatcher.addURI(AUTHORITY, "normal/*", TYPE_NORMAL_ALL)
         }
 
-        private val yuzuPrefix = arrayOf("yuzu:bookmarks", "yuzu:debug", "yuzu:downloads", "yuzu:history", "yuzu:home", "yuzu:readItLater", "yuzu:resBlock", "yuzu:settings", "yuzu:speeddial")
+        private val yuzuPrefix = arrayOf("bsw:bookmarks", "bsw:debug", "bsw:downloads", "bsw:history", "bsw:home", "bsw:readItLater", "bsw:resBlock", "bsw:settings", "bsw:speeddial")
 
         private const val COL_ID = 0
         //private static final int COL_TEXT_1 = 1;

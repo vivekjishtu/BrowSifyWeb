@@ -9,7 +9,7 @@
   "res_interrupt": "资源拦截设置",
   "res_interrupt_info": "根据地址对图像、外部脚本等内容进行拦截。<br>可用于进行广告拦截",
   "home_page": "主页",
-  "home_page_info": "在开启新标签页时打开指定地址。<br>默认为快捷访问（yuzu:speeddial）",
+  "home_page_info": "在开启新标签页时打开指定地址。<br>默认为快捷访问（bsw:speeddial）",
   "download": "下载行为",
   "download_type_info": "可更改下载文件等内容时的行为。",
   "download_type_none": "不进行操作",

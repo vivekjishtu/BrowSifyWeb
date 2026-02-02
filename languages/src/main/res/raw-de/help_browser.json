@@ -9,7 +9,7 @@
   "res_interrupt": "Ressourcen-Interrupt-Einstellungen",
   "res_interrupt_info": "Überprüft die URL und blockiert Bilder, externe Skripte, etc.<br>Es kann auch für verwendet werden, um Werbung zu blockieren.",
   "home_page": "Startseite",
-  "home_page_info": "öffnet die angegebene URL beim Öffnen eines neuen Reiters etc.<br>Die Voreinstellung ist Schnellwahl (yuzu:speeddial).",
+  "home_page_info": "öffnet die angegebene URL beim Öffnen eines neuen Reiters etc.<br>Die Voreinstellung ist Schnellwahl (bsw:speeddial).",
   "download": "Download Aktion",
   "download_type_info": "Sie können das Verhalten beim Herunterladen von Dateien usw. ändern.",
   "download_type_none": "Nichts unternehmen",

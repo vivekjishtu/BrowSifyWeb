@@ -61,7 +61,7 @@ public class MainTabData extends TabData {
         iconReceived = false;
         alertMode = ALERT_ALLOWED;
         if (AppPrefs.toolbar_show_favicon.get()) {
-            if (url.startsWith("yuzu:")) {
+            if (url.startsWith("bsw:")) {
                 removeIcon();
             } else {
                 setIcon(loadingIcon);
@@ -81,7 +81,7 @@ public class MainTabData extends TabData {
 //            if (AppPrefs.pause_web_tab_change.get())
 //                mWebView.onPause();
         }
-        if (AppPrefs.toolbar_show_favicon.get() && !url.startsWith("yuzu:") && !iconReceived) {
+        if (AppPrefs.toolbar_show_favicon.get() && !url.startsWith("bsw:") && !iconReceived) {
             setIcon(context.getDrawable(R.drawable.ic_page_white_24px));
         }
     }
@@ -111,7 +111,7 @@ public class MainTabData extends TabData {
             setText(url);
 
         if (originalUrl != null && AppPrefs.toolbar_show_favicon.get()) {
-            if (originalUrl.startsWith("yuzu:")) {
+            if (originalUrl.startsWith("bsw:")) {
                 removeIcon();
             } else {
                 setIcon(new BitmapDrawable(context.getResources(), faviconManager.get(originalUrl)));

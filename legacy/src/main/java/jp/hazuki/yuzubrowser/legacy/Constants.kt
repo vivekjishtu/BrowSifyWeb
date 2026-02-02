@@ -30,7 +30,7 @@ class Constants {
         const val EXTRA_MODE_ORIENTATION = "$INTENT_EXTRA_PREFIX.orientation"
         const val EXTRA_URL = "$INTENT_EXTRA_PREFIX.url"
         const val EXTRA_USER_AGENT = "$INTENT_EXTRA_PREFIX.user_agent"
-        const val EXTRA_OPEN_FROM_YUZU = "$INTENT_EXTRA_PREFIX.open.from.yuzu"
+        const val EXTRA_OPEN_FROM_YUZU = "$INTENT_EXTRA_PREFIX.open.from.bsw"
 
         const val ACTION_FINISH = "$INTENT_ACTION_PREFIX.finish"
         const val ACTION_NEW_TAB = "$INTENT_ACTION_PREFIX.newTab"

@@ -25,7 +25,7 @@ import jp.hazuki.yuzubrowser.core.utility.utils.getMimeType
 import java.io.IOException
 
 fun Uri.isHelpUrl(): Boolean {
-    return scheme == "yuzu" && host == "help"
+    return scheme == "bsw" && host == "help"
 }
 
 fun Uri.getHelpResponse(context: Context): WebResourceResponse? {
@@ -58,4 +58,4 @@ fun Uri.getHelpResponse(context: Context): WebResourceResponse? {
     return null
 }
 
-const val BROWSER_HELP_URL = "yuzu://help/index.html"
+const val BROWSER_HELP_URL = "bsw://help/index.html"

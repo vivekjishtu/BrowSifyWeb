@@ -25,7 +25,7 @@ import jp.hazuki.yuzubrowser.ui.settings.AppPrefs;
 public class AppUtils {
 
     public static String getVersionDeviceInfo(Context context) {
-        return "Yuzu " + ContextExtensionsKt.getVersionName(context) + "/" +
+        return "BSW " + ContextExtensionsKt.getVersionName(context) + "/" +
             Build.MANUFACTURER + "/" +
             Build.MODEL + "/" +
             Build.VERSION.RELEASE + "/" +

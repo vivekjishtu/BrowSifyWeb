@@ -110,7 +110,7 @@ class AbpUpdateService : JobIntentService() {
 
     private suspend fun updateInternal(entity: AbpEntity, forceUpdate: Boolean = false): Boolean {
         return when {
-            entity.url == "yuzu://adblock/filter" -> updateAssets(entity)
+            entity.url == "bsw://adblock/filter" -> updateAssets(entity)
             entity.url.startsWith("http") -> updateHttp(entity, forceUpdate)
             entity.url.startsWith("file") -> updateFile(entity)
             else -> false

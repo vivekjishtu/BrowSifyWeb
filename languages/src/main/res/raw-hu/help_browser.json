@@ -9,7 +9,7 @@
   "res_interrupt": "Forrás megszakítások beállításai",
   "res_interrupt_info": "URL ellenőrzés vagy képek blokkolása, külső scriptek, stb.<br>Relámszűrőként is használható",
   "home_page": "Kezdőlap",
-  "home_page_info": "megnyitja a beállított URL-t új lap nyitásakor, stb.<br>Alapértelmezésként a gyorsindító(yuzu:speeddial)",
+  "home_page_info": "megnyitja a beállított URL-t új lap nyitásakor, stb.<br>Alapértelmezésként a gyorsindító(bsw:speeddial)",
   "download": "Letöltési művelet",
   "download_type_info": "Beállíthatod, hogy hogyan viselkedjen a program fájlok letöltésekor",
   "download_type_none": "Ne csináljon semmit",

@@ -23,10 +23,10 @@ interface WebViewUtility {
     fun String.shouldLoadSameTabAuto() = regionMatches(0, "about:", 0, 6, true)
 
     fun String.shouldLoadSameTabScheme() = regionMatches(0, "intent:", 0, 7, true)
-            || regionMatches(0, "yuzu:", 0, 5, true)
+            || regionMatches(0, "bsw:", 0, 5, true)
             && isSpeedDial()
 
-    fun String.isSpeedDial() = equals("yuzu:speeddial", true)
+    fun String.isSpeedDial() = equals("bsw:speeddial", true)
 
     fun String.shouldLoadSameTabUser() = regionMatches(0, "javascript:", 0, 11, true)
 

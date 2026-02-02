@@ -69,7 +69,7 @@ public class AppPrefs {
     public static final BooleanContainer javascript = new BooleanContainer("javascript", true);
     public static final BooleanContainer web_db = new BooleanContainer("web_db", true);
     public static final BooleanContainer web_dom_db = new BooleanContainer("web_dom_db", true);
-    public static final StringContainer home_page = new StringContainer("home_page", "yuzu:speeddial");
+    public static final StringContainer home_page = new StringContainer("home_page", "bsw:speeddial");
     public static final BooleanContainer load_overview = new BooleanContainer("load_overview", true);
     public static final BooleanContainer web_wideview = new BooleanContainer("web_wideview", true);
     public static final IntContainer web_customview_oritentation = new IntContainer("web_customview_oritentation", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

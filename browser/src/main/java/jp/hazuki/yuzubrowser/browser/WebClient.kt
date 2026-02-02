@@ -483,7 +483,7 @@ class WebClient(
         }
 
         override fun onReceivedError(view: CustomWebView, errorCode: Int, description: CharSequence, url: Uri) {
-            if (errorCode == ERROR_UNSUPPORTED_SCHEME && url.toString().equals("yuzu:speeddial", true)) {
+            if (errorCode == ERROR_UNSUPPORTED_SCHEME && url.toString().equals("bsw:speeddial", true)) {
                 view.view.postDelayed({ view.reload() }, 50)
             }
         }
@@ -516,7 +516,7 @@ class WebClient(
         }
 
         override fun shouldInterceptRequest(web: CustomWebView, request: WebResourceRequest): WebResourceResponse? {
-            if ("yuzu".equals(request.url.scheme, ignoreCase = true)) {
+            if ("bsw".equals(request.url.scheme, ignoreCase = true)) {
                 if (request.url.isHelpUrl()) {
                     return request.url.getHelpResponse(activity)
                 }
@@ -580,7 +580,7 @@ class WebClient(
     fun checkLoadPagePatternMatch(tab: MainTabData, url: String?, handleOpenInBrowser: Boolean): Boolean {
         if (url == null) return false
 
-        if (url.startsWith("yuzu://help")) {
+        if (url.startsWith("bsw://help")) {
             if (!tab.mWebView.webSettings.javaScriptEnabled) {
                 if (tab.resetAction == null) {
                     tab.resetAction = WebSettingResetAction(tab)
@@ -606,7 +606,7 @@ class WebClient(
         var normalSettings = true
         var changeSetting = false
 
-        if (url.startsWith("yuzu://help")) {
+        if (url.startsWith("bsw://help")) {
             normalSettings = false
             changeSetting = true
         }
@@ -917,7 +917,7 @@ class WebClient(
                     Logger.e(TAG, "Can't resolve intent://", e)
                 }
             }
-            "yuzu" -> {
+            "bsw" -> {
                 var action = uri.schemeSpecificPart
 
                 val intent: Intent
@@ -957,7 +957,7 @@ class WebClient(
                     }
                     "speeddial" -> return false
                     "home" -> {
-                        if ("yuzu:home".equals(AppPrefs.home_page.get(), ignoreCase = true) || "yuzu://home".equals(AppPrefs.home_page.get(), ignoreCase = true)) {
+                        if ("bsw:home".equals(AppPrefs.home_page.get(), ignoreCase = true) || "bsw://home".equals(AppPrefs.home_page.get(), ignoreCase = true)) {
                             AppPrefs.home_page.set("about:blank")
                             AppPrefs.commit(activity, AppPrefs.home_page)
                         }
@@ -1200,7 +1200,7 @@ class WebClient(
     }
 
     fun String.isSpeedDialUrl(): Boolean {
-        return "yuzu:speeddial".equals(this, ignoreCase = true)
+        return "bsw:speeddial".equals(this, ignoreCase = true)
     }
 
     companion object {
