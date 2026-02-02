@@ -66,13 +66,7 @@ TL;DR
 
 Details are in [Contributing.md](https://github.com/hazuki0x0/YuzuBrowser/blob/dev/Contributing.md)
 
-## Build
-
-    $ git clone https://github.com/Hazuki0x0/YuzuBrowser.git
-    $ cd YuzuBrowser
-    $ ./gradlew build
-
-## License 
+## License BSW Browser
     Copyright (C) 2024 Vivek Jishtu
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,7 +80,7 @@ Details are in [Contributing.md](https://github.com/hazuki0x0/YuzuBrowser/blob/d
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-    
+
 ## License Yuzu Browser
     Copyright (C) 2017-2021 Hazuki
 

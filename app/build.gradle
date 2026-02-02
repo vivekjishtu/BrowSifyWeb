@@ -82,7 +82,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            manifestPlaceholders = [crashlyticsCollectionEnabled:"true"]
+            manifestPlaceholders = [crashlyticsCollectionEnabled:"false"]
             lintOptions {
                 disable 'MissingTranslation', 'GoogleAppIndexingWarning', 'ClickableViewAccessibility'
             }

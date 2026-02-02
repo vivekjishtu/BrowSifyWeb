@@ -51,7 +51,7 @@
         android:key="send_usage"
         android:title="@string/pref_send_usage"
         android:summary="@string/pref_send_usage_summary"
-        android:defaultValue="true"
+        android:defaultValue="false"
         app:iconSpaceReserved="false" />
 
 </PreferenceScreen>
