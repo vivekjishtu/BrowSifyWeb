@@ -38,10 +38,7 @@ import javax.inject.Inject
 class SearchUrlListFragment : Fragment(), SearchSettingDialog.OnUrlEditedListener, RecyclerMenu.OnRecyclerMenuListener, DeleteDialogCompat.OnDelete, SearchUrlAdapter.OnSearchUrlClickListener {
 
     private lateinit var binding: SearchSettingsFragmentBinding
-    private val viewModel by viewModels<SearchSettingsViewModel>(factoryProducer = { factory })
-
-    @Inject
-    internal lateinit var factory: SearchSettingsViewModel.Factory
+    private val viewModel by viewModels<SearchSettingsViewModel>()
 
     @Inject
     internal lateinit var faviconManager: FaviconManager

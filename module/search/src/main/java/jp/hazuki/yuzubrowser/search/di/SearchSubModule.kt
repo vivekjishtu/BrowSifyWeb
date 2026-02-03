@@ -30,7 +30,6 @@ import jp.hazuki.yuzubrowser.search.domain.ISearchUrlRepository
 import jp.hazuki.yuzubrowser.search.domain.ISuggestRepository
 import jp.hazuki.yuzubrowser.search.domain.usecase.SearchSettingsViewUseCase
 import jp.hazuki.yuzubrowser.search.domain.usecase.SearchViewUseCase
-import jp.hazuki.yuzubrowser.search.presentation.settings.SearchSettingsViewModel
 import jp.hazuki.yuzubrowser.search.repository.SearchUrlManager
 import jp.hazuki.yuzubrowser.search.repository.SuggestRepository
 import jp.hazuki.yuzubrowser.ui.provider.ISuggestProvider
@@ -73,11 +72,4 @@ class SearchSubModule {
         return SearchSettingsViewUseCase(searchUrlRepository)
     }
 
-    @Provides
-    internal fun provideSearchSettingsViewModelFactory(
-        application: Application,
-        useCase: SearchSettingsViewUseCase,
-    ): SearchSettingsViewModel.Factory {
-        return SearchSettingsViewModel.Factory(application, useCase)
-    }
 }

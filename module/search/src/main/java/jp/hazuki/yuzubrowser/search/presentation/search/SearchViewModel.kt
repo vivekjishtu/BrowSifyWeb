@@ -21,7 +21,6 @@ import androidx.databinding.ObservableInt
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hazuki.yuzubrowser.core.utility.utils.ui
 import jp.hazuki.yuzubrowser.search.domain.usecase.SearchViewUseCase
@@ -114,14 +113,4 @@ internal class SearchViewModel @Inject constructor(
 
     class FinishResult(val query: String, val url: String)
 
-    class Factory(
-        private val application: Application,
-        private val useCase: SearchViewUseCase
-    ) :ViewModelProvider.AndroidViewModelFactory(){
-
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return SearchViewModel(application, useCase) as T
-        }
-    }
 }

@@ -19,15 +19,16 @@ package jp.hazuki.yuzubrowser.search.presentation.settings
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hazuki.yuzubrowser.search.domain.usecase.SearchSettingsViewUseCase
 import jp.hazuki.yuzubrowser.search.model.provider.SearchUrl
 import jp.hazuki.yuzubrowser.ui.widget.recycler.RecyclerMenu
+import javax.inject.Inject
 
-internal class SearchSettingsViewModel(
+@HiltViewModel
+internal class SearchSettingsViewModel @Inject constructor(
     application: Application,
     private val useCase: SearchSettingsViewUseCase
 ) : AndroidViewModel(application), RecyclerMenu.OnRecyclerMoveListener {
@@ -117,15 +118,4 @@ internal class SearchSettingsViewModel(
     }
 
     class RemovedItem(val index: Int, val item: SearchUrl)
-
-    class Factory(
-        private val application: Application,
-        private val useCase: SearchSettingsViewUseCase
-    ) :ViewModelProvider.AndroidViewModelFactory(){
-
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return SearchSettingsViewModel(application, useCase) as T
-        }
-    }
 }
