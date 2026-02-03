@@ -30,13 +30,12 @@ class FileEditFragment : Fragment() {
 
     private lateinit var binding: FragmentDebugFileEditBinding
 
-    private val viewModel by viewModels<FileEditViewModel> {
-        FileEditViewModel.Factory(requireArguments().getSerializable(ARG_FILE) as File)
-    }
+    private val viewModel by viewModels<FileEditViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        viewModel.init(requireArguments().getSerializable(ARG_FILE) as File)
     }
 
     override fun onCreateView(

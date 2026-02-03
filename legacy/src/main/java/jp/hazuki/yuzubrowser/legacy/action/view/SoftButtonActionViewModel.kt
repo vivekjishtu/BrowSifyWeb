@@ -16,22 +16,12 @@
 
 package jp.hazuki.yuzubrowser.legacy.action.view
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import jp.hazuki.yuzubrowser.legacy.action.ActionIconMap
 import jp.hazuki.yuzubrowser.legacy.action.ActionNameMap
 
-class SoftButtonActionViewModel(
-    val actionNames: ActionNameMap,
-    val actionIcons: ActionIconMap,
-) : ViewModel() {
-    class Factory(
-        private val actionNames: ActionNameMap,
-        private val actionIcons: ActionIconMap,
-    ) : ViewModelProvider.AndroidViewModelFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return SoftButtonActionViewModel(actionNames, actionIcons) as T
-        }
-    }
+class SoftButtonActionViewModel(application: Application) : AndroidViewModel(application) {
+    val actionNames: ActionNameMap = ActionNameMap(application.resources)
+    val actionIcons: ActionIconMap = ActionIconMap(application.resources)
 }

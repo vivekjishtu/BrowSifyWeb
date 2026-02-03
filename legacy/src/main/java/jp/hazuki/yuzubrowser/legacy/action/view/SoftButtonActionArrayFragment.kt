@@ -43,12 +43,7 @@ import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
 
 class SoftButtonActionArrayFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDialogCompat.OnDelete {
 
-    private val activityViewModel by activityViewModels<SoftButtonActionViewModel> {
-        SoftButtonActionViewModel.Factory(
-            ActionNameMap(resources),
-            ActionIconMap(resources)
-        )
-    }
+    private val activityViewModel by activityViewModels<SoftButtonActionViewModel>()
 
     private var mActionType: Int = 0
     private var mActionId: Int = 0

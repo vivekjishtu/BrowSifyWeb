@@ -16,24 +16,26 @@
 
 package jp.hazuki.yuzubrowser.legacy.debug.file
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import jp.hazuki.yuzubrowser.core.lifecycle.KotlinLiveData
 import java.io.File
 import java.io.IOException
 
-class FileEditViewModel(
-    private val file: File
-) : ViewModel() {
+class FileEditViewModel(application: Application) : AndroidViewModel(application) {
     val text = KotlinLiveData("")
+    private var file: File? = null
 
-    init {
+    fun init(file: File) {
+        if (this.file?.path == file.path) return
+        this.file = file
         load()
     }
 
     private fun load() {
         try {
-            text *= file.readText()
+            val target = file ?: return
+            text *= target.readText()
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -41,16 +43,10 @@ class FileEditViewModel(
 
     fun save() {
         try {
-            file.writeText(text.value)
+            val target = file ?: return
+            target.writeText(text.value)
         } catch (e: IOException) {
             e.printStackTrace()
-        }
-    }
-
-    class Factory(val file: File) :ViewModelProvider.AndroidViewModelFactory(){
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return FileEditViewModel(file) as T
         }
     }
 }

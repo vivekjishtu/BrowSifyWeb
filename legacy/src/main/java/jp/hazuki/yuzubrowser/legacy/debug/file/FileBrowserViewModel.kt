@@ -16,14 +16,14 @@
 
 package jp.hazuki.yuzubrowser.legacy.debug.file
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import jp.hazuki.yuzubrowser.core.lifecycle.KotlinLiveData
 import java.io.File
 
-class FileBrowserViewModel(
-    val root: File
-) : ViewModel() {
+class FileBrowserViewModel(application: Application) : AndroidViewModel(application) {
+    var root: File = File(application.applicationInfo.dataDir)
+        private set
 
     val currentRoot = KotlinLiveData(root)
 
@@ -33,7 +33,9 @@ class FileBrowserViewModel(
 
     var exportFile: File? = null
 
-    init {
+    fun init(root: File) {
+        if (this.root == root) return
+        this.root = root
         setDir(root)
     }
 
@@ -56,14 +58,5 @@ class FileBrowserViewModel(
 
     fun reload() {
         setDir(currentRoot.value)
-    }
-
-    class Factory(
-        private val root: File
-    ) :ViewModelProvider.AndroidViewModelFactory(){
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return FileBrowserViewModel(root) as T
-        }
     }
 }

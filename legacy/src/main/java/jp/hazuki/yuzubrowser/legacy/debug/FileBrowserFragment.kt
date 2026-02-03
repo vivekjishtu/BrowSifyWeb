@@ -49,14 +49,13 @@ import java.io.IOException
 class FileBrowserFragment : Fragment(), FileAdapter.OnFileClickListener,
     EditTextDialogFragment.OnTextChangeCallback {
 
-    private val viewModel by viewModels<FileBrowserViewModel> {
-        val file = arguments?.getSerializable(ARG_FILE) as File?
-        FileBrowserViewModel.Factory(file ?: File(requireContext().applicationInfo.dataDir))
-    }
+    private val viewModel by viewModels<FileBrowserViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        val file = arguments?.getSerializable(ARG_FILE) as File?
+        viewModel.init(file ?: File(requireContext().applicationInfo.dataDir))
     }
 
     override fun onCreateView(

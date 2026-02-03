@@ -34,12 +34,7 @@ import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionManager
 import jp.hazuki.yuzubrowser.legacy.databinding.FragmentSoftButtonActionDetailBinding
 
 class SoftButtonActionDetailFragment : Fragment() {
-    private val activityViewModel by activityViewModels<SoftButtonActionViewModel> {
-        SoftButtonActionViewModel.Factory(
-            ActionNameMap(resources),
-            ActionIconMap(resources)
-        )
-    }
+    private val activityViewModel by activityViewModels<SoftButtonActionViewModel>()
 
     private val viewModel by viewModels<SoftButtonActionDetailViewModel>()
 
