@@ -52,13 +52,13 @@ class SpeedDialHtml(context: Context) {
             val builder = StringBuilder(400)
 
             if (!AppPrefs.speeddial_show_header.get())
-                builder.append(".browserName{display:none}")
+                builder.append(".browserName { display:none }")
 
             if (!AppPrefs.speeddial_show_search.get())
-                builder.append("#searchBox{display:none}")
+                builder.append("#searchBox { display:none }")
 
             if (!AppPrefs.speeddial_show_icon.get())
-                builder.append(".box img{display:none;}")
+                builder.append(".grid-item img {display:none;}")
 
             // portrait
             val pColumn = AppPrefs.speeddial_column.get()
@@ -100,15 +100,15 @@ class SpeedDialHtml(context: Context) {
         builder.append(start)
 
         for ((id, url, title, updateTime) in index) {
-            builder.append("<div class=\"box\"><a href=\"")
-                    .append(url)
-                    .append("\"><img src=\"bsw:speeddial/img/")
+            builder.append("<div class=\"grid-item\"><a href=\"")
+                .append(url)
+                .append("\"><img class=\"favicon\" src=\"bsw:speeddial/img/")
                 .append(id)
                 .append("?")
                 .append(updateTime)
-                .append("\" /><div class=\"name\">")
+                .append("\" /><span>")
                 .append(HtmlUtils.sanitize(title))
-                .append("</div></a></div>")
+                .append("</span></a></div>")
         }
 
         builder.append(getResourceString(context, R.raw.speeddial_end))
