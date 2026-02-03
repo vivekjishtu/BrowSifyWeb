@@ -16,11 +16,24 @@
   -->
 
 <resources>
-    <color name="tab_text_color_normal">#FF999999</color>
-    <color name="tab_text_color_selected">#FFEEEEEE</color>
+    <color name="chrome_tab_strip_bg">#F1F3F4</color>
+    <color name="chrome_tab_inactive_bg">@color/chrome_tab_strip_bg</color>
+    <color name="chrome_tab_active_bg">#FFFFFF</color>
+    <color name="chrome_tab_border">#DADCE0</color>
+    <color name="chrome_text_primary">#202124</color>
+    <color name="chrome_text_secondary">#5F6368</color>
+    <color name="chrome_icon_tint">#5F6368</color>
+    <color name="chrome_card_bg">#FFFFFF</color>
+    <color name="chrome_card_border">#DADCE0</color>
+    <color name="chrome_ripple">#1F202124</color>
+    <color name="chrome_button_bg">#E8EAED</color>
+    <color name="chrome_button_bg_pressed">#DADCE0</color>
+
+    <color name="tab_text_color_normal">@color/chrome_text_secondary</color>
+    <color name="tab_text_color_selected">@color/chrome_text_primary</color>
     <color name="tab_text_color_locked">#FF57FF2D</color>
     <color name="tab_text_color_pinning">#6ae1ff</color>
-    <color name="toolbar_text_color">#FFEEEEEE</color>
+    <color name="toolbar_text_color">@color/chrome_text_primary</color>
     <color name="web_gesture_color">#48FFFF00</color>
     <color name="add_gesture_color">#FFFFFF00</color>
     <color name="qc_normal">#E02A96BC</color>
@@ -35,7 +48,7 @@
     <color name="deep_gray">#222222</color>
     <color name="white">#FFFFFF</color>
     <color name="ripple">#42ffffff</color>
-    <color name="tab_list_background">#f5222222</color>
+    <color name="tab_list_background">@color/chrome_tab_strip_bg</color>
     <color name="white_gray">#e6e6e6</color>
     <color name="scroll_bar">#aa646464</color>
     <color name="selected_overlay">#800d87c6</color>

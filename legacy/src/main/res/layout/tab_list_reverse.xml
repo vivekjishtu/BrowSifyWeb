@@ -5,7 +5,7 @@
               android:layout_height="match_parent"
               android:background="@color/tab_list_background"
               android:orientation="vertical"
-              android:theme="@style/ThemeOverlay.AppCompat.Dark">
+              android:theme="@style/ThemeOverlay.AppCompat.Light">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -38,6 +38,7 @@
             android:id="@+id/newTabButton"
             android:paddingStart="30dp"
             android:paddingEnd="30dp"
+            android:tint="@color/chrome_icon_tint"
             style="?android:attr/buttonBarButtonStyle" />
     </LinearLayout>
 

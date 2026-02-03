@@ -28,7 +28,7 @@
     </style>
 
     <style name="ToolbarStyle">
-        <item name="android:background">@color/deep_gray</item>
+        <item name="android:background">?attr/colorPrimary</item>
         <item name="android:clickable">true</item>
     </style>
 

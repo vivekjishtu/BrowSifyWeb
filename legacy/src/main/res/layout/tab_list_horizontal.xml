@@ -7,7 +7,7 @@
     android:gravity="bottom"
     android:orientation="vertical"
     android:showDividers="middle"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:theme="@style/ThemeOverlay.AppCompat.Light">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -35,6 +35,7 @@
             android:contentDescription="@string/new_tab"
             android:paddingEnd="30dp"
             android:paddingStart="30dp"
-            android:src="@drawable/ic_add_box_white_24dp" />
+            android:src="@drawable/ic_add_box_white_24dp"
+            android:tint="@color/chrome_icon_tint" />
     </LinearLayout>
 </LinearLayout>

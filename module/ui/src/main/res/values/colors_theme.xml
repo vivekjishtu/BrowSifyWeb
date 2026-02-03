@@ -16,21 +16,21 @@
   -->
 
 <resources>
-    <color name="primary">#121212</color>
-    <color name="primary_dark">#101010</color>
+    <color name="primary">#202124</color>
+    <color name="primary_dark">#1A1A1A</color>
     <bool name="isLightStatusBar">false</bool>
-    <color name="primary_light">#515658</color>
-    <color name="accent">#33b5e5</color>
-    <color name="primary_text">#FFFFFF</color>
-    <color name="secondary_text">#B3FFFFFF</color>
-    <color name="icons">#FFFFFF</color>
-    <color name="divider">#BDBDBD</color>
-    <color name="content_normal">#bfbfbf</color>
-    <color name="iconColor">@color/white_gray</color>
-    <color name="urlBarBoxColor">@color/dark_box</color>
-    <color name="urlBarBoxBorderColor">@color/dark_border</color>
-    <color name="progressBarBackground">#47bfbfbf</color>
-    <color name="background">#303030</color>
-    <color name="browserBackground">#000000</color>
-    <color name="actionBarIconColor">#CCCCCC</color>
+    <color name="primary_light">#3C4043</color>
+    <color name="accent">#8AB4F8</color>
+    <color name="primary_text">#E8EAED</color>
+    <color name="secondary_text">#9AA0A6</color>
+    <color name="icons">#E8EAED</color>
+    <color name="divider">#3C4043</color>
+    <color name="content_normal">#9AA0A6</color>
+    <color name="iconColor">#E8EAED</color>
+    <color name="urlBarBoxColor">#303134</color>
+    <color name="urlBarBoxBorderColor">#5F6368</color>
+    <color name="progressBarBackground">#338AB4F8</color>
+    <color name="background">#202124</color>
+    <color name="browserBackground">#202124</color>
+    <color name="actionBarIconColor">#E8EAED</color>
 </resources>
