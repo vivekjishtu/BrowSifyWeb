@@ -69,6 +69,7 @@ import jp.hazuki.yuzubrowser.legacy.resblock.ResourceChecker
 import jp.hazuki.yuzubrowser.legacy.settings.activity.MainSettingsActivity
 import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDialAsyncManager
 import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDialHtml
+import jp.hazuki.yuzubrowser.legacy.speeddial.view.SpeedDialSettingActivity
 import jp.hazuki.yuzubrowser.legacy.tab.manager.MainTabData
 import jp.hazuki.yuzubrowser.legacy.toolbar.sub.GeolocationPermissionToolbar
 import jp.hazuki.yuzubrowser.legacy.userjs.UserScript
@@ -956,6 +957,7 @@ class WebClient(
                         return true
                     }
                     "speeddial" -> return false
+                    "speeddial-edit" -> intent = Intent(activity, SpeedDialSettingActivity::class.java)
                     "home" -> {
                         if ("bsw:home".equals(AppPrefs.home_page.get(), ignoreCase = true) || "bsw://home".equals(AppPrefs.home_page.get(), ignoreCase = true)) {
                             AppPrefs.home_page.set("about:blank")

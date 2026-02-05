@@ -1,4 +1,9 @@
-
+        <div class="grid-item">
+            <a href="bsw:speeddial-edit">
+                <img class="favicon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48cmVjdCB4PSI0IiB5PSI0IiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjOTRhM2I4Ii8+PHJlY3QgeD0iMTkiIHk9IjQiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiM5NGEzYjgiLz48cmVjdCB4PSIzNCIgeT0iNCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsb09mZmxpbmU9IiM5NGEzYjgiIGZpbGw9IiM5NGEzYjgiLz48cmVjdCB4PSI0IiB5PSIxOSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjE5IiB5PSIxOSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjM0IiB5PSIxOSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjQiIHk9IjM0IiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjOTRhM2I4Ii8+PHJlY3QgeD0iMTkiIHk9IjM0IiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjOTRhM2I4Ii8+PHJlY3QgeD0iMzQiIHk9IjM0IiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjMTBiOTgxIi8+PHBhdGggZD0iTTM5IDM0djEwTTM0IDM5aDEwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+" alt="Speeddial Settings" />
+                <span>Shortcuts</span>
+            </a>
+        </div>
  </div>
     <footer> <a href="bsw:history">History</a> <a href="bsw:bookmarks">Bookmarks</a> <a href="bsw:settings">Settings</a> </footer>
 </body>
