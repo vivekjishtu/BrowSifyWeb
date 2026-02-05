@@ -19,6 +19,8 @@ package jp.hazuki.yuzubrowser.legacy.toolbar.main
 import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import jp.hazuki.yuzubrowser.core.utility.extensions.convertDpToPx
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionController
@@ -99,15 +101,41 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
                     setTypeUrl(false)
                     text = data.title
                     gravity = Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL
+                    setCompoundDrawablesRelative(null, null, null, null)
                 }
             } else {
                 centerUrlButton.run {
                     setTypeUrl(true)
                     text = data.url.decodePunyCodeUrl()
                     gravity = Gravity.START or Gravity.CENTER_VERTICAL
+                    updateSecurityIcon(data.url)
                 }
             }
         }
+    }
+
+    private fun updateSecurityIcon(url: String?) {
+        val iconRes = when {
+            url == null -> null
+            url.startsWith("https://", ignoreCase = true) -> R.drawable.ic_lock_outline_white_24px
+            url.startsWith("http://", ignoreCase = true) -> R.drawable.ic_lock_open_white_24px
+            else -> null
+        }
+
+        if (iconRes == null) {
+            centerUrlButton.setCompoundDrawablesRelative(null, null, null, null)
+            return
+        }
+
+        val sizePx = context.convertDpToPx(16)
+        val drawable = ContextCompat.getDrawable(context, iconRes)?.mutate()
+        if (drawable != null) {
+            DrawableCompat.setTint(drawable, centerUrlButton.currentTextColor)
+            drawable.setBounds(0, 0, sizePx, sizePx)
+        }
+
+        centerUrlButton.compoundDrawablePadding = context.convertDpToPx(6)
+        centerUrlButton.setCompoundDrawablesRelative(drawable, null, null, null)
     }
 
 }

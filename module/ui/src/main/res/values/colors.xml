@@ -42,4 +42,9 @@
     <color name="light_border">#bfbfbf</color>
     <color name="dark_border">#000000</color>
     <color name="dark_box">#626262</color>
+
+    <color name="chrome_omnibox_bg_light">#F1F3F4</color>
+    <color name="chrome_omnibox_border_light">#C4C7C5</color>
+    <color name="chrome_omnibox_bg_dark">#202124</color>
+    <color name="chrome_omnibox_border_dark">#3C4043</color>
 </resources>

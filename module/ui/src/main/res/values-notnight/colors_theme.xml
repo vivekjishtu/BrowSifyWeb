@@ -27,8 +27,8 @@
     <color name="divider">#474747</color>
     <color name="content_normal">#848484</color>
     <color name="iconColor">@color/deep_gray</color>
-    <color name="urlBarBoxColor">@color/white</color>
-    <color name="urlBarBoxBorderColor">@color/light_border</color>
+    <color name="urlBarBoxColor">@color/chrome_omnibox_bg_light</color>
+    <color name="urlBarBoxBorderColor">@color/chrome_omnibox_border_light</color>
     <color name="progressBarBackground">#47272727</color>
     <color name="background">#FFFFFF</color>
     <color name="browserBackground">#FFFFFF</color>

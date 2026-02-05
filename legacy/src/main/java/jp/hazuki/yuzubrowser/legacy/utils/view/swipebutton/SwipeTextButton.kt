@@ -102,12 +102,11 @@ open class SwipeTextButton @JvmOverloads constructor(context: Context, attrs: At
     override fun setText(text: CharSequence?, type: BufferType) {
         content = text ?: ""
         contentDescription = content
-        updateVisibleText(measuredWidth - paddingLeft - paddingRight)
+        updateVisibleText(getAvailableTextWidth(measuredWidth))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val availWidth = MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight
-        updateVisibleText(availWidth)
+        updateVisibleText(getAvailableTextWidth(MeasureSpec.getSize(widthMeasureSpec)))
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
@@ -127,5 +126,12 @@ open class SwipeTextButton @JvmOverloads constructor(context: Context, attrs: At
 
             super.setText(visibleText, BufferType.SPANNABLE)
         }
+    }
+
+    private fun getAvailableTextWidth(totalWidth: Int): Int {
+        val startDrawable = compoundDrawablesRelative[0]
+        val drawableWidth = startDrawable?.bounds?.width() ?: 0
+        val drawablePadding = if (drawableWidth > 0) compoundDrawablePadding else 0
+        return totalWidth - paddingLeft - paddingRight - drawableWidth - drawablePadding
     }
 }
