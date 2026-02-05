@@ -19,10 +19,13 @@ package jp.hazuki.yuzubrowser.legacy.toolbar.main
 import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import jp.hazuki.yuzubrowser.core.utility.extensions.convertDpToPx
 import jp.hazuki.yuzubrowser.legacy.R
+import jp.hazuki.yuzubrowser.legacy.action.SingleAction
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionController
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionIconManager
 import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionArrayManager
@@ -37,6 +40,7 @@ import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 abstract class UrlBarBase(context: Context, controller: ActionController, iconManager: ActionIconManager, layout: Int, request_callback: RequestCallback) : ToolbarBase(context, AppPrefs.toolbar_url, request_callback) {
     private val mLeftButtonController: ButtonToolbarController
     private val mRightButtonController: ButtonToolbarController
+    private val actionController: ActionController = controller
     protected val centerUrlButton: SwipeTextButton
 
     init {
@@ -52,6 +56,15 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
 
         centerUrlButton.setActionData(softbtnManager.btn_url_center, controller, iconManager)
         ButtonToolbarController.settingButtonSize(centerUrlButton, toolbarSizeY)
+        centerUrlButton.setOnTouchListener { v, event ->
+            if (isStartDrawableHit(centerUrlButton, event)) {
+                if (event.action == MotionEvent.ACTION_UP) {
+                    actionController.run(SingleAction.makeInstance(SingleAction.PAGE_INFO), null, v)
+                }
+                return@setOnTouchListener true
+            }
+            false
+        }
 
         addButtons()
     }
@@ -136,6 +149,27 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
 
         centerUrlButton.compoundDrawablePadding = context.convertDpToPx(6)
         centerUrlButton.setCompoundDrawablesRelative(drawable, null, null, null)
+    }
+
+    private fun isStartDrawableHit(view: SwipeTextButton, event: MotionEvent): Boolean {
+        val drawable = view.compoundDrawablesRelative[0] ?: return false
+        val drawableWidth = drawable.bounds.width()
+        if (drawableWidth == 0) return false
+
+        val paddingStart = view.paddingStart
+        val paddingEnd = view.paddingEnd
+        val drawablePadding = view.compoundDrawablePadding
+        val x = event.x
+
+        return if (view.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+            val start = view.width - paddingEnd - drawableWidth
+            val end = view.width - paddingEnd + drawablePadding
+            x >= start && x <= end
+        } else {
+            val start = paddingStart
+            val end = paddingStart + drawableWidth + drawablePadding
+            x >= start && x <= end
+        }
     }
 
 }
