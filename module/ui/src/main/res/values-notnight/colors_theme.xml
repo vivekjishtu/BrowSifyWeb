@@ -33,4 +33,14 @@
     <color name="background">#FFFFFF</color>
     <color name="browserBackground">#FFFFFF</color>
     <color name="actionBarIconColor">#757575</color>
+
+    <color name="tab_text_color_normal">#5F6368</color>
+    <color name="tab_text_color_selected">#202124</color>
+
+    <color name="toolbar_tab_bg">#888888</color>
+    <color name="tab_strip_bg">@android:color/transparent</color> <!-- #E8EAED -->
+    <color name="tab_bg_normal">#C5C5C5</color>
+    <color name="tab_bg_selected">#DADCE0</color> <!-- #FFFFFF-->
+    <color name="tab_border_normal">#BDBDBD</color>
+    <color name="tab_border_selected">#DADCE0</color> <!-- 3C4043 -->
 </resources>

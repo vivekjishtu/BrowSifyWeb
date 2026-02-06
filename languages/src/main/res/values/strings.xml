@@ -16,6 +16,7 @@
 
 <resources>
     <string name="browser_app_name">Browsify</string>
+    <string name="omnibox_placeholder">Search or type URL</string>
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="reset">Reset</string>

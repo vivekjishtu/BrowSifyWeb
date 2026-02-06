@@ -750,11 +750,20 @@ class ActionExecutor(
             }
             SingleAction.RESTORE_TAB -> controller.restoreTab()
             SingleAction.REPLICATE_TAB -> controller.openInNewTab(controller.getTab(actionTarget))
-            SingleAction.SHOW_SEARCHBOX -> controller.showSearchBox(
-                controller.getTab(actionTarget).url ?: "",
-                actionTarget,
-                (action as ShowSearchBoxAction).openNewTabMode,
-                action.isReverse)
+            SingleAction.SHOW_SEARCHBOX -> {
+                val currentUrl = controller.getTab(actionTarget).url
+                val query = if (currentUrl != null && currentUrl.equals("bsw:speeddial", ignoreCase = true)) {
+                    ""
+                } else {
+                    currentUrl ?: ""
+                }
+                controller.showSearchBox(
+                    query,
+                    actionTarget,
+                    (action as ShowSearchBoxAction).openNewTabMode,
+                    action.isReverse
+                )
+            }
             SingleAction.PASTE_SEARCHBOX -> controller.showSearchBox(controller.applicationContextInfo.clipboardText,
                 actionTarget,
                 (action as PasteSearchBoxAction).openNewTabMode,

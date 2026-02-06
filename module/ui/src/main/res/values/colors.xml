@@ -32,7 +32,7 @@
     <color name="browser_primary_dark">#101010</color>
     <color name="default_nav_color">#000000</color>
 
-    <color name="deep_gray">#222222</color>
+    <color name="deep_gray">#FF35363A</color> <!-- 222222 -->
     <color name="white">#FFFFFF</color>
     <color name="ripple">#42ffffff</color>
     <color name="tab_list_background">#f5222222</color>
@@ -47,4 +47,7 @@
     <color name="chrome_omnibox_border_light">#C4C7C5</color>
     <color name="chrome_omnibox_bg_dark">#202124</color>
     <color name="chrome_omnibox_border_dark">#3C4043</color>
+
+    <color name="omnibox_placeholder_color">#9AA0A6</color>
+
 </resources>

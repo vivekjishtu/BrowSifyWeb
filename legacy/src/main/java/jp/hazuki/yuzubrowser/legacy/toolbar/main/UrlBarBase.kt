@@ -109,11 +109,23 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
     fun changeTitle(data: MainTabData) {
         //need post Runnable?
         post {
+            if (data.url != null && data.url.startsWith("bsw:speeddial", ignoreCase = true)) {
+                centerUrlButton.run {
+                    setTypeUrl(true)
+                    text = context.getString(R.string.omnibox_placeholder)
+                    gravity = Gravity.START or Gravity.CENTER_VERTICAL
+                    setTextColor(ContextCompat.getColor(context, R.color.omnibox_placeholder_color))
+                    setStartIcon(R.drawable.ic_search_white_24dp, R.color.omnibox_placeholder_color)
+                }
+                return@post
+            }
+
             if (!AppPrefs.toolbar_always_show_url.get() && data.title != null && !data.isInPageLoad) {
                 centerUrlButton.run {
                     setTypeUrl(false)
                     text = data.title
                     gravity = Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL
+                    setTextColor(ContextCompat.getColor(context, R.color.tab_text_color_selected))
                     setCompoundDrawablesRelative(null, null, null, null)
                 }
             } else {
@@ -121,6 +133,7 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
                     setTypeUrl(true)
                     text = data.url.decodePunyCodeUrl()
                     gravity = Gravity.START or Gravity.CENTER_VERTICAL
+                    setTextColor(ContextCompat.getColor(context, R.color.tab_text_color_selected))
                     updateSecurityIcon(data.url)
                 }
             }
@@ -140,10 +153,15 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
             return
         }
 
+        setStartIcon(iconRes, null)
+    }
+
+    private fun setStartIcon(drawableRes: Int, tintColorRes: Int?) {
         val sizePx = context.convertDpToPx(16)
-        val drawable = ContextCompat.getDrawable(context, iconRes)?.mutate()
+        val drawable = ContextCompat.getDrawable(context, drawableRes)?.mutate()
         if (drawable != null) {
-            DrawableCompat.setTint(drawable, centerUrlButton.currentTextColor)
+            val tintColor = tintColorRes?.let { ContextCompat.getColor(context, it) } ?: centerUrlButton.currentTextColor
+            DrawableCompat.setTint(drawable, tintColor)
             drawable.setBounds(0, 0, sizePx, sizePx)
         }
 

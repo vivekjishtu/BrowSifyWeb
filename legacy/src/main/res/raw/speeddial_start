@@ -39,11 +39,11 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-height: 100vh;
+       /* min-height: 100vh; */
     }
 
     .search-container {
-        margin-top: 10vh;
+      /*  margin-top: 10vh; */
         width: 100%;
         max-width: 600px;
         margin-bottom: 40px;
@@ -110,7 +110,7 @@
 
 
     footer {
-      position: absolute;
+      position: fixed;
       width: calc(100% - 20px);
       bottom: 0;
       height: 30px;
@@ -131,7 +131,36 @@
 
 </head>
 <body>
-   <div class="browserName"></div>
+   <div class="browserName">
+       <div class="logo-wrap">
+         <span class="brand-main">BrowSify</span><span class="brand-sub">Web</span>
+       </div>
+
+       <style>
+         .logo-wrap {
+           display: inline-block;
+           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+           font-size: 36px;
+           letter-spacing: -1.5px;
+           padding: 10px;
+           user-select: none;
+         }
+
+         .brand-main {
+          /* color: #2d3436; */
+         }
+
+         .brand-sub {
+           color: #0984e3;
+           margin-left: 2px;
+         }
+         /*
+         .logo-wrap:hover .brand-sub {
+           color: #00cec9;
+           border-color: #00cec9;
+         }*/
+       </style>
+   </div>
    <div class="search-container">
         <a href="bsw:search" id="searchBox">
             <input type="text" id="search-bar" placeholder="Search or type URL">
