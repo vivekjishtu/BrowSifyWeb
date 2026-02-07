@@ -1057,6 +1057,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         val tab = tabManagerIn[target]
         val historyList = tab.mWebView.copyMyBackForwardList()
 
+        val currentIndex = historyList.current
         val adapter = object : ArrayAdapter<CustomWebHistoryItem>(applicationContext, 0, historyList) {
             override fun getView(position: Int, view: View?, parent: ViewGroup): View {
                 val v = view ?: layoutInflater.inflate(R.layout.tab_history_list_item, parent, false)
@@ -1067,11 +1068,18 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
                     (v.findViewById<View>(R.id.siteUrlText) as TextView).text = item.url
                     (v.findViewById<View>(R.id.siteIconImageView) as ImageView).setImageBitmap(item.favicon)
                 }
+                v.isActivated = position == currentIndex
                 return v
             }
         }
 
-        val listView = ListView(this).also { it.adapter = adapter }
+        val listView = ListView(this).also {
+            it.adapter = adapter
+            it.choiceMode = ListView.CHOICE_MODE_SINGLE
+            it.setItemChecked(currentIndex, true)
+            it.divider = getDrawable(R.drawable.divider)
+            it.dividerHeight = 1
+        }
 
         val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.tab_history)

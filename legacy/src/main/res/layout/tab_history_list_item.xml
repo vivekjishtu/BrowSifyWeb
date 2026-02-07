@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
+    android:background="@drawable/tab_history_item_background"
     android:gravity="center_vertical"
-    android:minHeight="48dp">
+    android:minHeight="56dp"
+    android:paddingStart="12dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="8dp">
 
     <ImageView
         android:id="@+id/siteIconImageView"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="3dp"
+        android:layout_marginEnd="12dp"
         android:src="@null" />
 
     <LinearLayout
@@ -24,19 +29,23 @@
             android:id="@+id/siteTitleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
             android:gravity="center_vertical"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium" />
 
         <TextView
             android:id="@+id/siteUrlText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
             android:gravity="center_vertical"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="12sp"
+            android:alpha="0.72" />
     </LinearLayout>
 
 </LinearLayout>
