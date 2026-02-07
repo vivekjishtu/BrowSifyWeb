@@ -386,15 +386,20 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
         LocalEventBus.getDefault().observe(this, this::onNotifyEvent)
 
-        delayAction?.let {
-            actionController.run(it)
-            delayAction = null
-        }
+        runDelayedAction()
     }
 
     override fun onResume() {
         super.onResume()
         isResumed = true
+        runDelayedAction()
+    }
+
+    private fun runDelayedAction() {
+        delayAction?.let {
+            actionController.run(it)
+            delayAction = null
+        }
     }
 
     override fun onPostResume() {
