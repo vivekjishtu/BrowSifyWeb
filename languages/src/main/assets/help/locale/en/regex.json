@@ -74,3 +74,4 @@
   "ad_block_host_regex": "When using regular expressions in host block",
   "ad_block_host_regex_info": "<code>h [test\\.com]</code> can be specified as."
 }
+

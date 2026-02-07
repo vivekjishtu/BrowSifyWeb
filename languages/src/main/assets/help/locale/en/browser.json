@@ -56,9 +56,10 @@
   "unknown_scheme": "Share unknown scheme",
   "unknown_scheme_info": "Try to open url by another application that is not supported a scheme (such as intent: // or twitter: //)",
   "download_dir": "Download directory",
-  "download_dir_info": "Specify the destination folder<br>Sd card is only /storage/sdcard1/Android/data/jp.hazuki.yuzubrowser/files",
+  "download_dir_info": "Specify the destination folder<br>Sd card is only /storage/sdcard1/Android/data/jp.hazuki.BSWbrowser/files",
   "auto_save": "Auto save interval (sec.)",
   "auto_save_info": "Set auto save interval (sec.)<br>Automatic saving is not executed if it is 0 sec.",
   "slow_rendering": "Slow rendering",
   "slow_rendering_info": "It is a setting to take of a full screen screenshot.<br>It is not recommended to enable settings other than full screen screenshots because of the likelihood of frequent freezes."
 }
+

@@ -1,7 +1,7 @@
 {
   "title": "UI Settings",
   "theme": "Theme settings",
-  "theme_info": "You can choose built-in and your own theme<br>You can also use the theme of the mikan browser<br>Custom theme is inside the internal storage<br>Example (Please make appropriate changes):<code>/sdcard/YuzuBrowser/theme/**theme name**/theme.json</code><br>Please install so that it becomes",
+  "theme_info": "You can choose built-in and your own theme<br>You can also use the theme of the mikan browser<br>Custom theme is inside the internal storage<br>Example (Please make appropriate changes):<code>/sdcard/BSWBrowser/theme/**theme name**/theme.json</code><br>Please install so that it becomes",
   "toolbar": "Toolbar settings",
   "font_size": "Font size settings",
   "font_size_info": "You can change the font size of bookmarks, history, menu, and read it later lists.",
@@ -28,3 +28,4 @@
   "keep_screen_on": "Keep screen on",
   "keep_screen_on_info": "While browsing, do not turn off the screen on its own"
 }
+

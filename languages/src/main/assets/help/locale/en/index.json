@@ -1,6 +1,6 @@
 {
-  "help": "BSW Browser settings help",
-  "comment": "Thank you for using Yuzu browser!<br>I hope this help will be of service to you.<br><br>",
+  "help": "BSW Browser Help",
+  "comment": "Thank you for using BSW browser",
   "browser": "Browser settings",
   "page": "Page settings",
   "privacy": "Privacy settings",
@@ -10,3 +10,4 @@
   "regex": "Pattern(Wildcard) specification",
   "faq": "FAQ"
 }
+
