@@ -4,7 +4,7 @@
     android:title="@string/pref_speed_dial_setting">
 
     <PreferenceCategory
-        android:title="@string/pref_speed_dial"
+        android:title="@string/pref_category_manage"
         app:iconSpaceReserved="false">
         <Preference
             android:key="edit_speeddial"
@@ -13,7 +13,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_speeddial_ui_settings"
+        android:title="@string/pref_category_appearance"
         app:iconSpaceReserved="false">
         <jp.hazuki.yuzubrowser.ui.preference.StrToIntListPreference
             android:entries="@array/pref_speeddial_layout_list"

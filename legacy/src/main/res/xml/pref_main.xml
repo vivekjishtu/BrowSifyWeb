@@ -20,51 +20,71 @@
 
     <Preference
         android:key="fragment_browser"
-        android:title="@string/pref_browser_settings"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_browsing"
+        android:summary="@string/pref_summary_browser"
+        android:icon="@drawable/ic_web_asset_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="fragment_page"
-        android:title="@string/pref_page_settings"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_content"
+        android:summary="@string/pref_summary_page"
+        android:icon="@drawable/ic_info_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="fragment_privacy"
-        android:title="@string/pref_privacy_settings"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_privacy"
+        android:summary="@string/pref_summary_privacy"
+        android:icon="@drawable/ic_private_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="fragment_ui"
-        android:title="@string/pref_ui_settings"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_appearance"
+        android:summary="@string/pref_summary_ui"
+        android:icon="@drawable/ic_remove_red_eye_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="fragment_action"
-        android:title="@string/pref_operation_settings"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_controls"
+        android:summary="@string/pref_summary_operation"
+        android:icon="@drawable/ic_gesture_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="fragment_speseddial"
-        android:title="@string/pref_speed_dial_setting"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_speed_dial"
+        android:summary="@string/pref_summary_speed_dial"
+        android:icon="@drawable/ic_speed_dial_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="fragment_application"
-        android:title="@string/pref_app_settings"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_app"
+        android:summary="@string/pref_summary_app"
+        android:icon="@drawable/ic_android_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="fragment_import_export"
-        android:title="@string/pref_import_export"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_backup"
+        android:summary="@string/pref_summary_import_export"
+        android:icon="@drawable/ic_import_export_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="activity_help"
-        android:title="@string/pref_help"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_help"
+        android:summary="@string/pref_summary_help"
+        android:icon="@drawable/ic_info_white_24dp"
+        app:iconSpaceReserved="true" />
 
     <Preference
         android:key="fragment_about"
-        android:title="@string/pref_about"
-        app:iconSpaceReserved="false" />
+        android:title="@string/pref_main_about"
+        android:summary="@string/pref_summary_about"
+        android:icon="@drawable/ic_info_white_24dp"
+        app:iconSpaceReserved="true" />
 </PreferenceScreen>
