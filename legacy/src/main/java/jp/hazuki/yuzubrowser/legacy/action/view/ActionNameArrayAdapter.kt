@@ -33,37 +33,84 @@ import jp.hazuki.yuzubrowser.legacy.action.SingleAction
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
 
 class ActionNameArrayAdapter(
-        context: Context,
-        val nameArray: ActionNameArray,
-        private val listener: OnRecyclerListener
-) : RecyclerView.Adapter<ActionNameArrayAdapter.ViewHolder>() {
-    private val checked = BooleanArray(itemCount)
+    context: Context,
+    val nameArray: ActionNameArray,
+    private val listener: OnRecyclerListener
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val checked = BooleanArray(nameArray.actionList.size)
     private val inflater = LayoutInflater.from(context)
     private val icons = ActionIconMap(context.resources)
     private var mListener: OnSettingButtonListener? = null
 
+    private val listItems = mutableListOf<ListItem>()
+
+    init {
+        val categories = listOf(
+            0 to R.string.category_navigation,
+            2000 to R.string.category_controls,
+            5000 to R.string.category_page_tools,
+            10000 to R.string.category_tabs,
+            35000 to R.string.category_tools_search,
+            38000 to R.string.category_display,
+            50000 to R.string.category_system,
+            100000 to R.string.category_other
+        )
+
+        val categorizedItems = mutableListOf<Pair<Int, Int>>()
+
+        for (i in 0 until nameArray.actionList.size) {
+            val value = nameArray.actionValues[i]
+            var categoryResId = R.string.category_navigation
+            for (cat in categories.reversed()) {
+                if (value >= cat.first) {
+                    categoryResId = cat.second
+                    break
+                }
+            }
+            categorizedItems.add(categoryResId to i)
+        }
+
+        val grouped = categorizedItems.groupBy { it.first }
+
+        for (cat in categories) {
+            grouped[cat.second]?.let { items ->
+                listItems.add(ListItem.Header(context.getString(cat.second)))
+                for (item in items) {
+                    listItems.add(ListItem.ActionItem(item.second))
+                }
+            }
+        }
+    }
+
     override fun getItemCount(): Int {
-        return nameArray.actionList.size
+        return listItems.size
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (listItems[position]) {
+            is ListItem.Header -> VIEW_TYPE_HEADER
+            is ListItem.ActionItem -> VIEW_TYPE_ITEM
+        }
     }
 
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
 
-    private fun getName(position: Int): String {
-        return nameArray.actionList[position]!!
+    private fun getName(originalPosition: Int): String {
+        return nameArray.actionList[originalPosition]!!
     }
 
-    fun getItemValue(position: Int): Int {
-        return nameArray.actionValues[position]
+    fun getItemValue(originalPosition: Int): Int {
+        return nameArray.actionValues[originalPosition]
     }
 
-    private fun getIcon(position: Int): Drawable? {
-        return icons[nameArray.actionValues[position]]
+    private fun getIcon(originalPosition: Int): Drawable? {
+        return icons[nameArray.actionValues[originalPosition]]
     }
 
-    fun isChecked(position: Int): Boolean {
-        return checked[position]
+    fun isChecked(originalPosition: Int): Boolean {
+        return checked[originalPosition]
     }
 
     fun clearChoices() {
@@ -73,40 +120,61 @@ class ActionNameArrayAdapter(
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.select_action_item, parent, false))
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.icon.setImageDrawable(getIcon(position))
-        holder.text.text = getName(position)
-
-        val checked = isChecked(position)
-
-        holder.checkBox.isChecked = checked
-
-        if (SingleAction.checkSubPreference(getItemValue(position))) {
-            holder.setting.visibility = View.VISIBLE
-            holder.setting.isEnabled = checked
-            holder.setting.imageAlpha = if (checked) 0xff else 0x88
-            holder.setting.setOnClickListener { mListener?.invoke(position) }
-        } else {
-            holder.setting.visibility = View.GONE
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_HEADER -> HeaderViewHolder(inflater.inflate(R.layout.select_action_header, parent, false))
+            else -> ViewHolder(inflater.inflate(R.layout.select_action_item, parent, false))
         }
-
-        holder.itemView.setOnClickListener { listener.onRecyclerItemClicked(it, holder.adapterPosition) }
-        holder.itemView.setOnLongClickListener { listener.onRecyclerItemLongClicked(it, holder.adapterPosition) }
     }
 
-    fun toggleCheck(position: Int): Boolean {
-        val newState = !checked[position]
-        checked[position] = newState
-        notifyItemChanged(position)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = listItems[position]) {
+            is ListItem.Header -> {
+                (holder as HeaderViewHolder).headerText.text = item.title
+            }
+            is ListItem.ActionItem -> {
+                val originalPosition = item.position
+                val h = holder as ViewHolder
+                h.icon.setImageDrawable(getIcon(originalPosition))
+                h.text.text = getName(originalPosition)
+
+                val checked = isChecked(originalPosition)
+
+                h.checkBox.isChecked = checked
+
+                if (SingleAction.checkSubPreference(getItemValue(originalPosition))) {
+                    h.setting.visibility = View.VISIBLE
+                    h.setting.isEnabled = checked
+                    h.setting.imageAlpha = if (checked) 0xff else 0x88
+                    h.setting.setOnClickListener { mListener?.invoke(originalPosition) }
+                } else {
+                    h.setting.visibility = View.GONE
+                }
+
+                h.itemView.setOnClickListener { listener.onRecyclerItemClicked(it, originalPosition) }
+                h.itemView.setOnLongClickListener { listener.onRecyclerItemLongClicked(it, originalPosition) }
+            }
+        }
+    }
+
+    fun toggleCheck(originalPosition: Int): Boolean {
+        val newState = !checked[originalPosition]
+        checked[originalPosition] = newState
+
+        // Find adapter position
+        val adapterPos = getAdapterPosition(originalPosition)
+        if (adapterPos != -1) {
+            notifyItemChanged(adapterPos)
+        }
         return newState
     }
 
-    fun setChecked(position: Int, value: Boolean) {
-        checked[position] = value
+    fun getAdapterPosition(originalPosition: Int): Int {
+        return listItems.indexOfFirst { it is ListItem.ActionItem && it.position == originalPosition }
+    }
+
+    fun setChecked(originalPosition: Int, value: Boolean) {
+        checked[originalPosition] = value
     }
 
     fun setListener(mListener: OnSettingButtonListener) {
@@ -118,5 +186,19 @@ class ActionNameArrayAdapter(
         val text: TextView = view.findViewById(R.id.nameTextView)
         val setting: ImageButton = view.findViewById(R.id.settingsButton)
         val checkBox: CheckBox = view.findViewById(R.id.checkBox)
+    }
+
+    class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val headerText: TextView = view.findViewById(R.id.headerTextView)
+    }
+
+    sealed class ListItem {
+        data class Header(val title: String) : ListItem()
+        data class ActionItem(val position: Int) : ListItem()
+    }
+
+    companion object {
+        private const val VIEW_TYPE_HEADER = 0
+        private const val VIEW_TYPE_ITEM = 1
     }
 }

@@ -112,7 +112,7 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
         adapter.notifyDataSetChanged()
 
         if (initialPosition != -1)
-            binding.recyclerView.scrollToPosition(initialPosition)
+            binding.recyclerView.scrollToPosition(adapter.getAdapterPosition(initialPosition))
 
         binding.okButton.setOnClickListener {
             when (val actionManager = mActionManager) {
@@ -233,7 +233,7 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
                 }
                 adapter.notifyDataSetChanged()
                 if (initialPosition != -1)
-                    binding.recyclerView.scrollToPosition(initialPosition)
+                    binding.recyclerView.scrollToPosition(adapter.getAdapterPosition(initialPosition))
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }

@@ -346,6 +346,14 @@
     <string name="pinned_tab_warning">This tab is pinned.</string>
     <string name="select_file">Select file</string>
     <string name="action_list">Action list</string>
+    <string name="category_navigation">Navigation</string>
+    <string name="category_controls">Page Controls</string>
+    <string name="category_page_tools">Page Tools</string>
+    <string name="category_tabs">Tabs</string>
+    <string name="category_tools_search">Tools &amp; Search</string>
+    <string name="category_display">Display &amp; Bars</string>
+    <string name="category_system">System</string>
+    <string name="category_other">Other</string>
     <string name="add_to_home">Add to home screen</string>
 
     <string name="caches">Caches</string>
