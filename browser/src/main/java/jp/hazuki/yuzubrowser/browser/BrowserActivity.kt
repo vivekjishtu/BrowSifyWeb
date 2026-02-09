@@ -40,6 +40,8 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hazuki.asyncpermissions.AsyncPermissions
@@ -931,7 +933,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         }
     }
 
-    override fun removeTab(target: Int, error: Boolean, destroy: Boolean): Boolean {
+    override fun removeTab(target: Int, error: Boolean, destroy: Boolean, showUndo: Boolean): Boolean {
         if (tabManagerIn.size() <= 1) { // Last tab
             return false
         }
@@ -942,6 +944,8 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             if (error) Toast.makeText(applicationContext, R.string.pinned_tab_warning, Toast.LENGTH_SHORT).show()
             return true
         }
+
+        val title = oldData.title
 
         if (tabManagerIn.currentTabData == oldData) {
             setCurrentTab(getNewTabNo(target, oldData))
@@ -966,6 +970,18 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
         if (destroy)
             oldWeb.destroy()
+
+        if (showUndo) {
+            val message = if (title.isNullOrEmpty()) {
+                getString(R.string.closed_tab, "")
+            } else {
+                getString(R.string.closed_tab, title)
+            }
+            Snackbar.make(binding.coordinator, message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo) { restoreTab() }
+                .show()
+        }
+
         return true
     }
 

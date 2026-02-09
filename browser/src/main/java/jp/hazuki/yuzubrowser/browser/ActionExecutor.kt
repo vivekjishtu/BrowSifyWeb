@@ -687,7 +687,7 @@ class ActionExecutor(
                 }
             }
             SingleAction.NEW_TAB -> controller.openInNewTab(AppPrefs.home_page.get(), TabType.DEFAULT)
-            SingleAction.CLOSE_TAB -> if (!controller.removeTab(actionTarget)) {
+            SingleAction.CLOSE_TAB -> if (!controller.removeTab(actionTarget, showUndo = true)) {
                 checkAndRun((action as CloseTabSingleAction).defaultAction, target)
             }
             SingleAction.CLOSE_ALL -> {

@@ -47,7 +47,7 @@ interface BrowserController : BrowserInfo {
     fun notifyChangeWebState(tab: MainTabData? = currentTabData) = toolbarManager.notifyChangeWebState(tab)
     fun notifyChangeProgress(tab: MainTabData) = toolbarManager.notifyChangeProgress(tab)
     fun setCurrentTab(target: Int)
-    fun removeTab(target: Int, error: Boolean = true, destroy: Boolean = true): Boolean
+    fun removeTab(target: Int, error: Boolean = true, destroy: Boolean = true, showUndo: Boolean = false): Boolean
     fun swapTab(i: Int, j: Int)
     fun loadUrl(url: String, target: Int)
     fun loadUrl(tab: MainTabData = currentTabData!!, url: String, shouldOpenInNewTab: Boolean = false)
