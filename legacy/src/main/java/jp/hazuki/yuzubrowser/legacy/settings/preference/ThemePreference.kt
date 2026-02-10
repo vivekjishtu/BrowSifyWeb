@@ -59,8 +59,10 @@ class ThemePreference(context: Context, attrs: AttributeSet) : ListPreference(co
         val valueList = ArrayList<String>()
 
         //Add default
+     //   themeList.add(context.getString(R.string.pref_system_theme))
+     //   valueList.add(ThemeData.THEME_AUTO)
         themeList.add(context.getString(R.string.pref_dark_theme))
-        valueList.add("")
+        valueList.add(ThemeData.THEME_DARK)
         themeList.add(context.getString(R.string.pref_light_theme))
         valueList.add(ThemeData.THEME_LIGHT)
 

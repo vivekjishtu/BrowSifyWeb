@@ -116,7 +116,7 @@ public class AppPrefs {
     public static final IntContainer qc_position = new IntContainer("qc_position", 0);
     public static final IntContainer overlay_bottom_alpha = new IntContainer("overlay_bottom_alpha", 0xee);
     public static final BooleanContainer save_last_tabs = new BooleanContainer("save_last_tabs", false);
-    public static final BooleanContainer save_closed_tab = new BooleanContainer("save_closed_tab", false);
+    public static final BooleanContainer save_closed_tab = new BooleanContainer("save_closed_tab", true);
     public static final BooleanContainer userjs_enable = new BooleanContainer("userjs_enable", false);
     public static final BooleanContainer webswipe_enable = new BooleanContainer("webswipe_enable", false);
     public static final IntContainer webswipe_sensitivity_speed = new IntContainer("webswipe_sensitivity_speed", 5);
@@ -124,7 +124,7 @@ public class AppPrefs {
     public static final IntContainer auto_tab_save_delay = new IntContainer("auto_tab_save_delay", 0);
     public static final IntContainer minimum_font = new IntContainer("minimum_font", 8);
     public static final BooleanContainer detailed_log = new BooleanContainer("detailed_log", false);
-    public static final StringContainer theme_setting = new StringContainer("theme_setting", ThemeData.THEME_LIGHT);
+    public static final StringContainer theme_setting = new StringContainer("theme_setting", ThemeData.THEME_DARK);
     public static final BooleanContainer resblock_enable = new BooleanContainer("resblock_enable", false);
     public static final BooleanContainer allow_content_access = new BooleanContainer("allow_content_access", true);
     public static final BooleanContainer pull_to_refresh = new BooleanContainer("pull_to_refresh", true);
@@ -147,7 +147,7 @@ public class AppPrefs {
     public static final BooleanContainer ad_block = new BooleanContainer("ad_block", false);
     public static final IntContainer night_mode_color = new IntContainer("night_mode_color", 5000);
     public static final IntContainer night_mode_bright = new IntContainer("night_mode_bright", 100);
-    public static final IntContainer show_tab_divider = new IntContainer("show_tab_divider", 0);
+    public static final IntContainer show_tab_divider = new IntContainer("show_tab_divider", 2);
     public static final BooleanContainer volume_default_playing = new BooleanContainer("volume_default_playing", true);
     public static final BooleanContainer snap_toolbar = new BooleanContainer("snap_toolbar", true);
     public static final IntContainer fullscreen_hide_mode = new IntContainer("fullscreen_hide_mode", 0);

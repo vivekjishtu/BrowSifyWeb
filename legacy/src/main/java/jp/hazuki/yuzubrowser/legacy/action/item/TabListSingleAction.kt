@@ -30,7 +30,7 @@ import jp.hazuki.yuzubrowser.ui.app.StartActivityInfo
 import java.io.IOException
 
 class TabListSingleAction : SingleAction, Parcelable {
-    var mode = MODE_HORIZONTAL
+    var mode = MODE_NORMAL 
         private set
     var isLeftButton: Boolean = false
         private set

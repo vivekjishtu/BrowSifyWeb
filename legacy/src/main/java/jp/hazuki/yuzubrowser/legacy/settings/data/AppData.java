@@ -76,8 +76,9 @@ public class AppData {
 
             SoftButtonActionArrayManager softBtnAryManager = SoftButtonActionArrayManager.getInstance(context);
             softBtnAryManager.btn_tab_right.add(SingleAction.makeInstance(SingleAction.NEW_TAB));
-            softBtnAryManager.btn_url_left.add(SingleAction.makeInstance(SingleAction.ADD_BOOKMARK));
-            softBtnAryManager.btn_url_right.add(SingleAction.makeInstance(SingleAction.WEB_RELOAD_STOP));
+            //softBtnAryManager.btn_url_left.add(SingleAction.makeInstance(SingleAction.ADD_BOOKMARK));
+            softBtnAryManager.btn_url_right.add(SingleAction.makeInstance(SingleAction.TAB_LIST));
+            softBtnAryManager.btn_url_right.add(SingleAction.makeInstance(SingleAction.OPEN_OPTIONS_MENU));
             softBtnAryManager.save(context);
 
             HardButtonActionManager hardBtnManager = HardButtonActionManager.getInstance(context);
@@ -182,9 +183,25 @@ public class AppData {
 
             AppPrefs.toolbar_progress.size.set(4);
             AppPrefs.toolbar_progress.visibility.setHideWhenEndLoading(true);
+            AppPrefs.toolbar_progress.location_priority.set(4);
+            AppPrefs.toolbar_progress.location.set(7);
+
             AppPrefs.toolbar_custom1.size.set(42);
             AppPrefs.toolbar_custom1.location.set(ToolbarManager.LOCATION_BOTTOM);
-            AppPrefs.toolbar_tab.visibility.setVisible(false);
+            AppPrefs.toolbar_custom1.visibility.setVisible(false);
+
+            AppPrefs.toolbar_url.size.set(38);
+            AppPrefs.toolbar_url.visibility.setVisible(true);
+            AppPrefs.toolbar_url.location_priority.set(2);
+            AppPrefs.toolbar_url.location.set(7);
+
+            AppPrefs.toolbar_tab.size.set(42);
+            AppPrefs.toolbar_tab.visibility.setVisible(true);
+            AppPrefs.toolbar_tab.location_priority.set(1);
+            AppPrefs.toolbar_tab.location.set(7);
+
+            //AppPrefs.toolbar_tab.location.set(2);
+
 
             UserAgentList uaList = new UserAgentList();
             UserAgentUpdaterKt.init(uaList);

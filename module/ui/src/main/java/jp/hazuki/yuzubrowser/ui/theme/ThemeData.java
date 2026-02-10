@@ -51,6 +51,8 @@ import okio.Okio;
 
 public class ThemeData {
     public static final String THEME_LIGHT = "theme://internal/light";
+    public static final String THEME_DARK = "";
+    public static final String THEME_AUTO = "auto";
 
     public Drawable tabBackgroundNormal, tabBackgroundSelect;
     public int tabTextColorNormal, tabTextColorLock, tabTextColorPin, tabTextColorSelect, tabAccentColor, tabDividerColor;
