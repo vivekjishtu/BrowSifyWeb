@@ -41,6 +41,8 @@ import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionArrayManager;
 import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionManager;
 import jp.hazuki.yuzubrowser.legacy.action.manager.TabActionManager;
 import jp.hazuki.yuzubrowser.legacy.action.manager.ToolbarActionManager;
+import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDial;
+import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDialManager;
 import jp.hazuki.yuzubrowser.legacy.toolbar.ToolbarManager;
 import jp.hazuki.yuzubrowser.legacy.useragent.UserAgentList;
 import jp.hazuki.yuzubrowser.legacy.useragent.UserAgentUpdaterKt;
@@ -87,11 +89,15 @@ public class AppData {
             hardBtnManager.save(context);
 
             ToolbarActionManager toolbarManager = ToolbarActionManager.getInstance(context);
-            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.GO_BACK));
+           // toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.GO_BACK));
             toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.GO_FORWARD));
+            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.WEB_RELOAD_STOP));
+            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.ADD_BOOKMARK));
+            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.SHOW_DOWNLOADS));
             toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.SHOW_BOOKMARK), SingleAction.makeInstance(SingleAction.SHOW_HISTORY));
-            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.TAB_LIST));
-            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.OPEN_OPTIONS_MENU));
+            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.ALL_ACTION));
+            //toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.TAB_LIST));
+            //toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.OPEN_OPTIONS_MENU));
             toolbarManager.save(context);
 
             TabActionManager tabManager = TabActionManager.getInstance(context);
@@ -200,7 +206,6 @@ public class AppData {
             AppPrefs.toolbar_tab.location_priority.set(1);
             AppPrefs.toolbar_tab.location.set(7);
 
-            //AppPrefs.toolbar_tab.location.set(2);
 
 
             UserAgentList uaList = new UserAgentList();
@@ -230,6 +235,14 @@ public class AppData {
                 urlManager.save(providers.toSettings());
                 AppPrefs.search_url.set(providers.get(0).getUrl());
                 AppPrefs.commit(context, AppPrefs.search_url);
+            }
+
+            {
+                SpeedDialManager speedDialManager = new SpeedDialManager (context);
+                SpeedDial sd = new SpeedDial();
+                sd.setUrl("bsw://help/index.html");
+                sd.setTitle("Help");
+                speedDialManager.update(sd);
             }
 
             AdBlockInitSupportKt.initAbpFilter(context, abpDatabase);
