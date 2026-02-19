@@ -297,7 +297,7 @@ class WebClient(
 
     fun applyTabPrivacy(tab: MainTabData) {
         val isPrivateTab = tab.tabType == TabType.PRIVATE
-        val enableCookie = !isPrivateTab && AppPrefs.accept_cookie.get()
+        val enableCookie = AppPrefs.accept_cookie.get()
         tab.cookieMode = if (enableCookie) MainTabData.COOKIE_ENABLE else MainTabData.COOKIE_DISABLE
 
         val cookieManager = CookieManager.getInstance()

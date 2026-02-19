@@ -259,9 +259,6 @@ public class MainTabData extends TabData {
     }
 
     public boolean isEnableCookie() {
-        if (getTabType() == TabType.PRIVATE) {
-            return false;
-        }
         if (cookieMode == COOKIE_UNDEFINED) {
             return AppPrefs.accept_cookie.get();
         } else {
