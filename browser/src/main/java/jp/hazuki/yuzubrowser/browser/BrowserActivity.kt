@@ -762,9 +762,9 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             val window = intent.getBooleanExtra(EXTRA_WINDOW_MODE, false)
             if (url.isNullOrEmpty())
                 url = intent.getStringExtra(Intent.EXTRA_TEXT)
-            if (!url.isNullOrEmpty())
+            if (!url.isNullOrEmpty()) {
                 openInNewTab(url, if (window) TabType.WINDOW else TabType.INTENT, intent.getBooleanExtra(EXTRA_SHOULD_OPEN_IN_NEW_TAB, false))
-            else {
+            } else {
                 Logger.w(TAG, "ACTION_VIEW : url is null or empty.")
                 return false
             }
@@ -1292,7 +1292,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         // TODO: Restore this when Google fixes the bug where the WebView is blank after calling onPause followed by onResume.
         //        if (AppPrefs.pause_web_tab_change.get())
         //            web.onPause();
-        val tab = tabManagerIn.add(web, resolveTabTypeForCreation(type))
+        val tab = tabManagerIn.add(web, type)
         webClient.applyTabPrivacy(tab)
         if (ThemeData.isEnabled())
             tab.onMoveTabToBackground(resources, theme)
@@ -1354,7 +1354,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun openInNewTab(url: String, type: Int, shouldOpenInNewTab: Boolean) {
-        loadUrl(openNewTab(resolveTabTypeForCreation(type)), url, shouldOpenInNewTab)
+        loadUrl(openNewTab(type), url, shouldOpenInNewTab)
     }
 
     private fun openInNewTab(state: Bundle) {
@@ -1373,7 +1373,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun openInBackground(url: String, type: Int) {
-        val tab = addNewTab(resolveTabTypeForCreation(type))
+        val tab = addNewTab(type)
         tab.setUpBgTab()
         loadUrl(tab, url)
     }
@@ -1395,7 +1395,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun openInRightNewTab(url: String, type: Int) {
-        loadUrl(openRightNewTab(resolveTabTypeForCreation(type)), url)
+        loadUrl(openRightNewTab(type), url)
     }
 
     private fun openInRightNewTab(webTransport: WebView.WebViewTransport) {
@@ -1413,7 +1413,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun openInRightBgTab(url: String, type: Int) {
-        loadUrl(openRightBgTab(resolveTabTypeForCreation(type)), url)
+        loadUrl(openRightBgTab(type), url)
     }
 
     private fun openInRightBgTab(webTransport: WebView.WebViewTransport) {
@@ -1471,10 +1471,6 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             }
             else -> throw IllegalArgumentException("Unknown perform:$perform")
         }
-    }
-
-    private fun resolveTabTypeForCreation(@TabType requestedType: Int): Int {
-        return requestedType
     }
 
     override fun addBookmark(tab: MainTabData) {

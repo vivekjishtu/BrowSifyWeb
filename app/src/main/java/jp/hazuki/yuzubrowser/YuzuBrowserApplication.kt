@@ -52,18 +52,22 @@ class YuzuBrowserApplication : Application(), BrowserApplication {
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
+
+        Logger.d(TAG, "onCreate()")
+        Logger.isDebug = BuildConfig.DEBUG
+        browserState.isNeedLoad = true
+
         registerDownloadNotification()
         registerAdBlockNotification()
 
-        Logger.d(TAG, "onCreate()")
-        browserState.isNeedLoad = false
         ErrorReportServer.initialize(this)
         AppData.init(this, moshi, abpDatabase)
         ErrorReportServer.setDetailedLog(AppPrefs.detailed_log.get())
         if (AppPrefs.slow_rendering.get()) {
             WebView.enableSlowWholeDocumentDraw()
         }
-        Logger.isDebug = BuildConfig.DEBUG
+        browserState.isNeedLoad = false
     }
 
     override fun attachBaseContext(base: Context) {
