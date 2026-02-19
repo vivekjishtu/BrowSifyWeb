@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import jp.hazuki.yuzubrowser.legacy.R;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabIndexData;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabManager;
+import jp.hazuki.yuzubrowser.legacy.webkit.TabType;
 import jp.hazuki.yuzubrowser.ui.extensions.UrlExtensionsKt;
 
 class VerticalTabListAdapter extends TabListRecyclerBaseAdapter {
@@ -37,7 +38,11 @@ class VerticalTabListAdapter extends TabListRecyclerBaseAdapter {
 
     @Override
     void onBindViewHolder(ViewHolder holder, TabIndexData indexData) {
-        holder.url.setText(UrlExtensionsKt.decodePunyCodeUrl(indexData.getUrl()));
+        if (indexData.getTabType() == TabType.PRIVATE) {
+            holder.url.setText(R.string.private_tab_start_message);
+        } else {
+            holder.url.setText(UrlExtensionsKt.decodePunyCodeUrl(indexData.getUrl()));
+        }
 
         if (holder.getAdapterPosition() == getTabManager().getCurrentTabNo())
             holder.itemView.setBackgroundResource(R.drawable.tab_list_item_background_selected);

@@ -1338,7 +1338,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     private fun openInNewTab(webTransport: WebView.WebViewTransport) {
-        webTransport.webView = openNewTab(TabType.WINDOW).mWebView.webView
+        webTransport.webView = openNewTab(getLinkedTabTypeFromCurrent()).mWebView.webView
     }
 
     override fun openInNewTab(tab: MainTabData) {
@@ -1379,7 +1379,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     private fun openInBackground(webTransport: WebView.WebViewTransport) {
-        val data = addNewTab(TabType.WINDOW)
+        val data = addNewTab(getLinkedTabTypeFromCurrent())
         data.setUpBgTab()
         webTransport.webView = data.mWebView.webView
     }
@@ -1399,7 +1399,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     private fun openInRightNewTab(webTransport: WebView.WebViewTransport) {
-        val webView = openRightNewTab(TabType.WINDOW).mWebView.webView
+        val webView = openRightNewTab(getLinkedTabTypeFromCurrent()).mWebView.webView
         webTransport.webView = webView
     }
 
@@ -1417,7 +1417,11 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     private fun openInRightBgTab(webTransport: WebView.WebViewTransport) {
-        webTransport.webView = openRightBgTab(TabType.WINDOW).mWebView.webView
+        webTransport.webView = openRightBgTab(getLinkedTabTypeFromCurrent()).mWebView.webView
+    }
+
+    private fun getLinkedTabTypeFromCurrent(): Int {
+        return if (tabManagerIn.currentTabData?.tabType == TabType.PRIVATE) TabType.PRIVATE else TabType.WINDOW
     }
 
     override fun checkNewTabLink(perform: Int, transport: WebView.WebViewTransport): Boolean {
@@ -1470,9 +1474,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     private fun resolveTabTypeForCreation(@TabType requestedType: Int): Int {
-        if (requestedType == TabType.PRIVATE) return TabType.PRIVATE
-        if (requestedType == TabType.INTENT) return TabType.INTENT
-        return if (tabManagerIn.currentTabData?.tabType == TabType.PRIVATE) TabType.PRIVATE else requestedType
+        return requestedType
     }
 
     override fun addBookmark(tab: MainTabData) {

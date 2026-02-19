@@ -34,18 +34,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import jp.hazuki.yuzubrowser.legacy.R;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabIndexData;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabManager;
+import jp.hazuki.yuzubrowser.legacy.webkit.TabType;
 
 public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<TabListRecyclerBaseAdapter.ViewHolder> {
     private static final PorterDuffColorFilter IMAGE_FILTER = new PorterDuffColorFilter(0x64FFFFFF, PorterDuff.Mode.SRC_ATOP);
 
     private final Drawable closeIcon;
     private final Drawable pinIcon;
+    private final Context context;
 
     private LayoutInflater mInflater;
     private TabManager tabManager;
     private OnRecyclerListener mListener;
 
     TabListRecyclerBaseAdapter(Context context, TabManager list, OnRecyclerListener listener) {
+        this.context = context;
         mInflater = LayoutInflater.from(context);
         tabManager = list;
         mListener = listener;
@@ -73,7 +76,18 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
             } else {
                 holder.thumbNail.setImageResource(R.drawable.empty_thumbnail);
             }
-            holder.title.setText(indexData.getTitle());
+            String title = indexData.getTitle();
+            if (indexData.getTabType() == TabType.PRIVATE) {
+                if (TextUtils.isEmpty(title)) {
+                    title = context.getString(R.string.private_tab_start_title);
+                } else {
+                    title = context.getString(R.string.action_private) + " | " + title;
+                }
+                setPrivateIndicator(holder);
+            } else {
+                holder.title.setCompoundDrawablesRelative(null, null, null, null);
+            }
+            holder.title.setText(title);
             if (indexData.isPinning()) {
                 holder.closeButton.setImageDrawable(pinIcon);
                 holder.closeButton.setEnabled(false);
@@ -118,6 +132,17 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
     }
 
     abstract void onBindViewHolder(ViewHolder holder, TabIndexData indexData);
+
+    private void setPrivateIndicator(ViewHolder holder) {
+        Drawable privateIcon = context.getDrawable(R.drawable.ic_private_white_24dp);
+        if (privateIcon == null) return;
+        privateIcon = privateIcon.mutate();
+        privateIcon.setTint(holder.title.getCurrentTextColor());
+        int size = holder.title.getLineHeight();
+        privateIcon.setBounds(0, 0, size, size);
+        holder.title.setCompoundDrawablePadding(size / 3);
+        holder.title.setCompoundDrawablesRelative(privateIcon, null, null, null);
+    }
 
     @Override
     public int getItemCount() {

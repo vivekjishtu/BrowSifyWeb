@@ -109,7 +109,7 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
     fun changeTitle(data: MainTabData) {
         //need post Runnable?
         post {
-            if (data.url != null && data.url.startsWith("bsw:speeddial", ignoreCase = true)) {
+            if (data.url != null && (data.url.startsWith("bsw:speeddial", ignoreCase = true) || data.url.startsWith("bsw:private", ignoreCase = true))) {
                 centerUrlButton.run {
                     setTypeUrl(true)
                     text = context.getString(R.string.omnibox_placeholder)

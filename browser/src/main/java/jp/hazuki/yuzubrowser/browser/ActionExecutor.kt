@@ -752,7 +752,7 @@ class ActionExecutor(
             SingleAction.REPLICATE_TAB -> controller.openInNewTab(controller.getTab(actionTarget))
             SingleAction.SHOW_SEARCHBOX -> {
                 val currentUrl = controller.getTab(actionTarget).url
-                val query = if (currentUrl != null && currentUrl.equals("bsw:speeddial", ignoreCase = true)) {
+                val query = if (currentUrl != null && (currentUrl.equals("bsw:speeddial", ignoreCase = true) || currentUrl.equals("bsw:private", ignoreCase = true))) {
                     ""
                 } else {
                     currentUrl ?: ""
