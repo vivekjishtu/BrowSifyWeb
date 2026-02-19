@@ -62,6 +62,7 @@ interface BrowserController : BrowserInfo {
     fun finishQuick(clearTabNo: Int, finish_clear: Int = AppPrefs.finish_alert_default.get())
     fun moveTaskToBack(root: Boolean): Boolean
     fun openInCurrentTab(url: String)
+    fun openPrivateTab(inBackground: Boolean = false)
     fun openInNewTab(tab: MainTabData)
     fun openInNewTab(url: String, @TabType type: Int, shouldOpenInNewTab: Boolean = false)
     fun openInBackground(url: String, @TabType type: Int)

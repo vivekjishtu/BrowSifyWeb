@@ -39,6 +39,7 @@ import jp.hazuki.yuzubrowser.legacy.tab.manager.TabIndexData;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabManager;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabStorage;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.ThumbnailManager;
+import jp.hazuki.yuzubrowser.legacy.webkit.TabType;
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs;
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData;
 import jp.hazuki.yuzubrowser.webview.CustomWebView;
@@ -366,10 +367,22 @@ public class CacheTabManager implements TabManager, TabCache.OnCacheOverFlowList
         } else {
             text = indexData.getUrl();
         }
+        if (indexData.getTabType() == TabType.PRIVATE && text != null) {
+            text = view.getContext().getString(R.string.action_private) + " | " + text;
+        }
         ((TextView) view.findViewById(R.id.textView)).setText(text);
     }
 
     private void setIcon(View view, TabIndexData indexData) {
+        if (indexData.getTabType() == TabType.PRIVATE) {
+            TextView titleTextView = view.findViewById(R.id.textView);
+            Drawable drawable = view.getContext().getDrawable(R.drawable.ic_private_white_24dp);
+            if (drawable == null) return;
+            int size = titleTextView.getHeight() - titleTextView.getPaddingTop() - titleTextView.getPaddingBottom();
+            drawable.setBounds(0, 0, size, size);
+            titleTextView.setCompoundDrawables(drawable, null, null, null);
+            return;
+        }
         if (indexData.getOriginalUrl() == null || indexData.getOriginalUrl().startsWith("bsw:")) {
             return;
         }

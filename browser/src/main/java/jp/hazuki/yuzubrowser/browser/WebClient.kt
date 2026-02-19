@@ -97,6 +97,7 @@ import jp.hazuki.yuzubrowser.webview.utility.getUserAgent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.ByteArrayInputStream
 import java.net.URISyntaxException
 import java.text.DateFormat
 import java.util.*
@@ -181,7 +182,7 @@ class WebClient(
             AppPrefs.night_mode_color.get(),
             AppPrefs.night_mode_bright.get())
 
-        isEnableHistory = !AppPrefs.private_mode.get() && AppPrefs.save_history.get()
+        isEnableHistory = AppPrefs.save_history.get()
 
         resourceCheckerList = if (AppPrefs.resblock_enable.get()) {
             ResourceBlockManager(activity.applicationContext).list
@@ -217,17 +218,10 @@ class WebClient(
             controller.toolbarManager.notifyChangeWebState(it)
         }
 
-        val cookie = if (AppPrefs.private_mode.get())
-            AppPrefs.accept_cookie.get() && AppPrefs.accept_cookie_private.get()
-        else
-            AppPrefs.accept_cookie.get()
-
         val cookieManager = CookieManager.getInstance()
-        cookieManager.setAcceptCookie(cookie)
-
-        val thirdCookie = cookie && AppPrefs.accept_third_cookie.get()
+        cookieManager.setAcceptCookie(AppPrefs.accept_cookie.get())
         controller.tabManager.loadedData.forEach {
-            it.mWebView.setAcceptThirdPartyCookies(cookieManager, thirdCookie)
+            applyTabPrivacy(it)
         }
 
         resetUserScript(AppPrefs.userjs_enable.get())
@@ -273,18 +267,17 @@ class WebClient(
         setting.layoutAlgorithm = WebSettings.LayoutAlgorithm.valueOf(AppPrefs.layout_algorithm.get())
         setting.loadsImagesAutomatically = !AppPrefs.block_web_images.get()
 
-        val noPrivate = !AppPrefs.private_mode.get()
-        setting.databaseEnabled = noPrivate && AppPrefs.web_db.get()
-        setting.domStorageEnabled = noPrivate && AppPrefs.web_dom_db.get()
-        setting.geolocationEnabled = noPrivate && AppPrefs.web_geolocation.get()
-        setting.appCacheEnabled = noPrivate && AppPrefs.web_app_cache.get()
+        setting.databaseEnabled = AppPrefs.web_db.get()
+        setting.domStorageEnabled = AppPrefs.web_dom_db.get()
+        setting.geolocationEnabled = AppPrefs.web_geolocation.get()
+        setting.appCacheEnabled = AppPrefs.web_app_cache.get()
         setting.webTheme = AppPrefs.webTheme.get()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setting.safeBrowsingEnabled = AppPrefs.safe_browsing.get()
         } else {
             @Suppress("DEPRECATION")
-            setting.saveFormData = noPrivate && AppPrefs.save_formdata.get()
+            setting.saveFormData = AppPrefs.save_formdata.get()
         }
 
         setting.setAppCachePath(activity.appCacheFilePath)
@@ -300,6 +293,31 @@ class WebClient(
         web.swipeEnable = AppPrefs.pull_to_refresh.get()
 
         //if add to this, should also add to AbstractCacheWebView#settingWebView
+    }
+
+    fun applyTabPrivacy(tab: MainTabData) {
+        val isPrivateTab = tab.tabType == TabType.PRIVATE
+        val enableCookie = !isPrivateTab && AppPrefs.accept_cookie.get()
+        tab.cookieMode = if (enableCookie) MainTabData.COOKIE_ENABLE else MainTabData.COOKIE_DISABLE
+
+        val cookieManager = CookieManager.getInstance()
+        if (tab == controller.currentTabData) {
+            cookieManager.setAcceptCookie(enableCookie)
+        }
+
+        val setting = tab.mWebView.webSettings
+        val enableStorage = !isPrivateTab
+        tab.mWebView.setAcceptThirdPartyCookies(cookieManager, enableCookie && AppPrefs.accept_third_cookie.get())
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            @Suppress("DEPRECATION")
+            setting.saveFormData = enableStorage && AppPrefs.save_formdata.get()
+        }
+        setting.databaseEnabled = enableStorage && AppPrefs.web_db.get()
+        setting.domStorageEnabled = enableStorage && AppPrefs.web_dom_db.get()
+        setting.geolocationEnabled = enableStorage && AppPrefs.web_geolocation.get()
+        setting.appCacheEnabled = enableStorage && AppPrefs.web_app_cache.get()
+        setting.setAppCachePath(activity.appCacheFilePath)
     }
 
     fun loadUrl(tab: MainTabData, url: String, handleOpenInBrowser: Boolean) {
@@ -474,7 +492,9 @@ class WebClient(
         }
 
         override fun doUpdateVisitedHistory(web: CustomWebView, url: String, isReload: Boolean) {
-            val data = controller.getTabOrNull(web)?.originalUrl ?: return
+            val tab = controller.getTabOrNull(web) ?: return
+            if (tab.tabType == TabType.PRIVATE) return
+            val data = tab.originalUrl ?: return
 
             browserHistoryManager?.add(data)
         }
@@ -484,7 +504,7 @@ class WebClient(
         }
 
         override fun onReceivedError(view: CustomWebView, errorCode: Int, description: CharSequence, url: Uri) {
-            if (errorCode == ERROR_UNSUPPORTED_SCHEME && url.toString().equals("bsw:speeddial", true)) {
+            if (errorCode == ERROR_UNSUPPORTED_SCHEME && (url.toString().equals("bsw:speeddial", true) || url.toString().equals("bsw:private", true))) {
                 view.view.postDelayed({ view.reload() }, 50)
             }
         }
@@ -526,6 +546,7 @@ class WebClient(
                 if (action != null) {
                     when {
                         "speeddial".equals(action, ignoreCase = true) -> return speedDialHtml.createResponse()
+                        "private".equals(action, ignoreCase = true) -> return createPrivateTabResponse()
                         "speeddial/base.css" == action -> return speedDialHtml.baseCss
                         "speeddial/custom.css" == action -> return speedDialHtml.customCss
                         action.startsWith("speeddial/img/") -> return speedDialHtml.getImage(action)
@@ -740,7 +761,9 @@ class WebClient(
 
             data.onReceivedTitle(title)
 
-            browserHistoryManager?.update(data.originalUrl, title)
+            if (data.tabType != TabType.PRIVATE) {
+                browserHistoryManager?.update(data.originalUrl, title)
+            }
         }
 
         override fun onReceivedIcon(web: CustomWebView, icon: Bitmap) {
@@ -956,6 +979,7 @@ class WebClient(
                         controller.showSearchBox("", controller.indexOf(data.id), 0, "reverse".equals(uri.fragment, ignoreCase = true))
                         return true
                     }
+                    "private" -> return false
                     "speeddial" -> return false
                     "speeddial-edit" -> intent = Intent(activity, SpeedDialSettingActivity::class.java)
                     "home" -> {
@@ -1203,6 +1227,85 @@ class WebClient(
 
     fun String.isSpeedDialUrl(): Boolean {
         return "bsw:speeddial".equals(this, ignoreCase = true)
+    }
+
+    private fun createPrivateTabResponse(): WebResourceResponse {
+        return WebResourceResponse(
+            "text/html",
+            "UTF-8",
+            ByteArrayInputStream(createPrivateTabHtml().toByteArray(Charsets.UTF_8))
+        )
+    }
+
+    private fun createPrivateTabHtml(): String {
+        val title = getString(R.string.private_tab_start_title)
+        val subtitle = getString(R.string.private_tab_start_message)
+        val note = getString(R.string.private_tab_start_note)
+        return """
+            <!doctype html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <title>${escapeHtml(title)}</title>
+              <style>
+                :root { color-scheme: dark; }
+                body {
+                  margin: 0;
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                  background: linear-gradient(160deg, #121212, #1e1e1e);
+                  color: #f5f5f5;
+                }
+                .card {
+                  width: min(720px, calc(100vw - 32px));
+                  border-radius: 16px;
+                  padding: 28px 24px;
+                  box-sizing: border-box;
+                  background: rgba(32, 32, 32, 0.92);
+                  border: 1px solid rgba(255, 255, 255, 0.14);
+                }
+                h1 {
+                  margin: 0 0 10px;
+                  font-size: 24px;
+                  line-height: 1.3;
+                }
+                p {
+                  margin: 0;
+                  font-size: 16px;
+                  line-height: 1.6;
+                  color: #d8d8d8;
+                }
+                .note {
+                  margin-top: 18px;
+                  padding-top: 16px;
+                  border-top: 1px solid rgba(255, 255, 255, 0.12);
+                  font-size: 14px;
+                  color: #bdbdbd;
+                }
+              </style>
+            </head>
+            <body>
+              <section class="card">
+                <h1>${escapeHtml(title)}</h1>
+                <p>${escapeHtml(subtitle)}</p>
+                <p class="note">${escapeHtml(note)}</p>
+              </section>
+            </body>
+            </html>
+        """.trimIndent()
+    }
+
+    private fun escapeHtml(value: String): String {
+        return value
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#39;")
     }
 
     companion object {

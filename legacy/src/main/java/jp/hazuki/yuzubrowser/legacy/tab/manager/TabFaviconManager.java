@@ -27,6 +27,7 @@ import java.util.List;
 
 import jp.hazuki.yuzubrowser.favicon.FaviconManager;
 import jp.hazuki.yuzubrowser.legacy.R;
+import jp.hazuki.yuzubrowser.legacy.webkit.TabType;
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs;
 
 public class TabFaviconManager {
@@ -63,6 +64,14 @@ public class TabFaviconManager {
 
     private void setFavicon(View view, TabIndexData indexData, boolean show) {
         TextView titleTextView = view.findViewById(R.id.textView);
+        if (indexData.getTabType() == TabType.PRIVATE) {
+            Drawable icon = context.getDrawable(R.drawable.ic_private_white_24dp);
+            if (icon == null) return;
+            int size = titleTextView.getHeight() - titleTextView.getPaddingTop() - titleTextView.getPaddingBottom();
+            icon.setBounds(0, 0, size, size);
+            titleTextView.setCompoundDrawables(icon, null, null, null);
+            return;
+        }
         if (show && indexData.getOriginalUrl() != null && !indexData.getOriginalUrl().startsWith("bsw:")) {
             Bitmap bitmap = manager.get(indexData.getOriginalUrl());
             Drawable icon;

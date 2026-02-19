@@ -22,9 +22,10 @@ import java.lang.annotation.RetentionPolicy;
 import androidx.annotation.IntDef;
 
 @Retention(RetentionPolicy.SOURCE)
-@IntDef({TabType.DEFAULT, TabType.WINDOW, TabType.INTENT})
+@IntDef({TabType.DEFAULT, TabType.WINDOW, TabType.INTENT, TabType.PRIVATE})
 public @interface TabType {
     int DEFAULT = 0;
     int INTENT = 1;
     int WINDOW = 2;
+    int PRIVATE = 3;
 }

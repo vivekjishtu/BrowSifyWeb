@@ -991,11 +991,10 @@ class ActionExecutor(
             }
             SingleAction.TOAST -> Toast.makeText(controller.applicationContextInfo, (action as ToastAction).text, Toast.LENGTH_SHORT).show()
             SingleAction.PRIVATE -> {
-                val privateMode = !controller.isPrivateMode
-                controller.isPrivateMode = privateMode
+                controller.openPrivateTab()
                 if ((action as WithToastAction).showToast) {
                     Toast.makeText(controller.applicationContextInfo,
-                            if (privateMode) R.string.toggle_enable else R.string.toggle_disable,
+                            R.string.private_tab_created,
                             Toast.LENGTH_SHORT).show()
                 }
             }

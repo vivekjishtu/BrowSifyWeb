@@ -31,6 +31,7 @@ import androidx.core.content.res.ResourcesCompat;
 import jp.hazuki.yuzubrowser.favicon.FaviconManager;
 import jp.hazuki.yuzubrowser.legacy.R;
 import jp.hazuki.yuzubrowser.legacy.pattern.action.WebSettingResetAction;
+import jp.hazuki.yuzubrowser.legacy.webkit.TabType;
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs;
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData;
 import jp.hazuki.yuzubrowser.webview.CustomWebView;
@@ -183,17 +184,36 @@ public class MainTabData extends TabData {
     }
 
     private void setText(String text) {
-        titleTextView.setText(text);
+        if (text == null) {
+            titleTextView.setText(null);
+            return;
+        }
+        if (getTabType() == TabType.PRIVATE) {
+            titleTextView.setText(context.getString(R.string.action_private) + " | " + text);
+        } else {
+            titleTextView.setText(text);
+        }
     }
 
     private void setIcon(Drawable drawable) {
+        if (getTabType() == TabType.PRIVATE) {
+            drawable = context.getDrawable(R.drawable.ic_private_white_24dp);
+        }
+        if (drawable == null) {
+            removeIcon();
+            return;
+        }
         int size = titleTextView.getHeight() - titleTextView.getPaddingTop() - titleTextView.getPaddingBottom();
         drawable.setBounds(0, 0, size, size);
         titleTextView.setCompoundDrawables(drawable, null, null, null);
     }
 
     private void removeIcon() {
-        titleTextView.setCompoundDrawables(null, null, null, null);
+        if (getTabType() == TabType.PRIVATE) {
+            setIcon(context.getDrawable(R.drawable.ic_private_white_24dp));
+        } else {
+            titleTextView.setCompoundDrawables(null, null, null, null);
+        }
     }
 
     private final View mTabView;
@@ -239,8 +259,11 @@ public class MainTabData extends TabData {
     }
 
     public boolean isEnableCookie() {
+        if (getTabType() == TabType.PRIVATE) {
+            return false;
+        }
         if (cookieMode == COOKIE_UNDEFINED) {
-            return !AppPrefs.private_mode.get() && AppPrefs.accept_cookie.get();
+            return AppPrefs.accept_cookie.get();
         } else {
             return cookieMode == COOKIE_ENABLE;
         }

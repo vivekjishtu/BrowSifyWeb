@@ -61,7 +61,6 @@ import jp.hazuki.yuzubrowser.browser.manager.UserActionManager
 import jp.hazuki.yuzubrowser.browser.tab.TabManagerFactory
 import jp.hazuki.yuzubrowser.browser.view.Toolbar
 import jp.hazuki.yuzubrowser.core.eventbus.LocalEventBus
-import jp.hazuki.yuzubrowser.core.utility.extensions.appCacheFilePath
 import jp.hazuki.yuzubrowser.core.utility.extensions.getRealUserAgent
 import jp.hazuki.yuzubrowser.core.utility.extensions.getResColor
 import jp.hazuki.yuzubrowser.core.utility.log.ErrorReport
@@ -919,6 +918,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             it.scrollableChangeListener = scrollableChangeListener
             userActionManager.setGestureDetector(it)
         }
+        webClient.applyTabPrivacy(newTab)
         CookieManager.getInstance().setAcceptCookie(newTab.isEnableCookie)
 
         if (oldTab == null || oldTab.mWebView.isScrollable != newTab.mWebView.isScrollable) {
@@ -1292,7 +1292,8 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         // TODO: Restore this when Google fixes the bug where the WebView is blank after calling onPause followed by onResume.
         //        if (AppPrefs.pause_web_tab_change.get())
         //            web.onPause();
-        val tab = tabManagerIn.add(web, type)
+        val tab = tabManagerIn.add(web, resolveTabTypeForCreation(type))
+        webClient.applyTabPrivacy(tab)
         if (ThemeData.isEnabled())
             tab.onMoveTabToBackground(resources, theme)
 
@@ -1319,16 +1320,21 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             web.webView.setWillNotCacheDrawing(true)
         }
         webClient.initWebSetting(web)
-        val enableCookie = if (AppPrefs.private_mode.get())
-            AppPrefs.accept_cookie.get() && AppPrefs.accept_cookie_private.get()
-        else
-            AppPrefs.accept_cookie.get()
+        val enableCookie = AppPrefs.accept_cookie.get()
         web.setAcceptThirdPartyCookies(CookieManager.getInstance(), enableCookie && AppPrefs.accept_third_cookie.get())
         return web
     }
 
     override fun openInCurrentTab(url: String) {
         loadUrl(tabManagerIn.currentTabData, url, BrowserManager.LOAD_URL_TAB_CURRENT_FORCE)
+    }
+
+    override fun openPrivateTab(inBackground: Boolean) {
+        if (inBackground) {
+            openInBackground(PRIVATE_TAB_START_PAGE, TabType.PRIVATE)
+        } else {
+            openInNewTab(PRIVATE_TAB_START_PAGE, TabType.PRIVATE)
+        }
     }
 
     private fun openInNewTab(webTransport: WebView.WebViewTransport) {
@@ -1348,7 +1354,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun openInNewTab(url: String, type: Int, shouldOpenInNewTab: Boolean) {
-        loadUrl(openNewTab(type), url, shouldOpenInNewTab)
+        loadUrl(openNewTab(resolveTabTypeForCreation(type)), url, shouldOpenInNewTab)
     }
 
     private fun openInNewTab(state: Bundle) {
@@ -1367,7 +1373,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun openInBackground(url: String, type: Int) {
-        val tab = addNewTab(type)
+        val tab = addNewTab(resolveTabTypeForCreation(type))
         tab.setUpBgTab()
         loadUrl(tab, url)
     }
@@ -1389,7 +1395,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun openInRightNewTab(url: String, type: Int) {
-        loadUrl(openRightNewTab(type), url)
+        loadUrl(openRightNewTab(resolveTabTypeForCreation(type)), url)
     }
 
     private fun openInRightNewTab(webTransport: WebView.WebViewTransport) {
@@ -1407,7 +1413,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun openInRightBgTab(url: String, type: Int) {
-        loadUrl(openRightBgTab(type), url)
+        loadUrl(openRightBgTab(resolveTabTypeForCreation(type)), url)
     }
 
     private fun openInRightBgTab(webTransport: WebView.WebViewTransport) {
@@ -1437,29 +1443,36 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun performNewTabLink(perform: Int, tab: MainTabData, url: String, type: Int): Boolean {
+        val actualType = if (tab.tabType == TabType.PRIVATE && type != TabType.INTENT) TabType.PRIVATE else type
         when (perform) {
             BrowserManager.LOAD_URL_TAB_CURRENT -> {
                 loadUrl(tab, url)
                 return true
             }
             BrowserManager.LOAD_URL_TAB_NEW -> {
-                openInNewTab(url, type)
+                openInNewTab(url, actualType)
                 return true
             }
             BrowserManager.LOAD_URL_TAB_BG -> {
-                openInBackground(url, type)
+                openInBackground(url, actualType)
                 return true
             }
             BrowserManager.LOAD_URL_TAB_NEW_RIGHT -> {
-                openInRightNewTab(url, type)
+                openInRightNewTab(url, actualType)
                 return true
             }
             BrowserManager.LOAD_URL_TAB_BG_RIGHT -> {
-                openInRightBgTab(url, type)
+                openInRightBgTab(url, actualType)
                 return true
             }
             else -> throw IllegalArgumentException("Unknown perform:$perform")
         }
+    }
+
+    private fun resolveTabTypeForCreation(@TabType requestedType: Int): Int {
+        if (requestedType == TabType.PRIVATE) return TabType.PRIVATE
+        if (requestedType == TabType.INTENT) return TabType.INTENT
+        return if (tabManagerIn.currentTabData?.tabType == TabType.PRIVATE) TabType.PRIVATE else requestedType
     }
 
     override fun addBookmark(tab: MainTabData) {
@@ -1558,37 +1571,14 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             uiController.updateConfigureIfNeed()
         }
 
-    override var isPrivateMode: Boolean = false
+    override var isPrivateMode: Boolean
+        get() = tabManagerIn.currentTabData?.tabType == TabType.PRIVATE
         set(isPrivate) {
-            if (isPrivate == field) return
-
-            field = isPrivate
-            val noPrivate = !isPrivate
-            val enableCookie = if (isPrivate)
-                AppPrefs.accept_cookie.get() && AppPrefs.accept_cookie_private.get()
-            else
-                AppPrefs.accept_cookie.get()
-
-            webClient.isEnableHistory = noPrivate && AppPrefs.save_history.get()
-            CookieManager.getInstance().setAcceptCookie(enableCookie)
-
-            tabManagerIn.loadedData.forEach {
-                val settings = it.mWebView.webSettings
-
-                it.mWebView.setAcceptThirdPartyCookies(
-                    CookieManager.getInstance(), enableCookie && AppPrefs.accept_third_cookie.get())
-
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                    @Suppress("DEPRECATION")
-                    settings.saveFormData = noPrivate && AppPrefs.save_formdata.get()
-                }
-                settings.databaseEnabled = noPrivate && AppPrefs.web_db.get()
-                settings.domStorageEnabled = noPrivate && AppPrefs.web_dom_db.get()
-                settings.geolocationEnabled = noPrivate && AppPrefs.web_geolocation.get()
-                settings.appCacheEnabled = noPrivate && AppPrefs.web_app_cache.get()
-                settings.setAppCachePath(appCacheFilePath)
+            if (isPrivate) {
+                openPrivateTab()
+            } else if (tabManagerIn.currentTabData?.tabType == TabType.PRIVATE) {
+                openInNewTab(AppPrefs.home_page.get(), TabType.DEFAULT)
             }
-
             toolbar.notifyChangeWebState()
         }
 
@@ -1802,6 +1792,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         private const val TAG = "BrowserActivity"
         private const val TAB_TYPE = "tabType"
         private const val EXTRA_DATA_TARGET = "BrowserActivity.target"
+        private const val PRIVATE_TAB_START_PAGE = "bsw:private"
         const val EXTRA_WINDOW_MODE = "window_mode"
         const val EXTRA_SHOULD_OPEN_IN_NEW_TAB = "shouldOpenInNewTab"
 

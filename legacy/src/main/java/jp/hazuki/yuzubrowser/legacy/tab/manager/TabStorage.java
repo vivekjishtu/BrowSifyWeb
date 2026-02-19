@@ -44,6 +44,7 @@ import jp.hazuki.yuzubrowser.core.utility.utils.ArrayUtils;
 import jp.hazuki.yuzubrowser.core.utility.utils.FileUtils;
 import jp.hazuki.yuzubrowser.core.utility.utils.IOUtils;
 import jp.hazuki.yuzubrowser.core.utility.utils.ImageUtils;
+import jp.hazuki.yuzubrowser.legacy.webkit.TabType;
 import jp.hazuki.yuzubrowser.webview.CustomWebView;
 import jp.hazuki.yuzubrowser.webview.WebViewFactory;
 import okio.Okio;
@@ -165,6 +166,11 @@ public class TabStorage {
         TabIndexData data = tabData.getTabIndexData();
         saveIndexData();
 
+        if (data.getTabType() == TabType.PRIVATE) {
+            deleteWebView(data);
+            return data;
+        }
+
         Bundle bundle = new Bundle();
         tabData.mWebView.saveState(bundle);
         saveBundle(new File(tabPath, Long.toString(data.getId())), bundle);
@@ -188,6 +194,11 @@ public class TabStorage {
 
     private void saveThumbnails() {
         for (TabIndexData data : mTabIndexDataList) {
+            if (data.getTabType() == TabType.PRIVATE) {
+                new File(tabPath, data.getId() + FILE_TAB_THUMBNAIL_SUFFIX).delete();
+                data.setThumbnailUpdated(false);
+                continue;
+            }
             if (data.isThumbnailUpdated()) {
                 byte[] image = ImageUtils.bmp2byteArray(data.getThumbnail(), Bitmap.CompressFormat.JPEG, 75);
                 if (image != null)
@@ -343,6 +354,10 @@ public class TabStorage {
         try (JsonWriter writer = JsonWriter.of(Okio.buffer(Okio.sink(file)))) {
             writer.beginArray();
             for (TabIndexData data : tabIndexDataList) {
+                if (data.getTabType() == TabType.PRIVATE) {
+                    deleteWebView(data);
+                    continue;
+                }
                 writer.beginObject();
                 writer.name(JSON_NAME_ID);
                 writer.value(data.getId());
@@ -389,10 +404,41 @@ public class TabStorage {
     }
 
     public void saveCurrentTab(int currentTab) {
+        int persistentSize = 0;
+        for (TabIndexData data : mTabIndexDataList) {
+            if (data.getTabType() != TabType.PRIVATE) {
+                persistentSize++;
+            }
+        }
+
+        int persistentCurrentTab = 0;
+        if (persistentSize > 0) {
+            int upper = Math.min(currentTab, mTabIndexDataList.size() - 1);
+            int nonPrivateBeforeCurrent = 0;
+            for (int i = 0; i < upper; i++) {
+                if (mTabIndexDataList.get(i).getTabType() != TabType.PRIVATE) {
+                    nonPrivateBeforeCurrent++;
+                }
+            }
+
+            boolean currentIsNonPrivate = currentTab >= 0
+                && currentTab < mTabIndexDataList.size()
+                && mTabIndexDataList.get(currentTab).getTabType() != TabType.PRIVATE;
+
+            if (currentIsNonPrivate) {
+                persistentCurrentTab = nonPrivateBeforeCurrent;
+            } else {
+                persistentCurrentTab = nonPrivateBeforeCurrent;
+                if (persistentCurrentTab >= persistentSize) {
+                    persistentCurrentTab = persistentSize - 1;
+                }
+            }
+        }
+
         try (JsonWriter writer = JsonWriter.of(Okio.buffer(Okio.sink(new File(tabPath, FILE_TAB_CURRENT))))) {
             writer.beginObject();
             writer.name(JSON_NAME_CURRENT_TAB);
-            writer.value(currentTab);
+            writer.value(persistentCurrentTab);
             writer.endObject();
         } catch (IOException e) {
             e.printStackTrace();
