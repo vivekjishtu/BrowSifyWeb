@@ -24,10 +24,12 @@ import android.view.*
 import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.snackbar.Snackbar
+import jp.hazuki.yuzubrowser.core.eventbus.LocalEventBus
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.databinding.RecyclerWithFabBinding
 import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDial
 import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDialManager
+import jp.hazuki.yuzubrowser.ui.BROADCAST_ACTION_NOTIFY_REFRESH_SPEED_DIAL
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
 import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
@@ -119,6 +121,7 @@ class SpeedDialSettingActivityFragment : androidx.fragment.app.Fragment(), OnRec
         val (id) = speedDialList.removeAt(position)
         adapter.notifyDataSetChanged()
         manager.delete(id)
+        notifySpeedDialChanged()
     }
 
 
@@ -144,6 +147,7 @@ class SpeedDialSettingActivityFragment : androidx.fragment.app.Fragment(), OnRec
 
         manager.update(speedDial)
         adapter.notifyDataSetChanged()
+        notifySpeedDialChanged()
     }
 
     class FabActionDialog : androidx.fragment.app.DialogFragment() {
@@ -173,6 +177,7 @@ class SpeedDialSettingActivityFragment : androidx.fragment.app.Fragment(), OnRec
         override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
             adapter.move(viewHolder.adapterPosition, target.adapterPosition)
             manager.updateOrder(speedDialList)
+            notifySpeedDialChanged()
             return true
         }
 
@@ -191,6 +196,7 @@ class SpeedDialSettingActivityFragment : androidx.fragment.app.Fragment(), OnRec
                         override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                             if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
                                 manager.delete(speedDial.id)
+                                notifySpeedDialChanged()
                             }
                         }
                     })
@@ -220,6 +226,10 @@ class SpeedDialSettingActivityFragment : androidx.fragment.app.Fragment(), OnRec
     override fun onDetach() {
         super.onDetach()
         mListener = null
+    }
+
+    private fun notifySpeedDialChanged() {
+        LocalEventBus.getDefault().notify(BROADCAST_ACTION_NOTIFY_REFRESH_SPEED_DIAL)
     }
 
     interface OnSpeedDialAddListener {

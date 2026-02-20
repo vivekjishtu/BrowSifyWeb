@@ -86,6 +86,7 @@ import jp.hazuki.yuzubrowser.legacy.gesture.GestureManager
 import jp.hazuki.yuzubrowser.legacy.menuwindow.MenuWindow
 import jp.hazuki.yuzubrowser.legacy.readitlater.readItLater
 import jp.hazuki.yuzubrowser.legacy.settings.data.AppData
+import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDialManager
 import jp.hazuki.yuzubrowser.legacy.tab.BrowserTabManager
 import jp.hazuki.yuzubrowser.legacy.tab.TabListLayout
 import jp.hazuki.yuzubrowser.legacy.tab.UiTabManager
@@ -108,6 +109,7 @@ import jp.hazuki.yuzubrowser.search.presentation.search.SearchActivity
 import jp.hazuki.yuzubrowser.ui.*
 import jp.hazuki.yuzubrowser.ui.app.SystemUiController
 import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
+import jp.hazuki.yuzubrowser.ui.BROADCAST_ACTION_NOTIFY_REFRESH_SPEED_DIAL
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 import jp.hazuki.yuzubrowser.ui.utils.*
@@ -216,6 +218,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     private var findOnPage: WebViewFindDialog? = null
     private var delayAction: Action? = null
     override val secretKey = Random.nextInt().toString(36)
+    private var lastSpeedDialUpdateTime: Long = -1L
 
     @Inject
     internal lateinit var webViewFactory: WebViewFactory
@@ -320,6 +323,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         binding.webGestureOverlayView.setWebFrame(binding.appbar)
 
         onPreferenceReset()
+        lastSpeedDialUpdateTime = getCurrentSpeedDialUpdateTime()
 
         if (savedInstanceState != null) {
             restoreWebState()
@@ -394,6 +398,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     override fun onResume() {
         super.onResume()
         isResumed = true
+        refreshOpenSpeedDialTabsIfNeeded()
         runDelayedAction()
     }
 
@@ -1745,6 +1750,35 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         when (id) {
             BROADCAST_ACTION_UPDATE_AD_BLOCK_DATA -> webClient.updateAdBlockList()
             BROADCAST_ACTION_NOTIFY_CHANGE_WEB_STATE -> notifyChangeWebState()
+            BROADCAST_ACTION_NOTIFY_REFRESH_SPEED_DIAL -> {
+                refreshOpenSpeedDialTabs()
+                lastSpeedDialUpdateTime = getCurrentSpeedDialUpdateTime()
+            }
+        }
+    }
+
+    private fun refreshOpenSpeedDialTabs() {
+        tabManagerIn.loadedData.forEach { tab ->
+            val currentUrl = tab.url ?: tab.mWebView.url
+            if (currentUrl.equals("bsw:speeddial", ignoreCase = true)) {
+                tab.mWebView.reload()
+            }
+        }
+    }
+
+    private fun refreshOpenSpeedDialTabsIfNeeded() {
+        val now = getCurrentSpeedDialUpdateTime()
+        if (now > 0 && now != lastSpeedDialUpdateTime) {
+            refreshOpenSpeedDialTabs()
+            lastSpeedDialUpdateTime = now
+        }
+    }
+
+    private fun getCurrentSpeedDialUpdateTime(): Long {
+        return try {
+            SpeedDialManager(applicationContext).listUpdateTime
+        } catch (_: Throwable) {
+            -1L
         }
     }
 

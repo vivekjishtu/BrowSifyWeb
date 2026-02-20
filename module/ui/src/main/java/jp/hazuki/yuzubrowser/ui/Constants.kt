@@ -26,6 +26,7 @@ const val INTENT_EXTRA_MODE_FULLSCREEN = "$INTENT_EXTRA_PREFIX.fullscreen"
 const val INTENT_EXTRA_MODE_ORIENTATION = "$INTENT_EXTRA_PREFIX.orientation"
 
 const val BROADCAST_ACTION_NOTIFY_CHANGE_WEB_STATE = "jp.hazuki.yuzubrowser.adblock.broadcast.update.browser.webState"
+const val BROADCAST_ACTION_NOTIFY_REFRESH_SPEED_DIAL = "jp.hazuki.yuzubrowser.broadcast.update.browser.speeddial"
 
 const val PREFERENCE_FILE_NAME = "main_preference"
 
