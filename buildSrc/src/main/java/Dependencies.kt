@@ -15,10 +15,10 @@
  */
 
 object Build {
-    const val compile_sdk_version = 34
+    const val compile_sdk_version = 36
    // const val build_tools_version = "30.0.3"
     const val min_sdk_version = 23
-    const val target_sdk_version = 34
+    const val target_sdk_version = 36
 }
 
 object AppVersions {

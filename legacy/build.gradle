@@ -40,17 +40,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        jvmTarget = "21"
     }
 
     buildTypes {
@@ -69,11 +64,6 @@ android {
     lint {
         disable 'MissingTranslation', 'GoogleAppIndexingWarning', 'ClickableViewAccessibility'
     }
-}
-
-repositories {
-    maven { url 'https://jitpack.io' }
-    mavenCentral()
 }
 
 dependencies {
@@ -137,6 +127,6 @@ dependencies {
 
     // Declare the dependencies for the Crashlytics and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase li
-    implementation 'com.google.firebase:firebase-crashlytics-ktx'
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
 }

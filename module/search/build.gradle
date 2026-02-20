@@ -32,12 +32,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "21"
+        freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
     }
 
     buildTypes {
@@ -51,15 +52,6 @@ android {
         dataBinding true
     }
     namespace 'jp.hazuki.yuzubrowser.search'
-
-    kotlinOptions {
-        freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
-    }
-}
-
-repositories {
-    maven { url 'https://jitpack.io' }
-    mavenCentral()
 }
 
 dependencies {implementation fileTree(dir: 'libs', include: ['*.jar'])

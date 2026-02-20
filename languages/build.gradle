@@ -22,6 +22,11 @@ plugins {
 android {
     compileSdk Build.compile_sdk_version
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
     defaultConfig {
         minSdkVersion Build.min_sdk_version
         targetSdkVersion Build.target_sdk_version
@@ -31,7 +36,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            lintOptions {
+            lint {
                 disable 'MissingTranslation'
             }
         }
