@@ -41,16 +41,20 @@ public class MainTabData extends TabData {
         super(web);
         mTabView = view;
         titleTextView = view.findViewById(R.id.textView);
+        privateLabelTextView = view.findViewById(R.id.privateLabelTextView);
         context = view.getContext();
         loadingIcon = (AnimatedVectorDrawable) context.getDrawable(R.drawable.ic_loading_circle_24dp);
+        setPrivateLabelVisibility();
     }
 
     public MainTabData(CustomWebView web, View view, TabIndexData data) {
         super(web, data);
         mTabView = view;
         titleTextView = view.findViewById(R.id.textView);
+        privateLabelTextView = view.findViewById(R.id.privateLabelTextView);
         context = view.getContext();
         loadingIcon = (AnimatedVectorDrawable) context.getDrawable(R.drawable.ic_loading_circle_24dp);
+        setPrivateLabelVisibility();
     }
 
     @Override
@@ -184,15 +188,19 @@ public class MainTabData extends TabData {
     }
 
     private void setText(String text) {
+        setPrivateLabelVisibility();
         if (text == null) {
             titleTextView.setText(null);
             return;
         }
-        if (getTabType() == TabType.PRIVATE) {
-            titleTextView.setText(context.getString(R.string.action_private) + " | " + text);
-        } else {
-            titleTextView.setText(text);
+        titleTextView.setText(text);
+    }
+
+    private void setPrivateLabelVisibility() {
+        if (privateLabelTextView == null) {
+            return;
         }
+        privateLabelTextView.setVisibility(getTabType() == TabType.PRIVATE ? View.VISIBLE : View.GONE);
     }
 
     private void setIcon(Drawable drawable) {
@@ -218,6 +226,7 @@ public class MainTabData extends TabData {
 
     private final View mTabView;
     private final TextView titleTextView;
+    private final TextView privateLabelTextView;
     private final AnimatedVectorDrawable loadingIcon;
     private final Context context;
     private WebSettingResetAction resetAction;
