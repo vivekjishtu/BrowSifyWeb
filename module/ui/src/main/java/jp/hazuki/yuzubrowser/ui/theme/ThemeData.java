@@ -30,6 +30,7 @@ import android.graphics.drawable.NinePatchDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.text.TextUtils;
+import android.content.res.Configuration;
 import android.view.View;
 import android.widget.Toast;
 
@@ -390,6 +391,9 @@ public class ThemeData {
         if (TextUtils.isEmpty(folder)) {
             sInstance = null;
             loadedTheme = null;
+        } else if (THEME_AUTO.equals(folder)) {
+            sInstance = isSystemInLightMode(context) ? createLightTheme(context) : null;
+            loadedTheme = folder;
         } else if (THEME_LIGHT.equals(folder)) {
             sInstance = createLightTheme(context);
             loadedTheme = folder;
@@ -461,6 +465,11 @@ public class ThemeData {
         rect.right = (int) (rect.right * scale + 0.5f);
         rect.top = (int) (rect.top * scale + 0.5f);
         rect.bottom = (int) (rect.bottom * scale + 0.5f);
+    }
+
+    private static boolean isSystemInLightMode(@NonNull Context context) {
+        int nightMask = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return nightMask != Configuration.UI_MODE_NIGHT_YES;
     }
 
     private static ThemeData createLightTheme(Context context) {

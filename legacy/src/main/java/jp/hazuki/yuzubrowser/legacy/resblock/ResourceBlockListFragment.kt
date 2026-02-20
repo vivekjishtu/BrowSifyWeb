@@ -25,6 +25,7 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.resblock.checker.NormalChecker
 import jp.hazuki.yuzubrowser.legacy.utils.view.recycler.RecyclerFabFragment
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.widget.recycler.ArrayRecyclerAdapter
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
@@ -65,6 +66,7 @@ class ResourceBlockListFragment : RecyclerFabFragment(), OnRecyclerListener, Che
         adapter.notifyItemRemoved(index)
         val context = requireContext().applicationContext
         Snackbar.make(rootView, R.string.deleted, Snackbar.LENGTH_SHORT)
+                .applyAppTheme()
                 .setAction(R.string.undo) {
                     manager.add(index, checker)
                     adapter.notifyItemInserted(index)

@@ -30,6 +30,7 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.*
 import jp.hazuki.yuzubrowser.legacy.utils.view.recycler.RecyclerFabFragment
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.widget.recycler.ArrayRecyclerAdapter
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
@@ -127,6 +128,7 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
         adapter.notifyDataSetChanged()
         onActionListChanged()
         Snackbar.make(rootView, R.string.deleted, Snackbar.LENGTH_SHORT)
+                .applyAppTheme()
                 .setAction(R.string.undo) {
                     mList.add(index, action)
                     adapter.notifyDataSetChanged()
@@ -179,7 +181,9 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
                 RESULT_REQUEST_EDIT -> {
                     val action = data.getParcelableExtra<Action>(ActionActivity.EXTRA_ACTION)!!
                     if (action.isEmpty()) {
-                        Snackbar.make(rootView, R.string.action_cant_empty, Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(rootView, R.string.action_cant_empty, Snackbar.LENGTH_SHORT)
+                            .applyAppTheme()
+                            .show()
                         return
                     }
                     val position = data.getBundleExtra(ActionActivity.EXTRA_RETURN)!!.getInt(EXTRA_POSITION)

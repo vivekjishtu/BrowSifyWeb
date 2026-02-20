@@ -102,7 +102,7 @@ class YuzuBrowserApplication : Application(), BrowserApplication {
         lateinit var instance: YuzuBrowserApplication
 
         init {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
     }
 }

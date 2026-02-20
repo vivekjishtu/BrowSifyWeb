@@ -16,6 +16,8 @@
 
 package jp.hazuki.yuzubrowser.legacy.utils.view.templatepreserving
 
+import android.content.res.Configuration
+import android.graphics.Color
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -106,7 +108,13 @@ private constructor(parent: ViewGroup, content: View, contentViewCallback: Conte
             snackBar.duration = duration
             snackBar.setTemplateText(template)
             snackBar.setText(title)
+            snackBar.applyColorsForCurrentMode()
             return snackBar
+        }
+
+        private fun isNightMode(view: View): Boolean {
+            val mode = view.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            return mode == Configuration.UI_MODE_NIGHT_YES
         }
 
         private fun findSuitableParent(view: View?): ViewGroup? {
@@ -137,5 +145,16 @@ private constructor(parent: ViewGroup, content: View, contentViewCallback: Conte
             // If we reach here then we didn't find a CoL or a suitable content view so we'll fallback
             return fallback
         }
+    }
+
+    private fun applyColorsForCurrentMode() {
+        val night = isNightMode(view)
+        val backgroundColor = if (night) 0xFF323232.toInt() else 0xFFF3F3F3.toInt()
+        val textColor = if (night) Color.WHITE else 0xFF1D1D1D.toInt()
+        val actionColor = if (night) 0xFF84FFFF.toInt() else 0xFF00639A.toInt()
+
+        view.setBackgroundColor(backgroundColor)
+        textView.setTextColor(textColor)
+        action.setTextColor(actionColor)
     }
 }

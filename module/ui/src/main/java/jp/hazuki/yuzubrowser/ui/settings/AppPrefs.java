@@ -124,7 +124,7 @@ public class AppPrefs {
     public static final IntContainer auto_tab_save_delay = new IntContainer("auto_tab_save_delay", 0);
     public static final IntContainer minimum_font = new IntContainer("minimum_font", 8);
     public static final BooleanContainer detailed_log = new BooleanContainer("detailed_log", false);
-    public static final StringContainer theme_setting = new StringContainer("theme_setting", ThemeData.THEME_DARK);
+    public static final StringContainer theme_setting = new StringContainer("theme_setting", ThemeData.THEME_AUTO);
     public static final BooleanContainer resblock_enable = new BooleanContainer("resblock_enable", false);
     public static final BooleanContainer allow_content_access = new BooleanContainer("allow_content_access", true);
     public static final BooleanContainer pull_to_refresh = new BooleanContainer("pull_to_refresh", true);

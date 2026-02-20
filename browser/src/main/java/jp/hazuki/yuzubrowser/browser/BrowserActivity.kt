@@ -107,6 +107,7 @@ import jp.hazuki.yuzubrowser.legacy.webrtc.core.WebRtcRequest
 import jp.hazuki.yuzubrowser.search.presentation.search.SearchActivity
 import jp.hazuki.yuzubrowser.ui.*
 import jp.hazuki.yuzubrowser.ui.app.SystemUiController
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 import jp.hazuki.yuzubrowser.ui.utils.*
@@ -978,6 +979,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
                 getString(R.string.closed_tab, title)
             }
             Snackbar.make(binding.coordinator, message, Snackbar.LENGTH_LONG)
+                .applyAppTheme()
                 .setAction(R.string.undo) { restoreTab() }
                 .show()
         }
@@ -1510,7 +1512,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         get() = theme
 
     override val applicationContextInfo: Context
-        get() = applicationContext
+        get() = this
 
     override var isImeShown: Boolean = false
 

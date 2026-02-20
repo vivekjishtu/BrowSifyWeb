@@ -39,6 +39,7 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.databinding.FragmentUserScriptListBinding
 import jp.hazuki.yuzubrowser.legacy.databinding.FragmentUserjsItemBinding
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.extensions.registerForStartActivityForResult
 import jp.hazuki.yuzubrowser.ui.widget.recycler.ArrayRecyclerAdapter
@@ -207,6 +208,7 @@ class UserScriptListFragment : Fragment(), OnUserJsItemClickListener, DeleteDial
             val index = viewHolder.adapterPosition
             val js = adapter.remove(index)
             Snackbar.make(binding.linear, R.string.deleted, Snackbar.LENGTH_SHORT)
+                .applyAppTheme()
                 .setAction(R.string.undo) {
                     adapter.add(index, js)
                     adapter.notifyDataSetChanged()

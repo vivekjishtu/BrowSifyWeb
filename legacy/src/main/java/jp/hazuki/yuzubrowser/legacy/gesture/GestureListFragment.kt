@@ -34,6 +34,7 @@ import jp.hazuki.yuzubrowser.legacy.action.ActionNameArray
 import jp.hazuki.yuzubrowser.legacy.action.view.ActionActivity
 import jp.hazuki.yuzubrowser.legacy.utils.view.recycler.RecyclerFabFragment
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.widget.recycler.ArrayRecyclerAdapter
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
 
@@ -111,6 +112,7 @@ class GestureListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDia
     override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, index: Int) {
         val item = adapter.remove(index)
         Snackbar.make(rootView, R.string.deleted, Snackbar.LENGTH_SHORT)
+                .applyAppTheme()
                 .setAction(R.string.undo) {
                     adapter.add(index, item)
                     adapter.notifyItemInserted(index)

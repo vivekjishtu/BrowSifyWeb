@@ -30,6 +30,7 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.databinding.RecyclerWithFabBinding
 import jp.hazuki.yuzubrowser.legacy.useragent.SelectActionDialog.DELETE
 import jp.hazuki.yuzubrowser.legacy.useragent.SelectActionDialog.EDIT
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
@@ -160,6 +161,7 @@ class UserAgentSettingFragment : Fragment(), DeleteUserAgentDialog.OnDelete, Edi
             val ua = mAdapter.remove(position)
 
             Snackbar.make(binding.root, R.string.deleted, Snackbar.LENGTH_SHORT)
+                    .applyAppTheme()
                     .setAction(R.string.undo) {
                         mAdapter.add(position, ua)
                         mAdapter.notifyItemInserted(position)

@@ -33,6 +33,7 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.webencode.SelectActionDialog.DELETE
 import jp.hazuki.yuzubrowser.legacy.webencode.SelectActionDialog.EDIT
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
@@ -151,6 +152,7 @@ class WebTextEncodeSettingFragment : Fragment(), OnRecyclerListener, EditWebText
 
             mAdapter.notifyDataSetChanged()
             Snackbar.make(rootView!!, R.string.deleted, Snackbar.LENGTH_SHORT)
+                    .applyAppTheme()
                     .setAction(R.string.undo) {
                         mEncodeList.add(position, encode)
                         mAdapter.notifyDataSetChanged()

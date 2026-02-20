@@ -29,6 +29,7 @@ import jp.hazuki.yuzubrowser.legacy.databinding.RecyclerWithFabBinding
 import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDial
 import jp.hazuki.yuzubrowser.legacy.speeddial.SpeedDialManager
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
@@ -181,6 +182,7 @@ class SpeedDialSettingActivityFragment : androidx.fragment.app.Fragment(), OnRec
 
             adapter.notifyDataSetChanged()
             Snackbar.make(binding.rootLayout, R.string.deleted, Snackbar.LENGTH_SHORT)
+                    .applyAppTheme()
                     .setAction(R.string.undo) {
                         speedDialList.add(position, speedDial)
                         adapter.notifyDataSetChanged()

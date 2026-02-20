@@ -37,6 +37,7 @@ import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionArrayFile
 import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionFile
 import jp.hazuki.yuzubrowser.legacy.utils.view.recycler.RecyclerFabFragment
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.widget.recycler.ArrayRecyclerAdapter
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
@@ -118,6 +119,7 @@ class SoftButtonActionArrayFragment : RecyclerFabFragment(), OnRecyclerListener,
         adapter.notifyDataSetChanged()
         checkMax()
         Snackbar.make(rootView, R.string.deleted, Snackbar.LENGTH_SHORT)
+            .applyAppTheme()
             .setAction(R.string.undo) {
                 actionArray.list.add(index, file)
                 adapter.notifyDataSetChanged()

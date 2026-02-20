@@ -37,6 +37,7 @@ import jp.hazuki.yuzubrowser.legacy.action.ActionNameArray
 import jp.hazuki.yuzubrowser.legacy.action.SingleAction
 import jp.hazuki.yuzubrowser.legacy.action.view.ActionActivity
 import jp.hazuki.yuzubrowser.legacy.databinding.ActionCustomBinding
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.widget.recycler.ArrayRecyclerAdapter
 import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
@@ -171,6 +172,7 @@ class CustomSingleActionFragment : Fragment(), OnRecyclerListener, RecyclerMenu.
             val action = adapter.remove(position)
 
             Snackbar.make(binding.rootLayout, R.string.deleted, Snackbar.LENGTH_SHORT)
+                    .applyAppTheme()
                     .setAction(R.string.undo) {
                         adapter.add(position, action)
                         adapter.notifyItemInserted(position)

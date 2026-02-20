@@ -28,6 +28,7 @@ import jp.hazuki.yuzubrowser.legacy.databinding.RecyclerWithFabBinding
 import jp.hazuki.yuzubrowser.legacy.gesture.multiFinger.data.MultiFingerGestureItem
 import jp.hazuki.yuzubrowser.legacy.gesture.multiFinger.data.MultiFingerGestureManager
 import jp.hazuki.yuzubrowser.ui.dialog.DeleteDialogCompat
+import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
@@ -149,6 +150,7 @@ class MfsListFragment : androidx.fragment.app.Fragment(), OnRecyclerListener, De
             val item = adapter.remove(position)
 
             Snackbar.make(binding.rootLayout, R.string.deleted, Snackbar.LENGTH_SHORT)
+                    .applyAppTheme()
                     .setAction(R.string.undo) {
                         manager.add(position, item)
                         adapter.notifyDataSetChanged()

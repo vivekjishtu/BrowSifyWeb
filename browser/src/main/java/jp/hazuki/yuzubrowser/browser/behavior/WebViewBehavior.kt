@@ -41,10 +41,15 @@ class WebViewBehavior(context: Context, attrs: AttributeSet) : AppBarLayout.Scro
 
     override fun layoutDependsOn(parent: androidx.coordinatorlayout.widget.CoordinatorLayout, child: View, dependency: View): Boolean {
         if (dependency is AppBarLayout) {
-            topToolBar = parent.findViewById(R.id.topToolbar)
-            bottomBar = parent.findViewById(R.id.bottomOverlayLayout)
-            paddingFrame = child.findViewById(R.id.toolbarPadding)
-            overlayPaddingFrame = child.findViewById(R.id.bottomAlwaysOverlayToolbarPadding)
+            val top = parent.findViewById<View>(R.id.topToolbar) ?: return false
+            val bottom = parent.findViewById<View>(R.id.bottomOverlayLayout) ?: return false
+            val padding = child.findViewById<View>(R.id.toolbarPadding) ?: return false
+            val overlayPadding = child.findViewById<PaddingFrameLayout>(R.id.bottomAlwaysOverlayToolbarPadding) ?: return false
+
+            topToolBar = top
+            bottomBar = bottom
+            paddingFrame = padding
+            overlayPaddingFrame = overlayPadding
             isInitialized = true
             return true
         }
@@ -52,6 +57,9 @@ class WebViewBehavior(context: Context, attrs: AttributeSet) : AppBarLayout.Scro
     }
 
     override fun onDependentViewChanged(parent: androidx.coordinatorlayout.widget.CoordinatorLayout, child: View, dependency: View): Boolean {
+        if (!isInitialized || !::controller.isInitialized) {
+            return super.onDependentViewChanged(parent, child, dependency)
+        }
         val bottom = dependency.bottom
 
         val webView = webView
@@ -73,7 +81,7 @@ class WebViewBehavior(context: Context, attrs: AttributeSet) : AppBarLayout.Scro
     }
 
     fun adjustWebView(data: MainTabData, height: Int) {
-        if (!isInitialized) return
+        if (!isInitialized || !::controller.isInitialized) return
         if (paddingHeight != height) {
             paddingHeight = height
             val params = paddingFrame.layoutParams

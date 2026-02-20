@@ -31,20 +31,33 @@ open class ThemeActivity : AppCompatActivity() {
 
     override fun attachBaseContext(newBase: Context) {
         val application = newBase.applicationContext
-        if (!ThemeData.isLoaded()) {
-            ThemeData.createInstance(application, PrefPool.getSharedPref(application).getString(theme_setting, ThemeData.THEME_LIGHT))
+        val selectedTheme = PrefPool.getSharedPref(application).getString(theme_setting, ThemeData.THEME_AUTO)
+            ?: ThemeData.THEME_AUTO
+        if (selectedTheme == ThemeData.THEME_AUTO) {
+            // Recreate auto theme on each attach so it tracks system day/night changes.
+            ThemeData.createInstance(newBase, ThemeData.THEME_AUTO)
+        } else if (!ThemeData.isLoaded() || ThemeData.getLoadedTheme() != selectedTheme) {
+            ThemeData.createInstance(application, selectedTheme)
         }
 
-        val isLightMode = isLightMode()
+        val isLightMode = isLightMode(selectedTheme, newBase)
         val config = newBase.createLanguageConfig(AppPrefs.language.get())
 
-        applyThemeMode(isLightMode)
-        config.updateTheme(isLightMode)
+        applyThemeMode(isLightMode, selectedTheme)
+        if (selectedTheme != ThemeData.THEME_AUTO) {
+            config.updateTheme(isLightMode)
+        }
 
         super.attachBaseContext(ContextCompat(newBase.createConfigurationContext(config), newBase))
     }
 
-    private fun applyThemeMode(isLightMode: Boolean) {
+    private fun applyThemeMode(isLightMode: Boolean, selectedTheme: String) {
+        if (selectedTheme == ThemeData.THEME_AUTO) {
+            if (AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+            return
+        }
         val defaultMode = AppCompatDelegate.getDefaultNightMode()
         if (isLightMode) {
             if (defaultMode != AppCompatDelegate.MODE_NIGHT_NO) {
@@ -57,7 +70,11 @@ open class ThemeActivity : AppCompatActivity() {
         }
     }
 
-    private fun isLightMode(): Boolean {
+    private fun isLightMode(selectedTheme: String, context: Context): Boolean {
+        if (selectedTheme == ThemeData.THEME_AUTO) {
+            val nightMask = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            return nightMask != Configuration.UI_MODE_NIGHT_YES
+        }
         return ThemeData.getInstance()?.lightTheme ?: false
     }
 
@@ -83,6 +100,5 @@ open class ThemeActivity : AppCompatActivity() {
 
     companion object {
         private const val theme_setting = "theme_setting"
-        private const val language = "language"
     }
 }
