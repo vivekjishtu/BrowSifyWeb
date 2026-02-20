@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jp.hazuki.yuzubrowser.legacy.R;
 import jp.hazuki.yuzubrowser.legacy.utils.graphics.DividerDrawable;
 import jp.hazuki.yuzubrowser.legacy.utils.view.tab.TabLayout.OnTabClickListener;
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs;
@@ -44,6 +45,7 @@ public abstract class TabController {
     public void addTabView(View view) {
         settingTab(view, mViewList.size());
         mViewList.add(view);
+        updateActiveTabCloseButton();
     }
 
     public void addTabView(int id, View view) {
@@ -55,6 +57,7 @@ public abstract class TabController {
         for (int i = 0; i < count; ++i) {
             settingTab(mViewList.get(i), i);
         }
+        updateActiveTabCloseButton();
     }
 
     public abstract void requestAddView(View view, int index);
@@ -62,6 +65,7 @@ public abstract class TabController {
     public void setCurrentTab(int id) {
         mListener.onChangeCurrentTab((mCurrentId < mViewList.size()) ? mCurrentId : -1, id);
         mCurrentId = id;
+        updateActiveTabCloseButton();
     }
 
     public void removeTabAt(int id) {
@@ -80,6 +84,7 @@ public abstract class TabController {
         if (mCurrentId > id) {
             mCurrentId--;
         }
+        updateActiveTabCloseButton();
     }
 
     public abstract void requestRemoveViewAt(int id);
@@ -97,6 +102,15 @@ public abstract class TabController {
                     }
                 }
         );
+        View closeButton = viewholder.findViewById(R.id.closeTabButton);
+        if (closeButton != null) {
+            closeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onTabDoubleClick(tabId);
+                }
+            });
+        }
         viewholder.setOnLongClickListener(
                 new View.OnLongClickListener() {
                     @Override
@@ -170,6 +184,7 @@ public abstract class TabController {
         requestAddView(va, b);
         settingTab(va, b);
         settingTab(vb, a);
+        updateActiveTabCloseButton();
     }
 
     public void moveTab(int from, int to, int new_curernt) {
@@ -183,6 +198,17 @@ public abstract class TabController {
         int count = mViewList.size();
         for (int i = 0; i < count; ++i) {
             settingTab(mViewList.get(i), i);
+        }
+        updateActiveTabCloseButton();
+    }
+
+    private void updateActiveTabCloseButton() {
+        int count = mViewList.size();
+        for (int i = 0; i < count; ++i) {
+            View closeButton = mViewList.get(i).findViewById(R.id.closeTabButton);
+            if (closeButton != null) {
+                closeButton.setVisibility(i == mCurrentId ? View.VISIBLE : View.GONE);
+            }
         }
     }
 
