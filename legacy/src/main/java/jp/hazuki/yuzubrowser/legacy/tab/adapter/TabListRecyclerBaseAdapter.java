@@ -80,12 +80,15 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
             if (indexData.getTabType() == TabType.PRIVATE) {
                 if (TextUtils.isEmpty(title)) {
                     title = context.getString(R.string.private_tab_start_title);
-                } else {
-                    title = context.getString(R.string.action_private) + " | " + title;
                 }
-                setPrivateIndicator(holder);
+                if (holder.privateLabel != null) {
+                    holder.privateLabel.setVisibility(View.VISIBLE);
+                }
             } else {
                 holder.title.setCompoundDrawablesRelative(null, null, null, null);
+                if (holder.privateLabel != null) {
+                    holder.privateLabel.setVisibility(View.GONE);
+                }
             }
             holder.title.setText(title);
             if (indexData.isPinning()) {
@@ -133,17 +136,6 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
 
     abstract void onBindViewHolder(ViewHolder holder, TabIndexData indexData);
 
-    private void setPrivateIndicator(ViewHolder holder) {
-        Drawable privateIcon = context.getDrawable(R.drawable.ic_private_white_24dp);
-        if (privateIcon == null) return;
-        privateIcon = privateIcon.mutate();
-        privateIcon.setTint(holder.title.getCurrentTextColor());
-        int size = holder.title.getLineHeight();
-        privateIcon.setBounds(0, 0, size, size);
-        holder.title.setCompoundDrawablePadding(size / 3);
-        holder.title.setCompoundDrawablesRelative(privateIcon, null, null, null);
-    }
-
     @Override
     public int getItemCount() {
         return tabManager.size();
@@ -171,6 +163,7 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
 
         ImageView thumbNail;
         TextView title;
+        TextView privateLabel;
         TextView url;
         View disable;
         ImageButton closeButton;
@@ -180,6 +173,7 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
             super(itemView);
             thumbNail = itemView.findViewById(R.id.thumbNailImageView);
             title = itemView.findViewById(R.id.titleTextView);
+            privateLabel = itemView.findViewById(R.id.privateLabelTextView);
             url = itemView.findViewById(R.id.urlTextView);
             disable = itemView.findViewById(R.id.disable);
             closeButton = itemView.findViewById(R.id.closeImageButton);

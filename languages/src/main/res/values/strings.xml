@@ -307,6 +307,7 @@
     <string name="private_tab_created">Private tab opened</string>
     <string name="private_tab_start_title">You\'re in a private tab</string>
     <string name="private_tab_start_message">Cookies and site data from this tab won\'t be saved.</string>
+    <string name="private_tab_compact_hint">Private tab</string>
     <string name="private_tab_start_note">Downloads, bookmarks, and anything you save manually will still be kept.</string>
 
     <string name="print_not_support">This device does not support printing</string>

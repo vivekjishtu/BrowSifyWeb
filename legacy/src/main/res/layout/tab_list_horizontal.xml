@@ -17,24 +17,24 @@
 
     <LinearLayout
         android:id="@+id/bottomBar"
-        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/tab_list_background"
         android:clickable="true"
-        android:gravity="right"
+        android:gravity="end"
         android:orientation="horizontal"
+        android:paddingEnd="8dp"
         tools:ignore="KeyboardInaccessibleWidget,RtlHardcoded">
 
         <ImageButton
             android:id="@+id/newTabButton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="@string/new_tab"
-            android:paddingEnd="30dp"
-            android:paddingStart="30dp"
-            android:src="@drawable/ic_add_box_white_24dp" />
+            android:padding="10dp"
+            android:src="@drawable/ic_add_white_24dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:tint="@android:color/white" />
     </LinearLayout>
 </LinearLayout>
