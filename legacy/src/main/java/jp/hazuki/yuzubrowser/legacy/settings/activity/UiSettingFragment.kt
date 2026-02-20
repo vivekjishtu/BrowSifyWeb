@@ -19,9 +19,11 @@ import android.os.Bundle
 import androidx.fragment.app.commit
 import androidx.fragment.app.setFragmentResultListener
 import androidx.preference.Preference
+import androidx.preference.PreferenceScreen
 import jp.hazuki.yuzubrowser.core.utility.utils.ui
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.settings.preference.ThemePreference
+import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.RestartActivity
 import kotlinx.coroutines.delay
 
@@ -55,10 +57,44 @@ class UiSettingFragment : YuzuPreferenceFragment() {
             true
         }
 
+        bindIntSummary("swipebtn_sensitivity", AppPrefs.swipebtn_sensitivity.get(), "")
+        bindIntSummary("toolbar_size_tab", AppPrefs.toolbar_tab.size.get(), "dp")
+        bindIntSummary("toolbar_size_url", AppPrefs.toolbar_url.size.get(), "dp")
+        bindIntSummary("toolbar_size_progress", AppPrefs.toolbar_progress.size.get(), "dp")
+        bindIntSummary("toolbar_size_custom1", AppPrefs.toolbar_custom1.size.get(), "dp")
+        bindIntSummary("toolbar_text_size_url", AppPrefs.toolbar_text_size_url.get(), "sp")
+        bindIntSummary("tab_size_x", AppPrefs.tab_size_x.get(), "dp")
+        bindIntSummary("tab_font_size", AppPrefs.tab_font_size.get(), "sp")
+
+        bindToolbarCardSummary("ps_toolbar_tab", "toolbar_size_tab")
+        bindToolbarCardSummary("ps_toolbar_url", "toolbar_size_url")
+        bindToolbarCardSummary("ps_toolbar_progress", "toolbar_size_progress")
+        bindToolbarCardSummary("ps_toolbar_custom", "toolbar_size_custom1")
+
         setFragmentResultListener(ThemeManagementFragment.REQUEST_THEME_LIST_UPDATE) { _, bundle ->
             if (bundle.getBoolean(ThemeManagementFragment.REQUEST_THEME_LIST_UPDATE)) {
                 findPreference<ThemePreference>("theme_setting")!!.load()
             }
+        }
+    }
+
+    private fun bindToolbarCardSummary(toolbarKey: String, sizeKey: String) {
+        val toolbarPreference = findPreference<PreferenceScreen>(toolbarKey) ?: return
+        val sizePreference = findPreference<Preference>(sizeKey) ?: return
+
+        toolbarPreference.summaryProvider = Preference.SummaryProvider<PreferenceScreen> {
+            val sizeSummary = sizePreference.summaryProvider?.provideSummary(sizePreference)
+                ?: sizePreference.summary
+                ?: ""
+            "${getString(R.string.pref_toolbar_size)}: $sizeSummary"
+        }
+    }
+
+    private fun bindIntSummary(key: String, defaultValue: Int, suffix: String) {
+        val preference = findPreference<Preference>(key) ?: return
+        preference.summaryProvider = Preference.SummaryProvider<Preference> { pref ->
+            val value = pref.preferenceManager.sharedPreferences?.getInt(key, defaultValue) ?: defaultValue
+            if (suffix.isEmpty()) value.toString() else "$value $suffix"
         }
     }
 }

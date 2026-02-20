@@ -61,6 +61,12 @@
                 android:title="@string/pref_toolbar_small_icon"
                 app:iconSpaceReserved="false" />
             <jp.hazuki.yuzubrowser.ui.preference.SeekbarPreference
+                android:key="swipebtn_sensitivity"
+                android:title="@string/pref_toolbar_button_sensitivity"
+                app:seekMax="500"
+                app:seekMin="10"
+                app:iconSpaceReserved="false" />
+            <jp.hazuki.yuzubrowser.ui.preference.SeekbarPreference
                 android:key="overlay_bottom_alpha"
                 android:title="@string/pref_overlay_bottom_alpha"
                 app:seekMax="255"
@@ -143,6 +149,22 @@
                     android:key="toolbar_show_favicon"
                     android:title="@string/pref_show_favicon"
                     app:iconSpaceReserved="false" />
+
+                <PreferenceScreen
+                    android:key="ps_toolbar_tab_buttons"
+                    android:title="@string/pref_tab_bar_button_settings"
+                    app:iconSpaceReserved="false">
+                    <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
+                        android:title="@string/pref_btn_tab_left"
+                        app:actionGroup="s_btn_array"
+                        app:actionId="btnTabLeft"
+                        app:iconSpaceReserved="false" />
+                    <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
+                        android:title="@string/pref_btn_tab_right"
+                        app:actionGroup="s_btn_array"
+                        app:actionId="btnTabRight"
+                        app:iconSpaceReserved="false" />
+                </PreferenceScreen>
             </PreferenceScreen>
             <PreferenceScreen
                 android:key="ps_toolbar_url"
@@ -201,6 +223,27 @@
                     android:key="toolbar_always_show_url"
                     android:title="@string/pref_always_show_url"
                     app:iconSpaceReserved="false" />
+
+                <PreferenceScreen
+                    android:key="ps_toolbar_url_buttons"
+                    android:title="@string/pref_url_bar_button_settings"
+                    app:iconSpaceReserved="false">
+                    <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
+                        android:title="@string/pref_btn_url_left"
+                        app:actionGroup="s_btn_array"
+                        app:actionId="btnUrlLeft"
+                        app:iconSpaceReserved="false" />
+                    <jp.hazuki.yuzubrowser.legacy.settings.preference.SoftButtonActionPreference
+                        android:title="@string/pref_btn_url_center"
+                        app:actionGroup="s_btn"
+                        app:actionId="btnCenter"
+                        app:iconSpaceReserved="false" />
+                    <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
+                        android:title="@string/pref_btn_url_right"
+                        app:actionGroup="s_btn_array"
+                        app:actionId="btnUrlRight"
+                        app:iconSpaceReserved="false" />
+                </PreferenceScreen>
             </PreferenceScreen>
             <PreferenceScreen
                 android:key="ps_toolbar_progress"
@@ -288,6 +331,12 @@
                     android:title="@string/pref_toolbar_size"
                     app:seekMax="100"
                     app:seekMin="1"
+                    app:iconSpaceReserved="false" />
+
+                <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
+                    android:title="@string/pref_btn_custom"
+                    app:actionGroup="s_btn_custombar"
+                    app:actionId="custombar1"
                     app:iconSpaceReserved="false" />
             </PreferenceScreen>
         </PreferenceScreen>

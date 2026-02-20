@@ -50,6 +50,9 @@
     <string name="pref_default_encoding">Default text encoding</string>
     <string name="pref_text_encoding">Text encoding</string>
     <string name="pref_softbtn_settings">Toolbar button settings</string>
+    <string name="pref_toolbar_button_sensitivity">Toolbar button sensitivity</string>
+    <string name="pref_tab_bar_button_settings">Tab bar button settings</string>
+    <string name="pref_url_bar_button_settings">URL bar button settings</string>
     <string name="pref_btn_tab_left">Tab bar left button</string>
     <string name="pref_btn_tab_right">Tab bar right button</string>
     <string name="pref_btn_url_left">URL bar left button</string>

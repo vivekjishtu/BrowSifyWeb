@@ -69,58 +69,6 @@
                 app:iconSpaceReserved="false" />
         </PreferenceScreen>
 
-        <PreferenceScreen
-            android:key="ps_software_button"
-            android:title="@string/pref_softbtn_settings"
-            app:iconSpaceReserved="false">
-            <PreferenceCategory
-                android:title="@string/pref_basic_settings"
-                app:iconSpaceReserved="false">
-                <jp.hazuki.yuzubrowser.ui.preference.SeekbarPreference
-                    android:key="swipebtn_sensitivity"
-                    android:title="@string/pref_sensitivity_distance"
-                    app:seekMax="500"
-                    app:seekMin="10"
-                    app:iconSpaceReserved="false" />
-            </PreferenceCategory>
-            <PreferenceCategory
-                android:title="@string/pref_action_settings"
-                app:iconSpaceReserved="false">
-                <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
-                    android:title="@string/pref_btn_tab_left"
-                    app:actionGroup="s_btn_array"
-                    app:actionId="btnTabLeft"
-                    app:iconSpaceReserved="false" />
-                <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
-                    android:title="@string/pref_btn_tab_right"
-                    app:actionGroup="s_btn_array"
-                    app:actionId="btnTabRight"
-                    app:iconSpaceReserved="false" />
-                <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
-                    android:title="@string/pref_btn_url_left"
-                    app:actionGroup="s_btn_array"
-                    app:actionId="btnUrlLeft"
-                    app:iconSpaceReserved="false" />
-
-                <jp.hazuki.yuzubrowser.legacy.settings.preference.SoftButtonActionPreference
-                    android:title="@string/pref_btn_url_center"
-                    app:actionGroup="s_btn"
-                    app:actionId="btnCenter"
-                    app:iconSpaceReserved="false" />
-
-                <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
-                    android:title="@string/pref_btn_url_right"
-                    app:actionGroup="s_btn_array"
-                    app:actionId="btnUrlRight"
-                    app:iconSpaceReserved="false" />
-                <jp.hazuki.yuzubrowser.legacy.settings.preference.ToolbarActionListPrerence
-                    android:title="@string/pref_btn_custom"
-                    app:actionGroup="s_btn_custombar"
-                    app:actionId="custombar1"
-                    app:iconSpaceReserved="false" />
-            </PreferenceCategory>
-        </PreferenceScreen>
-
         <jp.hazuki.yuzubrowser.legacy.settings.preference.ActionListPreference
             android:title="@string/pref_menu_settings"
             app:actionGroup="menu"
