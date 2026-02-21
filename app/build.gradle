@@ -47,25 +47,25 @@ def gitHash = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.tri
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm:ssXXX")
 
 android {
-    compileSdk Build.compile_sdk_version
+    compileSdk = Build.compile_sdk_version
     defaultConfig {
-        applicationId "com.vivekjishtu.bswbrowser"
-        minSdkVersion Build.min_sdk_version
-        targetSdkVersion Build.target_sdk_version
+        applicationId = "com.vivekjishtu.bswbrowser"
+        minSdk = Build.min_sdk_version
+        targetSdk = Build.target_sdk_version
         versionCode AppVersions.version_code
-        versionName AppVersions.version_name
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        versionName = AppVersions.version_name
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "GIT_HASH", "\"${gitHash}\""
-        buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
-        resValue "string", "package_name", applicationId
-        resValue "string", "package_build", gitHash
-        resValue "string", "package_build_time", buildTime
+        buildConfigField("String", "GIT_HASH", "\"${gitHash}\"")
+        buildConfigField("String", "BUILD_TIME", "\"${buildTime}\"")
+        resValue("string", "package_name", applicationId)
+        resValue("string", "package_build", gitHash)
+        resValue("string", "package_build_time", buildTime)
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
         jvmTarget = "21"
@@ -73,9 +73,9 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles(getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro')
             manifestPlaceholders = [crashlyticsCollectionEnabled:"false"]
             lint {
                 disable 'MissingTranslation', 'GoogleAppIndexingWarning', 'ClickableViewAccessibility'
@@ -84,9 +84,9 @@ android {
         debug {
             ext.enableCrashlytics = false
             ext.alwaysUpdateBuildId = false
-            applicationIdSuffix ".debug"
-            resValue "string", "package_name", "${defaultConfig.applicationId}.debug"
-            manifestPlaceholders = [crashlyticsCollectionEnabled:"false"]
+            applicationIdSuffix = ".debug"
+            resValue("string", "package_name", "${defaultConfig.applicationId}.debug")
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "false"]
         }
     }
     packaging {
@@ -112,7 +112,7 @@ android {
     buildFeatures {
         buildConfig = true
     }
-    namespace 'jp.hazuki.yuzubrowser'
+    namespace = 'jp.hazuki.yuzubrowser'
 }
 
 // must be after the plugin is applied otherwise no tasks will be found

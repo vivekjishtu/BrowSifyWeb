@@ -20,16 +20,16 @@ plugins {
 }
 
 android {
-    compileSdk Build.compile_sdk_version
+    compileSdk = Build.compile_sdk_version
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     defaultConfig {
-        minSdkVersion Build.min_sdk_version
-        targetSdkVersion Build.target_sdk_version
+        minSdk = Build.min_sdk_version
+        targetSdk = Build.target_sdk_version
     }
 
     sourceSets.main {
@@ -37,7 +37,7 @@ android {
         java.srcDirs = ['src']
         res.srcDirs = ['res']
     }
-    namespace "com.android.colorpicker"
+    namespace = "com.android.colorpicker"
 }
 
 dependencies {

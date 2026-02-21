@@ -3,27 +3,27 @@ plugins {
 }
 
 android {
-    compileSdk Build.compile_sdk_version
+    compileSdk = Build.compile_sdk_version
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     defaultConfig {
-        minSdkVersion Build.min_sdk_version
-        targetSdkVersion Build.target_sdk_version
+        minSdk = Build.min_sdk_version
+        targetSdk = Build.target_sdk_version
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
         }
 
         debug {
-            minifyEnabled false
+            minifyEnabled = false
         }
     }
-    namespace 'com.github.clans.fab'
+    namespace = 'com.github.clans.fab'
 }
 
 dependencies {

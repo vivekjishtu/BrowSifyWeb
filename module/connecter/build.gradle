@@ -21,18 +21,18 @@ plugins {
 }
 
 android {
-    compileSdk Build.compile_sdk_version
+    compileSdk = Build.compile_sdk_version
 
     defaultConfig {
-        minSdkVersion Build.min_sdk_version
-        targetSdkVersion Build.target_sdk_version
+        minSdk = Build.min_sdk_version
+        targetSdk = Build.target_sdk_version
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
         compileOptions {
-            sourceCompatibility JavaVersion.VERSION_21
-            targetCompatibility JavaVersion.VERSION_21
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
         }
     
         kotlinOptions {
@@ -41,11 +41,11 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
+            proguardFiles(getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro')
         }
     }
-    namespace 'jp.hazuki.yuzubrowser.browser.connecter'
+    namespace = 'jp.hazuki.yuzubrowser.browser.connecter'
 }
 
 dependencies {
