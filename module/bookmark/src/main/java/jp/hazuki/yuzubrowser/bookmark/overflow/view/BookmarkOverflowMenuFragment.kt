@@ -46,16 +46,20 @@ class BookmarkOverflowMenuFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val binding = binding
         val activity = requireActivity()
         val arguments = arguments ?: throw IllegalArgumentException()
 
-
-        binding.lifecycleOwner = this
-
+        val adapter = OverflowMenuAdapter()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
-        binding.adapter = OverflowMenuAdapter()
-        binding.viewModel = mainViewModel
+        binding.recyclerView.adapter = adapter
+
+        mainViewModel.menuModels.observe(viewLifecycleOwner) {
+            if (it != null) {
+                adapter.list.clear()
+                adapter.list.addAll(it)
+                adapter.notifyDataSetChanged()
+            }
+        }
 
         val type = arguments.getInt(TYPE)
         val builder = MenuBuilder(activity)

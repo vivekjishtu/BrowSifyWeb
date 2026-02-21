@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import jp.hazuki.yuzubrowser.adblock.R
@@ -45,21 +46,21 @@ class AdBlockImportFragment : Fragment() {
 
     private val viewModel by viewModels<AdBlockImportViewModel>()
 
-    private var viewBinding: FragmentAdBlockImportBinding? = null
+    private var _binding: FragmentAdBlockImportBinding? = null
 
     private val binding: FragmentAdBlockImportBinding
-        get() = viewBinding!!
+        get() = _binding!!
 
     private lateinit var okCallback: () -> Unit
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        viewBinding = FragmentAdBlockImportBinding.inflate(inflater, container, false)
+        _binding = FragmentAdBlockImportBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewBinding = null
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,8 +68,28 @@ class AdBlockImportFragment : Fragment() {
         val fragmentManager = parentFragmentManager
         val uri = arguments?.getParcelable<Uri>(ARG_URI) ?: throw IllegalArgumentException()
 
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
+        binding.okButton.setOnClickListener { viewModel.onOkClick() }
+        binding.cancelButton.setOnClickListener { viewModel.onCancelClick() }
+        binding.excludeCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.isExclude.value = isChecked
+        }
+        binding.editText.doAfterTextChanged {
+            viewModel.text.value = it?.toString() ?: ""
+        }
+
+        viewModel.text.observe(viewLifecycleOwner) {
+            if (binding.editText.text.toString() != it) {
+                binding.editText.setText(it)
+            }
+        }
+        viewModel.isExclude.observe(viewLifecycleOwner) {
+            binding.excludeCheckBox.isChecked = it
+        }
+        viewModel.isButtonEnable.observe(viewLifecycleOwner) {
+            binding.okButton.isEnabled = it
+            binding.cancelButton.isEnabled = it
+        }
+
         viewModel.event.observe(viewLifecycleOwner, this::onButtonClick)
 
         var input: ByteArray? = null
@@ -79,14 +100,14 @@ class AdBlockImportFragment : Fragment() {
         }
 
         if (input != null && input.size > EDITABLE_SIZE) {
-            viewModel.text *= getString(R.string.adblock_file_large_mes)
+            viewModel.text.value = getString(R.string.adblock_file_large_mes)
             binding.editText.keyListener = null
-            viewModel.isExclude *= false
+            viewModel.isExclude.value = false
 
             okCallback = {
                 ui {
-                    viewModel.text *= getString(R.string.now_loading)
-                    viewModel.isButtonEnable *= false
+                    viewModel.text.value = getString(R.string.now_loading)
+                    viewModel.isButtonEnable.value = false
                     val adBlocks = withContext(Dispatchers.Default) {
                         AdBlockDecoder.decode(Scanner(ByteArrayInputStream(input)), true)
                     }
@@ -95,7 +116,7 @@ class AdBlockImportFragment : Fragment() {
                 }
             }
         } else {
-            viewModel.text *= input?.toString(StandardCharsets.UTF_8) ?: ""
+            viewModel.text.value = input?.toString(StandardCharsets.UTF_8) ?: ""
 
             okCallback = {
                 val adBlocks = AdBlockDecoder.decode(viewModel.text.value, viewModel.isExclude.value)

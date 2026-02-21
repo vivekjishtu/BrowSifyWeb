@@ -36,7 +36,6 @@ buildscript {
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'com.google.android.gms.oss-licenses-plugin'
     id 'com.google.gms.google-services'
@@ -111,7 +110,6 @@ android {
     }
 
     buildFeatures {
-        dataBinding true
         buildConfig = true
     }
     namespace 'jp.hazuki.yuzubrowser'

@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.hazuki.yuzubrowser.core.utility.utils.getMimeType
 import jp.hazuki.yuzubrowser.legacy.R
+import jp.hazuki.yuzubrowser.legacy.databinding.FragmentDebugFileBrowserBinding
 import jp.hazuki.yuzubrowser.legacy.debug.file.FileAdapter
 import jp.hazuki.yuzubrowser.legacy.debug.file.FileBrowserViewModel
 import jp.hazuki.yuzubrowser.legacy.debug.file.FileItem
@@ -51,6 +52,11 @@ class FileBrowserFragment : Fragment(), FileAdapter.OnFileClickListener,
 
     private val viewModel by viewModels<FileBrowserViewModel>()
 
+    private var _binding: FragmentDebugFileBrowserBinding? = null
+
+    private val binding: FragmentDebugFileBrowserBinding
+        get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -63,13 +69,19 @@ class FileBrowserFragment : Fragment(), FileAdapter.OnFileClickListener,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_debug_file_browser, container, false)
+        _binding = FragmentDebugFileBrowserBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+        val recyclerView = binding.recyclerView
 
-        val adapter = FileAdapter(viewLifecycleOwner, this)
+        val adapter = FileAdapter(this)
 
         recyclerView.let {
             it.layoutManager = LinearLayoutManager(requireContext())

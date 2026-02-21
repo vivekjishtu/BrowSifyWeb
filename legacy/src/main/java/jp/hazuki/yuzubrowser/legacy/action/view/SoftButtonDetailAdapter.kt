@@ -25,7 +25,6 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.databinding.FragmentSoftButtonActionItemBinding
 
 class SoftButtonDetailAdapter(
-    private val lifecycleOwner: LifecycleOwner,
     private val viewModel: SoftButtonActionDetailViewModel,
 ) : RecyclerView.Adapter<SoftButtonDetailAdapter.ItemModel>() {
 
@@ -36,11 +35,13 @@ class SoftButtonDetailAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemModel, position: Int) {
-        holder.binding.let {
-            it.lifecycleOwner = lifecycleOwner
-            it.type = position
-            it.typeName = holder.binding.root.context.resolveTypeName(position)
-            it.viewModel = viewModel
+        val binding = holder.binding
+        val context = binding.root.context
+        binding.textView.text = context.resolveTypeName(position)
+        binding.textView1a.text = viewModel.getName(position)
+        binding.imageView.setImageDrawable(viewModel.getIcon(position))
+        binding.actionView.setOnClickListener {
+            viewModel.onClick(holder.bindingAdapterPosition)
         }
     }
 

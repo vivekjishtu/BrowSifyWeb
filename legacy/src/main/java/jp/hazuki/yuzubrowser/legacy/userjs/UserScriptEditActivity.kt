@@ -20,7 +20,10 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.core.widget.doAfterTextChanged
 
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.databinding.ScrollEditTextModel
@@ -39,19 +42,27 @@ class UserScriptEditActivity : ThemeActivity() {
         super.onCreate(savedInstanceState)
         binding = ScrollEdittextBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.lifecycleOwner = this
-        binding.model = viewModel
 
         val intent = intent ?: throw NullPointerException("intent is null")
         val id = intent.getLongExtra(EXTRA_USERSCRIPT, -1)
         mUserScript = UserScriptDatabase.getInstance(applicationContext)[id] ?: UserScriptInfo()
 
         title = intent.getStringExtra(Intent.EXTRA_TITLE) ?: ""
+        viewModel.text.observe(this) {
+            if (binding.editText.text.toString() != it) {
+                binding.editText.setText(it)
+            }
+        }
+        binding.editText.doAfterTextChanged {
+            viewModel.text.value = it?.toString() ?: ""
+        }
         viewModel.text.value = mUserScript.data
-    }
 
-    override fun onBackPressed() {
-        showSaveDialog(true)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showSaveDialog(true)
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.hazuki.yuzubrowser.legacy.databinding.FragmentDebugFileItemBinding
 
 class FileAdapter(
-    private val lifecycleOwner: LifecycleOwner,
     private val listener: OnFileClickListener,
 ) : RecyclerView.Adapter<FileAdapter.Holder>() {
 
@@ -35,10 +34,13 @@ class FileAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        holder.binding.let {
-            it.lifecycleOwner = lifecycleOwner
-            it.listener = listener
-            it.item = files[position]
+        val item = files[position]
+        holder.binding.textView.text = item.name
+        holder.binding.rootView.setOnClickListener {
+            listener.onFileClick(item)
+        }
+        holder.binding.rootView.setOnLongClickListener {
+            listener.onFileLongPress(item)
         }
     }
 

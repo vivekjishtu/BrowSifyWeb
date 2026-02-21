@@ -28,8 +28,9 @@ class OverflowMenuAdapter : RecyclerView.Adapter<OverflowMenuAdapter.OverflowMen
     override fun getItemCount() = list.size
 
     override fun onBindViewHolder(holder: OverflowMenuHolder, position: Int) {
-        holder.binding.model = list[position]
-        holder.binding.executePendingBindings()
+        val item = list[position]
+        holder.binding.titleTextView.text = item.title
+        holder.binding.checkBox3.isChecked = item.enable
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OverflowMenuHolder {
@@ -38,11 +39,13 @@ class OverflowMenuAdapter : RecyclerView.Adapter<OverflowMenuAdapter.OverflowMen
     }
 
 
-    class OverflowMenuHolder(var binding: BookmarkOverlowMenuItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class OverflowMenuHolder(var binding: BookmarkOverlowMenuItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
             binding.root.setOnClickListener {
-                binding.model?.itemClick()
+                val item = list[bindingAdapterPosition]
+                item.itemClick()
+                binding.checkBox3.isChecked = item.enable
             }
         }
     }

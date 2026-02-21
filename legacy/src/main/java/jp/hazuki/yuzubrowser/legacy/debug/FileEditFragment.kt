@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.core.widget.doAfterTextChanged
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.databinding.FragmentDebugFileEditBinding
 import jp.hazuki.yuzubrowser.legacy.debug.file.FileEditViewModel
@@ -28,7 +29,10 @@ import java.io.File
 
 class FileEditFragment : Fragment() {
 
-    private lateinit var binding: FragmentDebugFileEditBinding
+    private var _binding: FragmentDebugFileEditBinding? = null
+
+    private val binding: FragmentDebugFileEditBinding
+        get() = _binding!!
 
     private val viewModel by viewModels<FileEditViewModel>()
 
@@ -43,13 +47,24 @@ class FileEditFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentDebugFileEditBinding.inflate(inflater, container, false)
+        _binding = FragmentDebugFileEditBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.model = viewModel
+        viewModel.text.observe(viewLifecycleOwner) {
+            if (binding.editTextTextMultiLine.text.toString() != it) {
+                binding.editTextTextMultiLine.setText(it)
+            }
+        }
+        binding.editTextTextMultiLine.doAfterTextChanged {
+            viewModel.text.value = it?.toString() ?: ""
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

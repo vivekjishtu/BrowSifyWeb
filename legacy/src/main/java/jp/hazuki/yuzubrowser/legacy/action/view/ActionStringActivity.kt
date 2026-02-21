@@ -23,6 +23,7 @@ import android.os.Parcelable
 import android.view.Menu
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.widget.doAfterTextChanged
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.Action
 import jp.hazuki.yuzubrowser.legacy.action.ActionList
@@ -44,12 +45,19 @@ class ActionStringActivity : ThemeActivity() {
         super.onCreate(savedInstanceState)
         binding = ScrollEdittextBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.lifecycleOwner = this
-        binding.model = viewModel
 
         val intent = intent ?: throw NullPointerException("Intent is null")
 
         mActionNameArray = intent.getParcelableExtra(ActionNameArray.INTENT_EXTRA)
+
+        viewModel.text.observe(this) {
+            if (binding.editText.text.toString() != it) {
+                binding.editText.setText(it)
+            }
+        }
+        binding.editText.doAfterTextChanged {
+            viewModel.text.value = it?.toString() ?: ""
+        }
 
         val action = intent.getParcelableExtra<Parcelable>(EXTRA_ACTION)
         if (action != null) {

@@ -57,11 +57,8 @@ class SoftButtonActionDetailFragment : Fragment() {
             it.onClick.observe(viewLifecycleOwner, this::onClick)
         }
 
-        binding.let {
-            it.lifecycleOwner = viewLifecycleOwner
-            it.layoutManager = LinearLayoutManager(requireContext())
-            it.adapter = SoftButtonDetailAdapter(viewLifecycleOwner, viewModel)
-        }
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.adapter = SoftButtonDetailAdapter(viewModel)
     }
 
     override fun onStart() {
@@ -81,7 +78,7 @@ class SoftButtonActionDetailFragment : Fragment() {
         } else if (manager is SoftButtonActionManager) {
             viewModel.action.value = manager.btn_url_center
         }
-        binding.adapter?.notifyDataSetChanged()
+        binding.recyclerView.adapter?.notifyDataSetChanged()
 
         parentFragmentManager.setFragmentResult(RESTART, Bundle())
     }

@@ -88,7 +88,7 @@ class DownloadListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoHolder {
         val binding = FragmentDownloadListItemBinding.inflate(inflater, parent, false)
-        return InfoHolder(lifecycleOwner, binding)
+        return InfoHolder(binding)
     }
 
     override fun onBindViewHolder(holder: InfoHolder, position: Int, payloads: MutableList<Any>) {
@@ -99,8 +99,8 @@ class DownloadListAdapter(
     override fun onBindViewHolder(holder: InfoHolder, position: Int) {
         val item = items[position]
 
-        holder.binding.formatter = timeFormatter
-        holder.binding.info = item
+        holder.binding.filenameTextView.text = item.name
+        holder.binding.timeTextView.text = timeFormatter.format(item.startTime)
         holder.binding.foreground.background =
             if (isMultiSelectMode && isSelected(position)) foregroundOverlay else null
 
@@ -269,13 +269,8 @@ class DownloadListAdapter(
     override fun getItemCount() = items.size
 
     class InfoHolder(
-        val lifecycleOwner: LifecycleOwner,
         val binding: FragmentDownloadListItemBinding,
-    ) : RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.lifecycleOwner = lifecycleOwner
-        }
-    }
+    ) : RecyclerView.ViewHolder(binding.root)
 
     override fun getHeaderId(position: Int): Long {
         calendar.timeInMillis = items[position].startTime

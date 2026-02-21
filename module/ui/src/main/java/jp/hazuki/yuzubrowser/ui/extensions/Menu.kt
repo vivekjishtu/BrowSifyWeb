@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Hazuki
+ * Copyright (C) 2017-2021 Hazuki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package jp.hazuki.yuzubrowser.ui.extensions
 
-import android.app.Application
-import androidx.databinding.BaseObservable
-import androidx.databinding.Observable
-import androidx.lifecycle.AndroidViewModel
+import android.content.Context
+import android.view.Menu
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.forEach
+import jp.hazuki.yuzubrowser.core.utility.extensions.getResColor
+import jp.hazuki.yuzubrowser.ui.R
 
-val AndroidViewModel.application: Application
-    get() = getApplication()
-
-inline fun BaseObservable.addOnPropertyChangedCallback(crossinline block: (sender: Observable, id: Int) -> Unit) {
-    addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-        override fun onPropertyChanged(sender: Observable, propertyId: Int) {
-            block(sender, propertyId)
-        }
-    })
+fun Menu.applyIconColor(context: Context) {
+    val color = context.getResColor(R.color.actionBarIconColor)
+    this.forEach {
+        it.icon?.colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_ATOP)
+    }
 }

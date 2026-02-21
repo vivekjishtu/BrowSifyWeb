@@ -89,7 +89,7 @@ class UserScriptListFragment : Fragment(), OnUserJsItemClickListener, DeleteDial
                 fabMenu.close(false)
             }
 
-            adapter = UserJsAdapter(activity, viewLifecycleOwner, mDb.allList, this@UserScriptListFragment)
+            adapter = UserJsAdapter(activity, mDb.allList, this@UserScriptListFragment)
             recyclerView.adapter = adapter
         }
     }
@@ -273,13 +273,12 @@ class UserScriptListFragment : Fragment(), OnUserJsItemClickListener, DeleteDial
 
     class UserJsAdapter(
         context: Context,
-        private val lifecycleOwner: LifecycleOwner,
         list: MutableList<UserScript>,
         private val listener: OnRecyclerListener
     ) : ArrayRecyclerAdapter<UserScript, UserJsAdapter.ViewHolder>(context, list, listener) {
 
         override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup?, viewType: Int): ViewHolder =
-            ViewHolder(FragmentUserjsItemBinding.inflate(inflater, parent, false), lifecycleOwner, this)
+            ViewHolder(FragmentUserjsItemBinding.inflate(inflater, parent, false), this)
 
         private fun onInfoButtonClick(position: Int, js: UserScript) {
             val resolvedPosition = searchPosition(position, js)
@@ -290,22 +289,16 @@ class UserScriptListFragment : Fragment(), OnUserJsItemClickListener, DeleteDial
 
         class ViewHolder(
             val binding: FragmentUserjsItemBinding,
-            lifecycleOwner: LifecycleOwner,
             private val adapter: UserJsAdapter,
         ) : ArrayRecyclerAdapter.ArrayViewHolder<UserScript>(binding.root, adapter) {
 
-            init {
-                binding.lifecycleOwner = lifecycleOwner
-            }
-
             override fun setUp(item: UserScript) {
                 super.setUp(item)
-                binding.script = item
-                binding.viewHolder = this
-            }
-
-            fun onClick() {
-                adapter.onInfoButtonClick(bindingAdapterPosition, item)
+                binding.textView.text = item.name
+                binding.checkBox.isChecked = item.isEnabled
+                binding.infoButton.setOnClickListener {
+                    adapter.onInfoButtonClick(bindingAdapterPosition, item)
+                }
             }
         }
     }

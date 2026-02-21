@@ -40,7 +40,8 @@ class SearchUrlAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position]
         val binding = holder.binding
-        binding.model = item
+        binding.titleTextView.text = item.title
+        binding.urlTextView.text = item.url
 
         val favicon = faviconManager[item.url]
         if (favicon != null) {

@@ -82,14 +82,13 @@ class BookmarkFragment : Fragment(), BookmarkItemAdapter.OnBookmarkRecyclerListe
     @Inject
     internal lateinit var faviconManager: FaviconManager
 
-    private var viewBinding: FragmentBookmarkBinding? = null
+    private var _binding: FragmentBookmarkBinding? = null
 
     private val binding: FragmentBookmarkBinding
-        get() = viewBinding!!
+        get() = _binding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        setHasOptionsMenu(true)
-        viewBinding = FragmentBookmarkBinding.inflate(inflater, container, false)
+        _binding = FragmentBookmarkBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -568,7 +567,7 @@ class BookmarkFragment : Fragment(), BookmarkItemAdapter.OnBookmarkRecyclerListe
             AppPrefs.saveBookmarkFolderId.set(mCurrentFolder.id)
             AppPrefs.commit(requireContext(), AppPrefs.saveBookmarkFolderId)
         }
-        viewBinding = null
+        _binding = null
     }
 
     private inner class Touch : ItemTouchHelper.Callback() {

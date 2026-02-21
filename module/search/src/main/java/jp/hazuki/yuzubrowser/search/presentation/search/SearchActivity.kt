@@ -16,15 +16,17 @@
 
 package jp.hazuki.yuzubrowser.search.presentation.search
 
+import android.app.Activity.RESULT_CANCELED
+import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.view.*
+import android.widget.AdapterView
 import androidx.activity.viewModels
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.Observable
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hazuki.yuzubrowser.core.utility.extensions.clipboardText
@@ -35,6 +37,7 @@ import jp.hazuki.yuzubrowser.search.databinding.SearchSeachBarBinding
 import jp.hazuki.yuzubrowser.search.presentation.widget.SearchButton
 import jp.hazuki.yuzubrowser.ui.INTENT_EXTRA_MODE_FULLSCREEN
 import jp.hazuki.yuzubrowser.ui.app.ThemeActivity
+import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 import javax.inject.Inject
@@ -56,11 +59,9 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.search_activity)
+        binding = SearchActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         barBinding = SearchSeachBarBinding.inflate(layoutInflater, binding.rootLayout, false)
-
-        binding.lifecycleOwner = this
-        barBinding.lifecycleOwner = this
 
         val intent = intent ?: throw IllegalStateException("Intent is null")
 
@@ -80,15 +81,45 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
         } else {
             binding.topBox.addView(barBinding.root)
         }
-        barBinding.callback = this
+        barBinding.searchButton.setActionCallback(this)
+
+        val suggestAdapter = SearchSuggestAdapter().also { it.listener = this }
+        binding.recyclerView.adapter = suggestAdapter
+
+        viewModel.suggestModels.observe(this) {
+            if (it != null) {
+                suggestAdapter.list.clear()
+                suggestAdapter.list.addAll(it)
+                suggestAdapter.notifyDataSetChanged()
+                val layoutManager = binding.recyclerView.layoutManager as LinearLayoutManager
+                if (layoutManager.reverseLayout && suggestAdapter.itemCount > 0) {
+                    binding.recyclerView.scrollToPosition(0)
+                }
+            }
+        }
 
         viewModel.also {
-            binding.model = it
-            barBinding.viewModel = it
-
             barBinding.searchUrlSpinner.adapter = SearchUrlSpinnerAdapter(
                 this, it.suggestProviders.urls, faviconManager)
-            it.providerSelection.set(it.suggestProviders.getSelectedIndex())
+            barBinding.searchUrlSpinner.setSelection(it.providerSelection.value ?: -1)
+            barBinding.searchUrlSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    it.providerSelection.value = position
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        }
+
+        viewModel.providerSelection.observe(this) { position ->
+            if (position >= 0) {
+                viewModel.suggestProviders.selectedId = position
+                if (AppPrefs.searchUrlShowIcon.get() && AppPrefs.searchUrlSaveSwitching.get()) {
+                    AppPrefs.search_url.set(viewModel.suggestProviders[position].url)
+                    AppPrefs.commit(this, AppPrefs.search_url)
+                    viewModel.saveProvider()
+                }
+            }
         }
 
         if (!AppPrefs.searchUrlShowIcon.get()) {
@@ -98,6 +129,18 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
         val searchButton = barBinding.searchButton
         val editText = barBinding.editText
         val recyclerView = binding.recyclerView
+
+        editText.doAfterTextChanged {
+            viewModel.setQuery(it?.toString() ?: "")
+        }
+
+        editText.setOnEditorActionListener { _, actionId, _ ->
+            if (android.view.inputmethod.EditorInfo.IME_ACTION_GO == actionId) {
+                autoSearch()
+                return@setOnEditorActionListener true
+            }
+            false
+        }
 
         ThemeData.getInstance()?.let { themeData ->
             if (themeData.toolbarBackgroundColor != 0)
@@ -184,8 +227,6 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
         recyclerView.setOnOutSideClickListener { finish() }
         recyclerView.setOnClickListener { finish() }
 
-        binding.adapter = SearchSuggestAdapter().also { it.listener = this }
-
         val initQuery = intent.getStringExtra(EXTRA_QUERY)
         if (initQuery != null) {
             viewModel.setInitQuery(initQuery)
@@ -201,15 +242,20 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (AppPrefs.searchUrlShowIcon.get() && AppPrefs.searchUrlSaveSwitching.get())
-            viewModel.providerSelection.addOnPropertyChangedCallback(callback)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.search_activity, menu)
+        menu.applyIconColor(this)
+        return true
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.providerSelection.removeOnPropertyChangedCallback(callback)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.voiceSearch -> {
+                recognizeSpeech()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun forceOpenUrl() {
@@ -294,14 +340,6 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
             finish()
         }
         return super.onTouchEvent(event)
-    }
-
-    private val callback = object : Observable.OnPropertyChangedCallback() {
-        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-            AppPrefs.search_url.set(viewModel.suggestProviders[viewModel.providerSelection.get()].url)
-            AppPrefs.commit(this@SearchActivity, AppPrefs.search_url)
-            viewModel.saveProvider()
-        }
     }
 
     companion object {

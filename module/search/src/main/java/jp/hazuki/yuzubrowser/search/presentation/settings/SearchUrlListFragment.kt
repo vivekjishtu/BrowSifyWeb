@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -43,6 +44,11 @@ class SearchUrlListFragment : Fragment(), SearchSettingDialog.OnUrlEditedListene
     @Inject
     internal lateinit var faviconManager: FaviconManager
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = SearchSettingsFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val activity = requireActivity()
 
@@ -57,15 +63,23 @@ class SearchUrlListFragment : Fragment(), SearchSettingDialog.OnUrlEditedListene
             SearchSettingDialog.newInstance(-1, null).show(childFragmentManager, "edit")
         }
 
-        val binding = binding
-        binding.lifecycleOwner = this
-        binding.adapter = SearchUrlAdapter(faviconManager, this)
-        binding.model = viewModel
-
+        val adapter = SearchUrlAdapter(faviconManager, this)
+        binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         val touchHelper = ItemTouchHelper(viewModel.touchHelperCallback)
         binding.recyclerView.addItemDecoration(touchHelper)
         touchHelper.attachToRecyclerView(binding.recyclerView)
+
+        viewModel.list.observe(viewLifecycleOwner) {
+            if (it != null) {
+                val diff = DiffUtil.calculateDiff(SearchUrlDiffCallback(adapter.list, it), true)
+                adapter.list.clear()
+                adapter.list.addAll(it)
+                diff.dispatchUpdatesTo(adapter)
+            }
+        }
+
+        binding.fab.setOnClickListener { viewModel.onFabClick() }
 
         viewModel.init()
     }
@@ -73,13 +87,6 @@ class SearchUrlListFragment : Fragment(), SearchSettingDialog.OnUrlEditedListene
     override fun onPause() {
         super.onPause()
         viewModel.onPause()
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return SearchSettingsFragmentBinding.inflate(inflater, container, false).let {
-            binding = it
-            it.root
-        }
     }
 
     override fun onEdit(position: Int, searchUrl: SearchUrl) {

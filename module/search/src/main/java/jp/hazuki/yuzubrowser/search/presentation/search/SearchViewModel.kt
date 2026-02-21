@@ -17,15 +17,12 @@
 package jp.hazuki.yuzubrowser.search.presentation.search
 
 import android.app.Application
-import androidx.databinding.ObservableInt
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hazuki.yuzubrowser.core.utility.utils.ui
 import jp.hazuki.yuzubrowser.search.domain.usecase.SearchViewUseCase
 import jp.hazuki.yuzubrowser.search.model.SearchSuggestModel
-import jp.hazuki.yuzubrowser.ui.extensions.addOnPropertyChangedCallback
 import jp.hazuki.yuzubrowser.ui.extensions.decodePunyCodeUrl
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import kotlinx.coroutines.Dispatchers
@@ -51,12 +48,9 @@ internal class SearchViewModel @Inject constructor(
 
     val suggestProviders = useCase.loadSuggestProviders()
 
-    val providerSelection = ObservableInt(-1)
+    val providerSelection = MutableLiveData(-1)
 
     init {
-        providerSelection.addOnPropertyChangedCallback { _, _ ->
-            suggestProviders.selectedId = providerSelection.get()
-        }
         useCase.suggestType = AppPrefs.searchSuggestType.get()
     }
 
@@ -88,7 +82,7 @@ internal class SearchViewModel @Inject constructor(
         if (!AppPrefs.private_mode.get() && mode != SEARCH_MODE_URL) {
             useCase.saveQuery(query)
         }
-        return FinishResult(query, suggestProviders[providerSelection.get()].url)
+        return FinishResult(query, suggestProviders[providerSelection.value ?: -1].url)
     }
 
     fun setInitQuery(query: String) {

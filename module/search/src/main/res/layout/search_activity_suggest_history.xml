@@ -15,77 +15,65 @@
   ~ limitations under the License.
   -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/colorBackground"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/search_list_size"
+    android:orientation="horizontal">
 
-    <data>
+    <View
+        android:id="@+id/background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/inputImageButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <variable
-            name="model"
-            type="jp.hazuki.yuzubrowser.search.model.SearchSuggestModel.HistoryModel"/>
-    </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/titleTextView"
+        style="@style/TextAppearance.ListTitle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:minHeight="@dimen/search_list_size"
-        android:background="?android:attr/colorBackground">
+        android:maxLines="1"
+        app:layout_constraintBottom_toTopOf="@id/urlTextView"
+        app:layout_constraintEnd_toStartOf="@+id/inputImageButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-        <View
-            android:id="@+id/background"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="?attr/selectableItemBackground"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/inputImageButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <TextView
-            android:id="@+id/titleTextView"
-            style="@style/TextAppearance.ListTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:text="@{model.title}"
-            app:layout_constraintBottom_toTopOf="@id/urlTextView"
-            app:layout_constraintEnd_toStartOf="@+id/inputImageButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"/>
-
-        <TextView
-            android:id="@+id/urlTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:gravity="center_vertical"
-            android:maxLines="1"
-            android:text="@{model.url}"
-            style="@style/TextAppearance.ListBody"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/inputImageButton"
-            app:layout_constraintStart_toStartOf="@+id/titleTextView"
-            app:layout_constraintTop_toBottomOf="@+id/titleTextView"
-            app:layout_constraintVertical_chainStyle="packed"/>
+    <TextView
+        android:id="@+id/urlTextView"
+        style="@style/TextAppearance.ListBody"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/inputImageButton"
+        app:layout_constraintStart_toStartOf="@+id/titleTextView"
+        app:layout_constraintTop_toBottomOf="@+id/titleTextView"
+        app:layout_constraintVertical_chainStyle="packed" />
 
 
-        <ImageButton
-            android:id="@+id/inputImageButton"
-            android:layout_width="@dimen/search_list_size"
-            android:layout_height="@dimen/search_list_size"
-            android:background="?android:attr/selectableItemBackground"
-            android:scaleType="center"
-            android:src="@drawable/ic_reply_black_24dp"
-            android:tint="@color/iconColor"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+    <ImageButton
+        android:id="@+id/inputImageButton"
+        android:layout_width="@dimen/search_list_size"
+        android:layout_height="@dimen/search_list_size"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="center"
+        android:src="@drawable/ic_reply_black_24dp"
+        android:tint="@color/iconColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>
