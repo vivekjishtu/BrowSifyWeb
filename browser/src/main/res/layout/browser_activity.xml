@@ -83,19 +83,21 @@
                         android:id="@+id/pullToRefresh"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@color/browserBackground"
                         android:layout_weight="1">
 
                         <FrameLayout
                             android:id="@+id/webFrameLayout"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_height="match_parent"
+                            android:background="@color/browserBackground" />
                     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
                     <jp.hazuki.yuzubrowser.ui.widget.PaddingFrameLayout
                         android:id="@+id/toolbarPadding"
                         android:layout_width="match_parent"
                         android:layout_height="0px"
-                        android:background="@color/white"
+                        android:background="@android:color/transparent"
                         android:layout_weight="0"
                         android:visibility="gone" />
 
@@ -103,7 +105,7 @@
                         android:id="@+id/bottomAlwaysOverlayToolbarPadding"
                         android:layout_width="match_parent"
                         android:layout_height="0px"
-                        android:background="@color/white"
+                        android:background="@android:color/transparent"
                         android:layout_weight="0"
                         android:visibility="gone" />
                 </LinearLayout>
