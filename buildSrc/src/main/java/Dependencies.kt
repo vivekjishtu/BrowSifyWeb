@@ -27,14 +27,14 @@ object AppVersions {
 }
 
 object Versions {
-    const val androidX = "1.8.0"
+    const val androidX = "1.8.1"
     const val appCompat = "1.7.0"
-    const val activityX = "1.9.0"
-    const val androidKTX = "1.13.1"
-    const val fragmentKtx = "1.8.1"
+    const val activityX = "1.10.0"
+    const val androidKTX = "1.15.0"
+    const val fragmentKtx = "1.8.5"
     const val recyclerView = "1.3.2"
     const val androidxRoom = "2.6.1"
-    const val lifeCycle = "2.8.3"
+    const val lifeCycle = "2.8.7"
     const val material = "1.12.0"
     const val support_fix_lib = "1.2.1"
     const val support_constraint_lib = "2.1.4"
@@ -42,23 +42,23 @@ object Versions {
     const val print = "1.0.0"
     const val swipeRefreshLayout = "1.1.0"
     const val moshi = "1.15.0"
-    const val okhttp = "4.9.1"
-    const val okio = "3.2.0" //"2.10.0"
+    const val okhttp = "4.12.0"
+    const val okio = "3.9.1" //"2.10.0"
     const val kvs_schema = "5.0.1"
-    const val kotlin = "1.9.24"
-    const val kotlin_coroutines = "1.8.1"
+    const val kotlin = "2.1.10"
+    const val kotlin_coroutines = "1.10.1"
     const val junit = "4.13.2"
-    const val assertk = "0.23.1"
-    const val espresso = "3.3.0"
-    const val testCore = "1.3.0"
-    const val runner = "1.1.2"
+    const val assertk = "0.28.1"
+    const val espresso = "3.6.1"
+    const val testCore = "1.6.1"
+    const val runner = "1.2.1"
     const val header_decor = "0.2.8"
     const val materialprogressbar = "1.6.1"
-    const val mockito = "3.8.0"
+    const val mockito = "5.15.2"
     const val powermock = "2.0.9"
-    const val jsoup = "1.13.1"
-    const val re2j = "1.5"
-    const val webkit = "1.9.0"
+    const val jsoup = "1.18.3"
+    const val re2j = "1.8"
+    const val webkit = "1.12.1"
 }
 
 object AndroidX {
@@ -128,7 +128,7 @@ object Dependencies {
 }
 
 object Dagger {
-    const val hiltVersion = "2.51.1"
+    const val hiltVersion = "2.55"
 
     const val hiltPlugin = "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
     const val hilt = "com.google.dagger:hilt-android:$hiltVersion"

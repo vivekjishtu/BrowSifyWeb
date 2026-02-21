@@ -94,7 +94,7 @@ dependencies {
     implementation Libs.kotlin_coroutines_android
 
     implementation Dagger.hilt
-    ksp Dagger.hiltCompiler
+    kapt Dagger.hiltCompiler
 
     implementation Libs.jsoup
 }
