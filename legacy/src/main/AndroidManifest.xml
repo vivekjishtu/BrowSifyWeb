@@ -63,10 +63,6 @@
     <uses-permission android:name="jp.hazuki.yuzubrowser.permission.myapp.signature"/>
 
     <application>
-        <activity
-            android:name=".licenses.LicensesActivity"
-            android:label="@string/open_source_license">
-        </activity>
     </application>
 
 </manifest>

@@ -17,9 +17,7 @@
 /*
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
-apply plugin: 'com.cookpad.android.plugin.license-tools'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 */
@@ -32,7 +30,6 @@ buildscript {
     }
 
     dependencies {
-        classpath 'gradle.plugin.com.cookpad.android.plugin:plugin:1.2.8'
     }
 }
 
@@ -41,7 +38,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
-    id 'com.cookpad.android.plugin.license-tools' version '1.2.8'
+    id 'com.google.android.gms.oss-licenses-plugin'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
     id 'com.google.devtools.ksp'
@@ -123,7 +120,7 @@ android {
 // must be after the plugin is applied otherwise no tasks will be found
 android.applicationVariants.configureEach { variant ->
     def googleTask = tasks.findByName("process${variant.name.capitalize()}GoogleServices")
-    googleTask.enabled = "debug" != variant.name
+    googleTask.enabled = true
 }
 
 
@@ -159,7 +156,9 @@ dependencies {
     implementation Libs.kotlin_stdlib
 
     implementation Dagger.hilt
-    kapt Dagger.hiltCompiler
+    ksp Dagger.hiltCompiler
+
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.1.0'
 
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:33.1.1')

@@ -92,7 +92,7 @@ dependencies {
     implementation Libs.okhttp
     implementation Libs.okio
     implementation Libs.moshi
-    kapt Libs.moshiCodeGen
+    ksp Libs.moshiCodeGen
 
     implementation Libs.header_decor
     implementation Libs.jsoup
@@ -117,6 +117,8 @@ dependencies {
 
     implementation Dagger.hilt
     ksp Dagger.hiltCompiler
+
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.1.0'
 
     implementation AndroidX.room
     implementation AndroidX.roomKtx

@@ -92,5 +92,5 @@ dependencies {implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation Libs.kotlin_coroutines_android
 
     implementation Dagger.hilt
-    kapt Dagger.hiltCompiler
+    ksp Dagger.hiltCompiler
 }
