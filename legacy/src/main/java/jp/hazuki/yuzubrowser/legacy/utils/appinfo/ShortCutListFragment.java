@@ -10,6 +10,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.ListFragment;
 import androidx.loader.app.LoaderManager;
@@ -22,8 +23,8 @@ public class ShortCutListFragment extends ListFragment implements LoaderManager.
     private AppInfoListAdapter adapter;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
     }
 

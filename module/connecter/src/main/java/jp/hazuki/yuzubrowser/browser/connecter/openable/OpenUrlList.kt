@@ -16,7 +16,7 @@
 
 package jp.hazuki.yuzubrowser.browser.connecter.openable
 
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class OpenUrlList(private val url: List<String>, override val target: Int) : BrowserOpenable {

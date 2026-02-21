@@ -67,7 +67,7 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         // データ表示
-        TabIndexData indexData = getItem(holder.getAdapterPosition());
+        TabIndexData indexData = getItem(holder.getBindingAdapterPosition());
         if (indexData != null) {
             holder.setIndexData(indexData);
             Bitmap thumbNail = indexData.getThumbnail();
@@ -198,21 +198,21 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapter.onItemClicked(v, getAdapterPosition(), indexData);
+                    adapter.onItemClicked(v, getBindingAdapterPosition(), indexData);
                 }
             });
 
             closeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapter.onCloseClicked(v, getAdapterPosition(), indexData);
+                    adapter.onCloseClicked(v, getBindingAdapterPosition(), indexData);
                 }
             });
 
             historyButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapter.onHistoryClicked(v, getAdapterPosition(), indexData);
+                    adapter.onHistoryClicked(v, getBindingAdapterPosition(), indexData);
                 }
             });
         }

@@ -62,7 +62,7 @@ configurations {
 }
 
 static def isNonStable(v) {
-    ["-alpha", "-beta", "-rc", "-m"].any { v.toLowerCase().contains(it) }
+    ["-alpha", "-beta", "-rc", "-m"].any { v.lowercase().contains(it) }
 }
 
 tasks.named("dependencyUpdates").configure {

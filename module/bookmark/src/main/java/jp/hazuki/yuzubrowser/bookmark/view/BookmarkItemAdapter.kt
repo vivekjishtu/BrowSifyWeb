@@ -152,9 +152,9 @@ open class BookmarkItemAdapter(
 
             more.setOnClickListener {
                 if (adapter.isMultiSelectMode) {
-                    adapter.toggle(adapterPosition)
+                    adapter.toggle(bindingAdapterPosition)
                 } else {
-                    adapter.onOverflowButtonClick(more, adapterPosition, item)
+                    adapter.onOverflowButtonClick(more, bindingAdapterPosition, item)
                 }
             }
         }
@@ -171,9 +171,9 @@ open class BookmarkItemAdapter(
         init {
             imageButton.setOnClickListener {
                 if (adapter.isMultiSelectMode) {
-                    adapter.toggle(adapterPosition)
+                    adapter.toggle(bindingAdapterPosition)
                 } else {
-                    adapter.onIconClick(it, adapterPosition, item)
+                    adapter.onIconClick(it, bindingAdapterPosition, item)
                 }
             }
         }

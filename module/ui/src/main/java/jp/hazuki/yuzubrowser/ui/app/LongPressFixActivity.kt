@@ -64,7 +64,7 @@ open class LongPressFixActivity : ThemeActivity() {
     override fun onBackPressed() {}
 
     open fun onBackKeyPressed() {
-        super.onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
     }
 
     open fun onBackKeyLongPressed() {

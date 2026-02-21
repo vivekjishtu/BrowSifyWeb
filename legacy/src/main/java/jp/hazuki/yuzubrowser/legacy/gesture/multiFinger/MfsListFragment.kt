@@ -136,7 +136,7 @@ class MfsListFragment : androidx.fragment.app.Fragment(), OnRecyclerListener, De
         }
 
         override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
-            adapter.move(viewHolder.adapterPosition, target.adapterPosition)
+            adapter.move(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             return true
         }
 
@@ -146,7 +146,7 @@ class MfsListFragment : androidx.fragment.app.Fragment(), OnRecyclerListener, De
         }
 
         override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.adapterPosition
+            val position = viewHolder.bindingAdapterPosition
             val item = adapter.remove(position)
 
             Snackbar.make(binding.rootLayout, R.string.deleted, Snackbar.LENGTH_SHORT)

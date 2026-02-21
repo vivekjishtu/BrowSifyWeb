@@ -94,6 +94,7 @@ class BookmarkFragment : Fragment(), BookmarkItemAdapter.OnBookmarkRecyclerListe
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val activity = requireActivity()
         val arguments = arguments ?: throw IllegalArgumentException()
 
@@ -136,11 +137,8 @@ class BookmarkFragment : Fragment(), BookmarkItemAdapter.OnBookmarkRecyclerListe
         }
 
         setList(firstPos)
-    }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             if (adapter.isSortMode) {
                 adapter.isSortMode = false
                 Toast.makeText(activity, R.string.end_sort, Toast.LENGTH_SHORT).show()
@@ -580,7 +578,7 @@ class BookmarkFragment : Fragment(), BookmarkItemAdapter.OnBookmarkRecyclerListe
         }
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            adapter.move(viewHolder.adapterPosition, target.adapterPosition)
+            adapter.move(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             mManager.save()
             return true
         }

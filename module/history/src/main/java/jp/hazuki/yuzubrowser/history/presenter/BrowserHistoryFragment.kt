@@ -71,6 +71,7 @@ class BrowserHistoryFragment : Fragment(), BrowserHistoryAdapter.OnHistoryRecycl
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val activity = requireActivity()
         val arguments = arguments ?: throw IllegalArgumentException()
 
@@ -98,11 +99,8 @@ class BrowserHistoryFragment : Fragment(), BrowserHistoryAdapter.OnHistoryRecycl
         recyclerView.adapter = adapter
 
         recyclerView.addOnItemTouchListener(locationDetector)
-    }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             val searchView = searchView
             if (searchView != null && !searchView.isIconified) {
                 searchView.isIconified = true

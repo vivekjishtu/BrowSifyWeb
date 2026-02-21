@@ -34,7 +34,6 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.utils.AppUtils
 import jp.hazuki.yuzubrowser.legacy.utils.extensions.setClipboardWithToast
 import jp.hazuki.yuzubrowser.ui.extensions.intentFor
-import java.util.zip.GZIPInputStream
 
 class AboutFragment : YuzuPreferenceFragment() {
 
@@ -53,12 +52,8 @@ class AboutFragment : YuzuPreferenceFragment() {
         findPreference<Preference>("build_time")!!.summary = activity.getString(R.string.package_build_time)
 
         findPreference<Preference>("osl")!!.setOnPreferenceClickListener {
-            if (isDebugLicensePlaceholder()) {
-                FallbackLicensesDialog().show(childFragmentManager, "fallback_licenses")
-            } else {
-                OssLicensesMenuActivity.setActivityTitle(getString(R.string.open_source_license))
-                startActivity(intentFor<OssLicensesMenuActivity>())
-            }
+            OssLicensesMenuActivity.setActivityTitle(getString(R.string.open_source_license))
+            startActivity(intentFor<OssLicensesMenuActivity>())
             true
         }
         findPreference<Preference>("translation")!!.setOnPreferenceClickListener {
@@ -83,46 +78,12 @@ class AboutFragment : YuzuPreferenceFragment() {
         }
     }
 
-    private fun isDebugLicensePlaceholder(): Boolean {
-        val context = context ?: return false
-        return runCatching {
-            val id = context.resources.getIdentifier("third_party_licenses", "raw", context.packageName)
-            if (id == 0) {
-                return@runCatching true
-            }
-            context.resources.openRawResource(id).bufferedReader().use { reader ->
-                val content = reader.readText()
-                content.contains("Licenses are only provided in build variants", ignoreCase = true)
-            }
-        }.getOrDefault(false)
-    }
-
     class TranslationDialog : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val activity = requireActivity()
             return AlertDialog.Builder(activity)
                 .setTitle(R.string.pref_translation)
                 .setView(WebView(activity).apply { loadUrl("file:///android_asset/translators.html") })
-                .create()
-        }
-    }
-
-    class FallbackLicensesDialog : DialogFragment() {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val activity = requireActivity()
-            val webView = WebView(activity).apply {
-                val html = runCatching {
-                    activity.assets.open("licenses.compressed").use { input ->
-                        GZIPInputStream(input).bufferedReader().use { it.readText() }
-                    }
-                }.getOrElse {
-                    "<html><body><p>Open source licenses are unavailable in this build.</p></body></html>"
-                }
-                loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null)
-            }
-            return AlertDialog.Builder(activity)
-                .setTitle(R.string.open_source_license)
-                .setView(webView)
                 .create()
         }
     }

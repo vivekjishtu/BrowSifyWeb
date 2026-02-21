@@ -163,12 +163,12 @@ class CustomSingleActionFragment : Fragment(), OnRecyclerListener, RecyclerMenu.
         }
 
         override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
-            adapter.move(viewHolder.adapterPosition, target.adapterPosition)
+            adapter.move(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             return true
         }
 
         override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.adapterPosition
+            val position = viewHolder.bindingAdapterPosition
             val action = adapter.remove(position)
 
             Snackbar.make(binding.rootLayout, R.string.deleted, Snackbar.LENGTH_SHORT)
@@ -185,7 +185,7 @@ class CustomSingleActionFragment : Fragment(), OnRecyclerListener, RecyclerMenu.
 
         override fun onBindViewHolder(holder: AVH, item: SingleAction, position: Int) {
             holder.title.text = item.toString(nameArray)
-            holder.menu.setOnClickListener { v -> RecyclerMenu(context, v, holder.adapterPosition, menuListener, this@ActionAdapter).show() }
+            holder.menu.setOnClickListener { v -> RecyclerMenu(context, v, holder.bindingAdapterPosition, menuListener, this@ActionAdapter).show() }
         }
 
         override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup?, viewType: Int): AVH {

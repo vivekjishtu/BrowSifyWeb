@@ -166,7 +166,7 @@ private fun guessFileName(url: String, contentDisposition: String?, mimeType: St
             }
         }
         if (extension == null) {
-            extension = if (mimeType != null && mimeType.toLowerCase(Locale.ROOT).startsWith("text/")) {
+            extension = if (mimeType != null && mimeType.lowercase().startsWith("text/")) {
                 if (mimeType.equals("text/html", ignoreCase = true)) {
                     ".html"
                 } else {

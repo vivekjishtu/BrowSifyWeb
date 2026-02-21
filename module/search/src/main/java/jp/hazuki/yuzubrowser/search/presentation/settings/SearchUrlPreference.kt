@@ -143,9 +143,9 @@ class SearchUrlPreference(context: Context, attrs: AttributeSet) : DialogPrefere
 
                 init {
 
-                    itemView.setOnClickListener { v -> listener.onRecyclerItemClicked(v, adapterPosition) }
+                    itemView.setOnClickListener { v -> listener.onRecyclerItemClicked(v, bindingAdapterPosition) }
 
-                    itemView.setOnLongClickListener { v -> listener.onRecyclerItemLongClicked(v, adapterPosition) }
+                    itemView.setOnLongClickListener { v -> listener.onRecyclerItemLongClicked(v, bindingAdapterPosition) }
                 }
             }
         }

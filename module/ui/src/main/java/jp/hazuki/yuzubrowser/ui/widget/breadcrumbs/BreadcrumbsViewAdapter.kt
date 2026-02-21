@@ -69,7 +69,7 @@ class BreadcrumbsViewAdapter<T : BreadcrumbsView.Breadcrumb>(context: Context, p
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BreadcrumbViewHolder {
         val holder = BreadcrumbViewHolder(inflater.inflate(R.layout.breadcrumbs_item, parent, false))
-        holder.title.setOnClickListener { breadcrumbsView.listener?.onBreadcrumbItemClick(holder.adapterPosition) }
+        holder.title.setOnClickListener { breadcrumbsView.listener?.onBreadcrumbItemClick(holder.bindingAdapterPosition) }
         return holder
     }
 

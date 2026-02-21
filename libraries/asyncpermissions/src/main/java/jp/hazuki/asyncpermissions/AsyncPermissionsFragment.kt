@@ -30,7 +30,6 @@ class AsyncPermissionsFragment : androidx.fragment.app.Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        retainInstance = true
         queue = PermissionsContinuationQueue()
     }
 

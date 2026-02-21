@@ -175,14 +175,14 @@ class SpeedDialSettingActivityFragment : androidx.fragment.app.Fragment(), OnRec
         }
 
         override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
-            adapter.move(viewHolder.adapterPosition, target.adapterPosition)
+            adapter.move(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             manager.updateOrder(speedDialList)
             notifySpeedDialChanged()
             return true
         }
 
         override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.adapterPosition
+            val position = viewHolder.bindingAdapterPosition
             val speedDial = speedDialList.removeAt(position)
 
             adapter.notifyDataSetChanged()

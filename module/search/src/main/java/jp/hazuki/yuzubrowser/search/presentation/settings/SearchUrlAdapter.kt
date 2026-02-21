@@ -49,8 +49,8 @@ class SearchUrlAdapter(
             binding.iconColorView.setSearchUrl(item)
         }
 
-        binding.root.setOnClickListener { listener.onEdit(holder.adapterPosition, item) }
-        binding.menuImageButton.setOnClickListener { listener.onOpenMenu(it, holder.adapterPosition) }
+        binding.root.setOnClickListener { listener.onEdit(holder.bindingAdapterPosition, item) }
+        binding.menuImageButton.setOnClickListener { listener.onOpenMenu(it, holder.bindingAdapterPosition) }
     }
 
     class ViewHolder(val binding: SearchUrlListEditItemBinding) : RecyclerView.ViewHolder(binding.root)

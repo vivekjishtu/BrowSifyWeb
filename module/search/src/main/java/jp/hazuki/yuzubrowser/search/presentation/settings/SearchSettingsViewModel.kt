@@ -104,13 +104,13 @@ internal class SearchSettingsViewModel @Inject constructor(
         }
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            useCase.move(viewHolder.adapterPosition, target.adapterPosition)
+            useCase.move(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             updateList()
             return true
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.adapterPosition
+            val position = viewHolder.bindingAdapterPosition
             removedItem.value = RemovedItem(position, useCase.removeAt(position))
             updateList()
         }

@@ -99,7 +99,7 @@ abstract class RecyclerFabFragment : Fragment() {
         }
 
         override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
-            return this@RecyclerFabFragment.onMove(recyclerView, viewHolder.adapterPosition, target.adapterPosition)
+            return this@RecyclerFabFragment.onMove(recyclerView, viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
         }
 
         override fun onMoved(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, fromPos: Int, target: androidx.recyclerview.widget.RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
@@ -107,7 +107,7 @@ abstract class RecyclerFabFragment : Fragment() {
         }
 
         override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
-            this@RecyclerFabFragment.onSwiped(viewHolder, viewHolder.adapterPosition)
+            this@RecyclerFabFragment.onSwiped(viewHolder, viewHolder.bindingAdapterPosition)
         }
 
         override fun isLongPressDragEnabled(): Boolean {

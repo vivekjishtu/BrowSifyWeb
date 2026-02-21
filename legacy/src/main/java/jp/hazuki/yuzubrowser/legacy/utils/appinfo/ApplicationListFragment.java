@@ -22,8 +22,8 @@ public class ApplicationListFragment extends ListFragment implements LoaderManag
     private OnAppSelectListener mListener;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
     }
 

@@ -58,8 +58,8 @@ class AbpEntityAdapter(private val context: Context, val items: MutableList<AbpE
         val enable: CheckBox = view.findViewById(R.id.enableCheckBox)
 
         init {
-            view.setOnClickListener { listener.onRecyclerItemClicked(view, adapterPosition) }
-            view.setOnLongClickListener { listener.onRecyclerItemLongClicked(view, adapterPosition) }
+            view.setOnClickListener { listener.onRecyclerItemClicked(view, bindingAdapterPosition) }
+            view.setOnLongClickListener { listener.onRecyclerItemLongClicked(view, bindingAdapterPosition) }
         }
     }
 }

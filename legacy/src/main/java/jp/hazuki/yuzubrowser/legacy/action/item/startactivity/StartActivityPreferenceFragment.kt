@@ -27,8 +27,8 @@ class StartActivityPreferenceFragment : androidx.fragment.app.ListFragment() {
 
     private var mListener: OnActionListener? = null
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         listAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_list_item_1, resources.getStringArray(R.array.action_start_activity_template))
     }

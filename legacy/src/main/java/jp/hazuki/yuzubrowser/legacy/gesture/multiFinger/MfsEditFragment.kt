@@ -170,7 +170,7 @@ class MfsEditFragment : androidx.fragment.app.Fragment() {
             @SuppressLint("SetTextI18n")
             override fun setUp(item: Int) {
                 super.setUp(item)
-                title.text = "${adapterPosition + 1}."
+                title.text = "${bindingAdapterPosition + 1}."
                 icon.setImageResource(getImage(item))
             }
 

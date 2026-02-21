@@ -44,8 +44,8 @@ class ActivityListActivity : ThemeActivity() {
     }
 
     class ActivityListFragment : androidx.fragment.app.ListFragment() {
-        override fun onActivityCreated(savedInstanceState: Bundle?) {
-            super.onActivityCreated(savedInstanceState)
+        override fun onViewCreated(rootView: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(rootView, savedInstanceState)
 
             try {
                 val activity = activity ?: return

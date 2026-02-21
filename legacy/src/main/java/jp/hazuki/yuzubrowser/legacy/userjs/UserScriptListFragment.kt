@@ -199,13 +199,13 @@ class UserScriptListFragment : Fragment(), OnUserJsItemClickListener, DeleteDial
             makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) or makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.DOWN or ItemTouchHelper.UP)
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            adapter.move(viewHolder.adapterPosition, target.adapterPosition)
+            adapter.move(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             mDb.saveAll(adapter.items)
             return true
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val index = viewHolder.adapterPosition
+            val index = viewHolder.bindingAdapterPosition
             val js = adapter.remove(index)
             Snackbar.make(binding.linear, R.string.deleted, Snackbar.LENGTH_SHORT)
                 .applyAppTheme()
@@ -305,7 +305,7 @@ class UserScriptListFragment : Fragment(), OnUserJsItemClickListener, DeleteDial
             }
 
             fun onClick() {
-                adapter.onInfoButtonClick(adapterPosition, item)
+                adapter.onInfoButtonClick(bindingAdapterPosition, item)
             }
         }
     }

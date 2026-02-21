@@ -52,6 +52,7 @@ class AbpFragment : Fragment(), OnRecyclerListener, AddAbpDialog.OnAddItemListen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val activity = activity ?: throw IllegalStateException()
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
         val fab: FloatingActionButton = view.findViewById(R.id.fab)
@@ -68,10 +69,6 @@ class AbpFragment : Fragment(), OnRecyclerListener, AddAbpDialog.OnAddItemListen
             AddAbpDialog.create(null)
                     .show(childFragmentManager, "edit")
         }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         setHasOptionsMenu(true)
     }
 

@@ -143,7 +143,7 @@ abstract class ArrayRecyclerAdapter<T, VH : ArrayRecyclerAdapter.ArrayViewHolder
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        val pos = holder.adapterPosition
+        val pos = holder.bindingAdapterPosition
         if (items.size > pos && items[pos] != null) {
             holder.setUp(items[pos])
             onBindViewHolder(holder, items[pos], pos)
@@ -205,9 +205,9 @@ abstract class ArrayRecyclerAdapter<T, VH : ArrayRecyclerAdapter.ArrayViewHolder
             get() = target ?: throw NullPointerException()
 
         init {
-            itemView.setOnClickListener { v -> adapter.onItemClick(v, adapterPosition, item) }
+            itemView.setOnClickListener { v -> adapter.onItemClick(v, bindingAdapterPosition, item) }
 
-            itemView.setOnLongClickListener { v -> adapter.onItemLongClick(v, adapterPosition, item) }
+            itemView.setOnLongClickListener { v -> adapter.onItemLongClick(v, bindingAdapterPosition, item) }
         }
 
         open fun setUp(item: I) {

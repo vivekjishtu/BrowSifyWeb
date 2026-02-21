@@ -141,13 +141,13 @@ class WebTextEncodeSettingFragment : Fragment(), OnRecyclerListener, EditWebText
         }
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            mAdapter.move(viewHolder.adapterPosition, target.adapterPosition)
+            mAdapter.move(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             mEncodeList.write(applicationContext, moshi)
             return true
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.adapterPosition
+            val position = viewHolder.bindingAdapterPosition
             val encode = mEncodeList.removeAt(position)
 
             mAdapter.notifyDataSetChanged()

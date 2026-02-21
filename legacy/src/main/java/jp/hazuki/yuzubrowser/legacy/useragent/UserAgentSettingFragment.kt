@@ -151,13 +151,13 @@ class UserAgentSettingFragment : Fragment(), DeleteUserAgentDialog.OnDelete, Edi
         }
 
         override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
-            mAdapter.move(viewHolder.adapterPosition, target.adapterPosition)
+            mAdapter.move(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             mUserAgentList.write(applicationContext, moshi)
             return true
         }
 
         override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.adapterPosition
+            val position = viewHolder.bindingAdapterPosition
             val ua = mAdapter.remove(position)
 
             Snackbar.make(binding.root, R.string.deleted, Snackbar.LENGTH_SHORT)

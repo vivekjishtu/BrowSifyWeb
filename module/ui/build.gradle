@@ -61,6 +61,7 @@ dependencies {
 
     implementation AndroidX.appcompat
     implementation AndroidX.design
+    implementation AndroidX.recyclerView
     implementation AndroidX.constraintLayout
     implementation AndroidX.fragmentKtx
     implementation AndroidX.fix_preference

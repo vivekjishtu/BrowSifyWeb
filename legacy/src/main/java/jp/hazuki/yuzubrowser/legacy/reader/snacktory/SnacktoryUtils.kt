@@ -28,6 +28,6 @@ internal object SnacktoryUtils {
     private fun Element.count(): Int {
         return ownText().length + children().asSequence()
                 .filter { "p" == it.tagName() }
-                .sumBy { it.text().length }
+                .sumOf { it.text().length }
     }
 }

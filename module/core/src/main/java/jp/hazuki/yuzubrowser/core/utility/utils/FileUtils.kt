@@ -82,7 +82,7 @@ fun getParsedFileName(filename: String): ParsedFileName {
 fun getMimeType(fileName: String): String {
     val lastDot = fileName.lastIndexOf('.')
     if (lastDot >= 0) {
-        val extension = fileName.substring(lastDot + 1).toLowerCase()
+        val extension = fileName.substring(lastDot + 1).lowercase()
         return getMimeTypeFromExtension(extension)
     }
     return "application/octet-stream"

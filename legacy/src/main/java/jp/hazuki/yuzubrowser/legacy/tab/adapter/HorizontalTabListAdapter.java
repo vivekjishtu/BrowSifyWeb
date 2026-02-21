@@ -43,7 +43,7 @@ class HorizontalTabListAdapter extends TabListRecyclerBaseAdapter {
         if (indexData.getTabType() != TabType.PRIVATE && TextUtils.isEmpty(indexData.getTitle()))
             holder.title.setText(UrlExtensionsKt.decodePunyCodeUrl(indexData.getUrl()));
 
-        if (holder.getAdapterPosition() == getTabManager().getCurrentTabNo())
+        if (holder.getBindingAdapterPosition() == getTabManager().getCurrentTabNo())
             holder.disable.setVisibility(View.GONE);
         else
             holder.disable.setVisibility(View.VISIBLE);

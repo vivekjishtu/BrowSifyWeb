@@ -103,7 +103,7 @@ constructor(
     }
 
     override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
-        val item = historyModels[holder.adapterPosition]
+        val item = historyModels[holder.bindingAdapterPosition]
         val url = item.url?.decodePunyCodeUrlHost()
         val image = faviconManager[item.url!!]
 
@@ -126,13 +126,13 @@ constructor(
 
         holder.itemView.setOnClickListener { v ->
             if (isMultiSelectMode) {
-                toggle(holder.adapterPosition)
+                toggle(holder.bindingAdapterPosition)
             } else {
-                listener.onRecyclerItemClicked(v, holder.adapterPosition)
+                listener.onRecyclerItemClicked(v, holder.bindingAdapterPosition)
             }
         }
 
-        holder.itemView.setOnLongClickListener { v -> listener.onRecyclerItemLongClicked(v, holder.adapterPosition) }
+        holder.itemView.setOnLongClickListener { v -> listener.onRecyclerItemLongClicked(v, holder.bindingAdapterPosition) }
 
         if (pickMode) {
             holder.imageButton.isClickable = false
@@ -140,16 +140,16 @@ constructor(
         } else {
             holder.imageButton.setOnClickListener { v ->
                 if (isMultiSelectMode) {
-                    toggle(holder.adapterPosition)
+                    toggle(holder.bindingAdapterPosition)
                 } else {
-                    listener.onIconClicked(v, holder.adapterPosition)
+                    listener.onIconClicked(v, holder.bindingAdapterPosition)
                 }
             }
             holder.overflowButton.setOnClickListener {
                 if (isMultiSelectMode) {
-                    toggle(holder.adapterPosition)
+                    toggle(holder.bindingAdapterPosition)
                 } else {
-                    listener.onShowMenu(it, holder.adapterPosition)
+                    listener.onShowMenu(it, holder.bindingAdapterPosition)
                 }
             }
         }

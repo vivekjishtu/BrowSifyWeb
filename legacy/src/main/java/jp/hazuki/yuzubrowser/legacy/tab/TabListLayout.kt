@@ -181,8 +181,8 @@ constructor(context: Context, attrs: AttributeSet?, mode: Int, left: Boolean, va
             snackbar?.run {
                 if (isShown) dismiss()
             }
-            callback.requestMoveTab(viewHolder.adapterPosition, target.adapterPosition)
-            adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
+            callback.requestMoveTab(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+            adapter.notifyItemMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             return true
         }
 
@@ -191,7 +191,7 @@ constructor(context: Context, attrs: AttributeSet?, mode: Int, left: Boolean, va
                 snackbar?.run {
                     if (isShown) dismiss()
                 }
-                val position = viewHolder.adapterPosition
+                val position = viewHolder.bindingAdapterPosition
 
                 val current = position == tabManager.currentTabNo
 

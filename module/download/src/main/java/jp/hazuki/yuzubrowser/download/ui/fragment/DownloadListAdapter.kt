@@ -118,22 +118,22 @@ class DownloadListAdapter(
 
         holder.itemView.setOnClickListener {
             if (isMultiSelectMode) {
-                toggle(holder.adapterPosition)
+                toggle(holder.bindingAdapterPosition)
             } else {
-                listener.onRecyclerItemClicked(it, holder.adapterPosition)
+                listener.onRecyclerItemClicked(it, holder.bindingAdapterPosition)
             }
         }
         holder.binding.overflowButton.setOnClickListener {
             if (isMultiSelectMode) {
-                toggle(holder.adapterPosition)
+                toggle(holder.bindingAdapterPosition)
             } else {
                 val popupMenu = PopupMenu(context, it)
-                listener.onCreateContextMenu(popupMenu.menu, holder.adapterPosition)
+                listener.onCreateContextMenu(popupMenu.menu, holder.bindingAdapterPosition)
                 popupMenu.show()
             }
         }
         holder.itemView.setOnLongClickListener {
-            listener.onRecyclerItemLongClicked(it, holder.adapterPosition)
+            listener.onRecyclerItemLongClicked(it, holder.bindingAdapterPosition)
             true
         }
     }
