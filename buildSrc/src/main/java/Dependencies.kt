@@ -28,22 +28,22 @@ object AppVersions {
 
 object Versions {
     const val androidX = "1.8.1"
-    const val appCompat = "1.7.0"
-    const val activityX = "1.10.0"
-    const val androidKTX = "1.15.0"
-    const val fragmentKtx = "1.8.5"
+    const val appCompat = "1.7.1"
+    const val activityX = "1.12.4"
+    const val androidKTX = "1.17.0"
+    const val fragmentKtx = "1.8.9"
     const val recyclerView = "1.3.2"
-    const val androidxRoom = "2.6.1"
-    const val lifeCycle = "2.8.7"
+    const val androidxRoom = "2.8.4"
+    const val lifeCycle = "2.10.0"
     const val material = "1.12.0"
     const val support_fix_lib = "1.2.1"
     const val support_constraint_lib = "2.1.4"
     const val documentFile = "1.0.1"
     const val print = "1.0.0"
     const val swipeRefreshLayout = "1.1.0"
-    const val moshi = "1.15.0"
-    const val okhttp = "4.12.0"
-    const val okio = "3.9.1" //"2.10.0"
+    const val moshi = "1.15.2"
+    const val okhttp = "4.12.0" // Reverting to stable 4.x as 5.x is still alpha
+    const val okio = "3.9.1"
     const val kvs_schema = "5.0.1"
     const val kotlin = "2.1.10"
     const val kotlin_coroutines = "1.10.1"
@@ -97,8 +97,7 @@ object Libs {
     const val okio = "com.squareup.okio:okio:${Versions.okio}"
 
     //Kotlin
-    const val kotlin_stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
-    const val kotlin_android_extensions = "org.jetbrains.kotlin:kotlin-android-extensions:${Versions.kotlin}"
+    const val kotlin_stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
     const val kotlin_coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlin_coroutines}"
     const val kotlin_coroutines_android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.kotlin_coroutines}"
 
