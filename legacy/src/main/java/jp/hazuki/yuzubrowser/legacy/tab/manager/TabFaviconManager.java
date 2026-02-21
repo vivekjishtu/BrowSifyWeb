@@ -67,6 +67,8 @@ public class TabFaviconManager {
         if (indexData.getTabType() == TabType.PRIVATE) {
             Drawable icon = context.getDrawable(R.drawable.ic_private_white_24dp);
             if (icon == null) return;
+            icon = icon.mutate();
+            icon.setTint(titleTextView.getCurrentTextColor());
             int size = titleTextView.getHeight() - titleTextView.getPaddingTop() - titleTextView.getPaddingBottom();
             icon.setBounds(0, 0, size, size);
             titleTextView.setCompoundDrawables(icon, null, null, null);
