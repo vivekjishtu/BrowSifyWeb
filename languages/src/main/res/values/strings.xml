@@ -411,4 +411,6 @@
     <string name="site">Site</string>
     <string name="updating_ad_filters">Updating Ad block filters</string>
     <string name="do_nothing">Do nothing</string>
+    <string name="theme_changed_message">Theme has changed. Restart to apply?</string>
+    <string name="theme_changed_restart">Restart</string>
 </resources>

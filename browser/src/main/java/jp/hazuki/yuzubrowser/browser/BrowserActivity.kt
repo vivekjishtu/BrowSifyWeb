@@ -219,6 +219,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     private var delayAction: Action? = null
     override val secretKey = Random.nextInt().toString(36)
     private var lastSpeedDialUpdateTime: Long = -1L
+    private var lastUiMode: Int = 0
 
     @Inject
     internal lateinit var webViewFactory: WebViewFactory
@@ -249,6 +250,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
         binding = BrowserActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        lastUiMode = resources.configuration.uiMode
         uiController = SystemUiController.create(window)
         //Crash workaround for pagePaddingHeight...
         binding.toolbarPadding.visibility = View.GONE
@@ -537,6 +539,16 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        if ((newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK) != (lastUiMode and Configuration.UI_MODE_NIGHT_MASK)) {
+            lastUiMode = newConfig.uiMode
+            if (AppPrefs.theme_setting.get() == ThemeData.THEME_AUTO) {
+                Snackbar.make(binding.coordinator, R.string.theme_changed_message, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.theme_changed_restart) {
+                        ActivityCompat.recreate(this)
+                    }
+                    .show()
+            }
+        }
         toolbar.onActivityConfigurationChanged(newConfig)
     }
 
