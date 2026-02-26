@@ -20,14 +20,22 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.WindowCompat
 import jp.hazuki.yuzubrowser.core.utility.utils.createLanguageConfig
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 
 @SuppressLint("Registered")
 open class ThemeActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Keep app content below system bars by default on Android 15+.
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun attachBaseContext(newBase: Context) {
         val application = newBase.applicationContext
