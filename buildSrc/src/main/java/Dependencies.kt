@@ -23,7 +23,7 @@ object Build {
 
 object AppVersions {
     const val version_name = "7.0.0"
-    const val version_code = 700001
+    const val version_code = 700002
 }
 
 object Versions {
