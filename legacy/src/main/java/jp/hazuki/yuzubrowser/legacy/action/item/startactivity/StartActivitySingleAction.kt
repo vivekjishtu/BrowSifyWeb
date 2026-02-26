@@ -26,9 +26,11 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.Base64
+import androidx.core.content.IntentCompat
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import jp.hazuki.yuzubrowser.core.utility.log.ErrorReport
@@ -120,9 +122,19 @@ class StartActivitySingleAction : SingleAction, Parcelable {
     }
 
     private constructor(source: Parcel) : super(source.readInt()) {
-        mIntent = source.readParcelable(Intent::class.java.classLoader)
+        mIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            source.readParcelable(Intent::class.java.classLoader, Intent::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            source.readParcelable(Intent::class.java.classLoader)
+        }
         mName = source.readString()
-        mIcon = source.readParcelable(Bitmap::class.java.classLoader)
+        mIcon = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            source.readParcelable(Bitmap::class.java.classLoader, Bitmap::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            source.readParcelable(Bitmap::class.java.classLoader)
+        }
     }
 
     override fun showMainPreference(context: ActionActivity): StartActivityInfo {
@@ -136,7 +148,7 @@ class StartActivitySingleAction : SingleAction, Parcelable {
             if (resultCode != Activity.RESULT_OK || data == null)
                 return@StartActivityInfo
 
-            val sIntent = data.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
+            val sIntent = IntentCompat.getParcelableExtra(data, Intent.EXTRA_INTENT, Intent::class.java)
                 ?: return@StartActivityInfo
             mIntent = sIntent
 
@@ -144,10 +156,12 @@ class StartActivitySingleAction : SingleAction, Parcelable {
                 return@StartActivityInfo
             }
 
+            @Suppress("DEPRECATION")
             val name = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME)
-            var icon: Bitmap? = data.getParcelableExtra(EXTRA_ICON)
+            var icon: Bitmap? = IntentCompat.getParcelableExtra(data, EXTRA_ICON, Bitmap::class.java)
             if (icon == null) {
-                val iconRes = data.getParcelableExtra<ShortcutIconResource>(Intent.EXTRA_SHORTCUT_ICON_RESOURCE)
+                @Suppress("DEPRECATION")
+                val iconRes = IntentCompat.getParcelableExtra(data, Intent.EXTRA_SHORTCUT_ICON_RESOURCE, ShortcutIconResource::class.java)
                 if (iconRes != null) {
                     try {
                         val foreignResources = context.packageManager.getResourcesForApplication(iconRes.packageName)
@@ -182,6 +196,7 @@ class StartActivitySingleAction : SingleAction, Parcelable {
         val extras = intent.extras
         if (extras != null) {
             for (key in extras.keySet()) {
+                @Suppress("DEPRECATION")
                 val obj = extras.get(key)
                 if (obj is CharSequence) {
                     intent.putExtra(key, replaceString(tab, obj.toString()))

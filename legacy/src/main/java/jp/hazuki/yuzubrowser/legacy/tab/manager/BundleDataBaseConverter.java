@@ -20,6 +20,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
 
+import androidx.core.os.BundleCompat;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,9 +76,9 @@ public class BundleDataBaseConverter {
     private void restoreInstanceState(Context context, Bundle bundle) {
         int currentNo = bundle.getInt(EXTRA_CURRENT_NO);
         int list_count = bundle.getInt(EXTRA_LIST_COUNT);
-        int[] tabType = (int[]) bundle.getSerializable(EXTRA_TAB_TYPE);
-        long[] ids = (long[]) bundle.getSerializable(EXTRA_TAB_ID);
-        long[] parents = (long[]) bundle.getSerializable(EXTRA_TAB_PARENT);
+        int[] tabType = BundleCompat.getSerializable(bundle, EXTRA_TAB_TYPE, int[].class);
+        long[] ids = BundleCompat.getSerializable(bundle, EXTRA_TAB_ID, long[].class);
+        long[] parents = BundleCompat.getSerializable(bundle, EXTRA_TAB_PARENT, long[].class);
         if (tabType == null) tabType = new int[list_count];
         if (ids == null) ids = new long[list_count];
         if (parents == null) parents = new long[list_count];
