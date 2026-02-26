@@ -32,15 +32,12 @@ import jp.hazuki.yuzubrowser.core.utility.extensions.getNoCacheResponse
 import jp.hazuki.yuzubrowser.core.utility.utils.IOUtils
 import jp.hazuki.yuzubrowser.core.utility.utils.getMimeType
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.ByteArrayInputStream
 import java.util.concurrent.CountDownLatch
 
 class AdBlockController(private val context: Context, private val abpDao: AbpDao) {
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val dummyImage: ByteArray = IOUtils.readByte(context.resources.assets.open("blank.png"))
     private val dummy = WebResourceResponse("text/plain", "UTF-8", EmptyInputStream())
 
@@ -56,7 +53,7 @@ class AdBlockController(private val context: Context, private val abpDao: AbpDao
 
     fun update() {
         waitForLoading = CountDownLatch(1)
-        GlobalScope.launch(Dispatchers.IO) {
+        scope.launch {
             try {
                 val abpLoader = AbpLoader(context.getFilterDir(), abpDao.getAll())
                 val deny = async {
@@ -142,5 +139,10 @@ class AdBlockController(private val context: Context, private val abpDao: AbpDao
         val cosmetic = elementBlocker ?: return null
 
         return cosmetic.loadScript(url)
+    }
+
+    fun destroy() {
+        scope.cancel()
+        manager.destroy()
     }
 }

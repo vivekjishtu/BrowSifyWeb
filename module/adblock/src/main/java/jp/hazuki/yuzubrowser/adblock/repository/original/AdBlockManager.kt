@@ -28,9 +28,7 @@ import jp.hazuki.yuzubrowser.adblock.filter.unified.getFilterDir
 import jp.hazuki.yuzubrowser.adblock.filter.unified.io.FilterReader
 import jp.hazuki.yuzubrowser.adblock.filter.unified.io.FilterWriter
 import jp.hazuki.yuzubrowser.adblock.filter.unified.writeFilter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.IOException
@@ -38,6 +36,7 @@ import java.util.*
 
 class AdBlockManager internal constructor(private val context: Context) {
 
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val mOpenHelper = MyOpenHelper(context)
     private val appContext = context.applicationContext
 
@@ -165,7 +164,7 @@ class AdBlockManager internal constructor(private val context: Context) {
             }
         }
         val list = getMatcherList(table)
-        GlobalScope.launch(Dispatchers.IO) {
+        scope.launch {
             writeFilter(getFilterFile(table), list)
             updateCacheTime(table)
         }
@@ -228,7 +227,7 @@ class AdBlockManager internal constructor(private val context: Context) {
                 val adBlocks = AdBlockDecoder.decode(Scanner(it), false)
                 addAll(ALLOW_TABLE_NAME, adBlocks)
             }
-            GlobalScope.launch(Dispatchers.IO) {
+            scope.launch {
                 createCache(ALLOW_TABLE_NAME)
             }
         } catch (e: IOException) {
@@ -240,7 +239,7 @@ class AdBlockManager internal constructor(private val context: Context) {
                 val adBlocks = AdBlockDecoder.decode(Scanner(it), false)
                 addAll(ALLOW_PAGE_TABLE_NAME, adBlocks)
             }
-            GlobalScope.launch(Dispatchers.IO) {
+            scope.launch {
                 createCache(ALLOW_PAGE_TABLE_NAME)
             }
         } catch (e: IOException) {
@@ -394,5 +393,9 @@ class AdBlockManager internal constructor(private val context: Context) {
             TYPE_ALLOW_PAGE_TABLE -> AdBlockItemProvider(context, ALLOW_PAGE_TABLE_NAME)
             else -> throw IllegalArgumentException("unknown type")
         }
+    }
+
+    fun destroy() {
+        scope.cancel()
     }
 }

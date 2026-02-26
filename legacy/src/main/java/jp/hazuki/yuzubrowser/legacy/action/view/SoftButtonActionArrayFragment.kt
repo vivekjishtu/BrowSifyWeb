@@ -23,9 +23,12 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import jp.hazuki.yuzubrowser.legacy.R
@@ -65,7 +68,25 @@ class SoftButtonActionArrayFragment : RecyclerFabFragment(), OnRecyclerListener,
         super.onViewCreated(view, savedInstanceState)
         val activity = activity ?: return
 
-        setHasOptionsMenu(true)
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.sort, menu)
+                applyIconColor(menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                if (menuItem.itemId == R.id.sort) {
+                    val next = !adapter.isSortMode
+                    adapter.isSortMode = next
+
+                    Toast.makeText(activity, if (next) R.string.start_sort else R.string.end_sort, Toast.LENGTH_SHORT).show()
+                    return true
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         initData()
         val actionNames = activityViewModel.actionNames
         val actionIcons = activityViewModel.actionIcons
@@ -135,7 +156,10 @@ class SoftButtonActionArrayFragment : RecyclerFabFragment(), OnRecyclerListener,
                 .show()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             RESULT_REQUEST_ADD -> {
                 adapter.notifyDataSetChanged()
@@ -145,20 +169,9 @@ class SoftButtonActionArrayFragment : RecyclerFabFragment(), OnRecyclerListener,
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.sort, menu)
-        applyIconColor(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.sort -> {
-                val next = !adapter.isSortMode
-                adapter.isSortMode = next
-
-                Toast.makeText(activity, if (next) R.string.start_sort else R.string.end_sort, Toast.LENGTH_SHORT).show()
-                return true
-            }
-        }
         return false
     }
 

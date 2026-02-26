@@ -78,6 +78,7 @@ object AndroidX {
     const val documentFile = "androidx.documentfile:documentfile:${Versions.documentFile}"
     const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Versions.swipeRefreshLayout}"
     const val lifecycle = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifeCycle}"
+    const val lifecycleRuntime = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifeCycle}"
     const val print = "androidx.print:print:${Versions.print}"
     const val webkit = "androidx.webkit:webkit:${Versions.webkit}"
     const val workRuntime = "androidx.work:work-runtime-ktx:${Versions.work}"

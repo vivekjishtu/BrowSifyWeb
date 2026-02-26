@@ -20,6 +20,10 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.core.os.BundleCompat
+import androidx.lifecycle.Lifecycle
 import com.google.android.material.snackbar.Snackbar
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.resblock.checker.NormalChecker
@@ -40,12 +44,30 @@ class ResourceBlockListFragment : RecyclerFabFragment(), OnRecyclerListener, Che
         val activity = activity ?: return
         val arguments = arguments ?: throw IllegalArgumentException()
 
-        setHasOptionsMenu(true)
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.sort, menu)
+                applyIconColor(menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                if (menuItem.itemId == R.id.sort) {
+                    val next = !adapter.isSortMode
+                    adapter.isSortMode = next
+
+                    Toast.makeText(activity, if (next) R.string.start_sort else R.string.end_sort, Toast.LENGTH_SHORT).show()
+                    return true
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         manager = ResourceBlockManager(activity.applicationContext)
         adapter = ResBlockAdapter(activity, manager.list, this)
         setRecyclerViewAdapter(adapter)
 
-        val checker = arguments.getSerializable(CHECKER) as? NormalChecker
+        val checker = BundleCompat.getSerializable(arguments, CHECKER, NormalChecker::class.java)
 
         if (checker != null) {
             showEditDialog(-1, checker)
@@ -57,7 +79,10 @@ class ResourceBlockListFragment : RecyclerFabFragment(), OnRecyclerListener, Che
         return true
     }
 
-    public override fun onMoved(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, fromPos: Int, target: androidx.recyclerview.widget.RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
+    @Deprecated("Deprecated in Java")
+    override fun onMoved(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, fromPos: Int, target: androidx.recyclerview.widget.RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
+        @Suppress("DEPRECATION")
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
         manager.save(requireContext().applicationContext)
     }
 
@@ -122,20 +147,9 @@ class ResourceBlockListFragment : RecyclerFabFragment(), OnRecyclerListener, Che
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.sort, menu)
-        applyIconColor(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.sort -> {
-                val next = !adapter.isSortMode
-                adapter.isSortMode = next
-
-                Toast.makeText(activity, if (next) R.string.start_sort else R.string.end_sort, Toast.LENGTH_SHORT).show()
-                return true
-            }
-        }
         return false
     }
 

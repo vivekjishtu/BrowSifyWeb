@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.content.IntentCompat
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.Action
 import jp.hazuki.yuzubrowser.ui.app.OnActivityResultListener
@@ -34,9 +35,9 @@ class CloseAutoSelectActivity : ThemeActivity() {
 
         supportFragmentManager.beginTransaction()
                 .replace(R.id.container, CloseAutoSelectFragment(
-                        intent?.getParcelableExtra(DEFAULT),
-                        intent?.getParcelableExtra(INTENT),
-                        intent?.getParcelableExtra(WINDOW)))
+                        intent?.let { IntentCompat.getParcelableExtra(it, DEFAULT, Action::class.java) },
+                        intent?.let { IntentCompat.getParcelableExtra(it, INTENT, Action::class.java) },
+                        intent?.let { IntentCompat.getParcelableExtra(it, WINDOW, Action::class.java) }))
                 .commit()
     }
 
@@ -46,9 +47,9 @@ class CloseAutoSelectActivity : ThemeActivity() {
         fun setListener(callback: (defaultAction: Action, intentAction: Action, windowAction: Action) -> Unit): Builder {
             listener = { _, resultCode, intent ->
                 if (resultCode == RESULT_OK && intent != null) {
-                    val defaultAction = intent.getParcelableExtra<Action>(DEFAULT)!!
-                    val intentAction = intent.getParcelableExtra<Action>(INTENT)!!
-                    val windowAction = intent.getParcelableExtra<Action>(WINDOW)!!
+                    val defaultAction = IntentCompat.getParcelableExtra(intent, DEFAULT, Action::class.java)!!
+                    val intentAction = IntentCompat.getParcelableExtra(intent, INTENT, Action::class.java)!!
+                    val windowAction = IntentCompat.getParcelableExtra(intent, WINDOW, Action::class.java)!!
                     callback(defaultAction, intentAction, windowAction)
                 }
             }

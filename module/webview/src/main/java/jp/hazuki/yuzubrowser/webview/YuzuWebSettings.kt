@@ -78,8 +78,10 @@ class YuzuWebSettings(private val origin: WebSettings) {
         }
 
     var saveFormData: Boolean
+        @Suppress("DEPRECATION")
         @Deprecated("")
         get() = origin.saveFormData
+        @Suppress("DEPRECATION")
         @Deprecated("")
         set(save) {
             origin.saveFormData = save
@@ -218,7 +220,9 @@ class YuzuWebSettings(private val origin: WebSettings) {
         }
 
     var databaseEnabled: Boolean
+        @Suppress("DEPRECATION")
         get() = origin.databaseEnabled
+        @Suppress("DEPRECATION")
         set(flag) {
             origin.databaseEnabled = flag
         }
@@ -230,13 +234,17 @@ class YuzuWebSettings(private val origin: WebSettings) {
         }
 
     var allowUniversalAccessFromFileURLs: Boolean
+        @Suppress("DEPRECATION")
         get() = origin.allowUniversalAccessFromFileURLs
+        @Suppress("DEPRECATION")
         set(flag) {
             origin.allowUniversalAccessFromFileURLs = flag
         }
 
     var allowFileAccessFromFileURLs: Boolean
+        @Suppress("DEPRECATION")
         get() = origin.allowFileAccessFromFileURLs
+        @Suppress("DEPRECATION")
         set(flag) {
             origin.allowFileAccessFromFileURLs = flag
         }
@@ -376,6 +384,7 @@ class YuzuWebSettings(private val origin: WebSettings) {
     }
 
     @SuppressLint("RequiresFeature")
+    @Suppress("DEPRECATION")
     private fun setWebTheme() {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {

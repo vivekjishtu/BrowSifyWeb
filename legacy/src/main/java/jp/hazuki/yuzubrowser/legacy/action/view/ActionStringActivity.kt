@@ -23,6 +23,7 @@ import android.os.Parcelable
 import android.view.Menu
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.content.IntentCompat
 import androidx.core.widget.doAfterTextChanged
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.Action
@@ -48,7 +49,7 @@ class ActionStringActivity : ThemeActivity() {
 
         val intent = intent ?: throw NullPointerException("Intent is null")
 
-        mActionNameArray = intent.getParcelableExtra(ActionNameArray.INTENT_EXTRA)
+        mActionNameArray = IntentCompat.getParcelableExtra(intent, ActionNameArray.INTENT_EXTRA, ActionNameArray::class.java)
 
         viewModel.text.observe(this) {
             if (binding.editText.text.toString() != it) {
@@ -59,7 +60,7 @@ class ActionStringActivity : ThemeActivity() {
             viewModel.text.value = it?.toString() ?: ""
         }
 
-        val action = intent.getParcelableExtra<Parcelable>(EXTRA_ACTION)
+        val action = IntentCompat.getParcelableExtra(intent, EXTRA_ACTION, Parcelable::class.java)
         if (action != null) {
             if (action is Action) {
                 mTarget = ACTION_ACTIVITY
@@ -130,22 +131,26 @@ class ActionStringActivity : ThemeActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             ACTION_ACTIVITY -> {
                 if (resultCode != Activity.RESULT_OK || data == null) return
 
-                val action = data.getParcelableExtra<Action>(ActionActivity.EXTRA_ACTION) ?: return
+                val action = IntentCompat.getParcelableExtra(data, ActionActivity.EXTRA_ACTION, Action::class.java) ?: return
                 viewModel.text.value = action.toJsonString()
             }
             ACTION_LIST_ACTIVITY -> {
                 if (resultCode != Activity.RESULT_OK || data == null) return
 
-                val action = data.getParcelableExtra<ActionList>(ActionListActivity.EXTRA_ACTION_LIST)
+                val action = IntentCompat.getParcelableExtra(data, ActionListActivity.EXTRA_ACTION_LIST, ActionList::class.java)
                     ?: return
                 viewModel.text.value = action.toJsonString()
             }
-            else -> super.onActivityResult(requestCode, resultCode, data)
+            else -> {
+                @Suppress("DEPRECATION")
+                super.onActivityResult(requestCode, resultCode, data)
+            }
         }
     }
 

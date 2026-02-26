@@ -25,6 +25,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import com.google.android.material.snackbar.Snackbar
 import jp.hazuki.yuzubrowser.core.utility.extensions.dimension
 import jp.hazuki.yuzubrowser.core.utility.extensions.getResColor
@@ -44,12 +47,28 @@ class GestureListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDia
     private var mGestureId: Int = 0
     private lateinit var adapter: GestureListAdapter
 
+    private val addLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            reset()
+        }
+    }
+
+    private val editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val data = result.data!!
+            val bundle = data.getBundleExtra(ActionActivity.EXTRA_RETURN)!!
+            val action = IntentCompat.getParcelableExtra(data, ActionActivity.EXTRA_ACTION, Action::class.java)
+            mManager.updateAction(bundle.getLong(ITEM_ID), action)
+            reset()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val activity = activity ?: return
         val arguments = arguments ?: throw IllegalArgumentException()
 
-        val mActionNameArray = arguments.getParcelable<ActionNameArray>(ActionNameArray.INTENT_EXTRA) ?: throw IllegalArgumentException()
+        val mActionNameArray = BundleCompat.getParcelable(arguments, ActionNameArray.INTENT_EXTRA, ActionNameArray::class.java) ?: throw IllegalArgumentException()
         mGestureId = arguments.getInt(GestureManager.INTENT_EXTRA_GESTURE_ID)
         mManager = GestureManager.getInstance(activity.applicationContext, mGestureId)
         mManager.load()
@@ -66,7 +85,7 @@ class GestureListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDia
                 .setReturnData(bundle)
                 .create()
 
-        startActivityForResult(intent, RESULT_REQUEST_EDIT)
+        editLauncher.launch(intent)
     }
 
     override fun onRecyclerItemLongClicked(v: View, position: Int): Boolean {
@@ -86,27 +105,17 @@ class GestureListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDia
         val intent = Intent(activity, AddGestureActivity::class.java)
         intent.putExtra(GestureManager.INTENT_EXTRA_GESTURE_ID, mGestureId)
         intent.putExtra(Intent.EXTRA_TITLE, activity.title)
-        startActivityForResult(intent, RESULT_REQUEST_ADD)
+        addLauncher.launch(intent)
     }
 
     override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, fromIndex: Int, toIndex: Int): Boolean {
         return false
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                RESULT_REQUEST_ADD -> reset()
-                RESULT_REQUEST_EDIT -> {
-                    if (data == null) return
-
-                    val bundle = data.getBundleExtra(ActionActivity.EXTRA_RETURN)!!
-                    val action = data.getParcelableExtra<Action>(ActionActivity.EXTRA_ACTION)
-                    mManager.updateAction(bundle.getLong(ITEM_ID), action)
-                    reset()
-                }
-            }
-        }
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, index: Int) {

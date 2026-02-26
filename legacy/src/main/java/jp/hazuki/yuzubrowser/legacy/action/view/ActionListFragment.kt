@@ -25,6 +25,12 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import com.google.android.material.snackbar.Snackbar
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.*
@@ -43,17 +49,93 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
     private lateinit var names: ActionNameMap
     private lateinit var icons: ActionIconMap
 
+    private val addLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val data = result.data!!
+            val action = IntentCompat.getParcelableExtra(data, ActionActivity.EXTRA_ACTION, Action::class.java)!!
+            mList.add(action)
+            onActionListChanged()
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    private val editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val data = result.data!!
+            val action = IntentCompat.getParcelableExtra(data, ActionActivity.EXTRA_ACTION, Action::class.java)!!
+            if (action.isEmpty()) {
+                Snackbar.make(rootView, R.string.action_cant_empty, Snackbar.LENGTH_SHORT)
+                    .applyAppTheme()
+                    .show()
+                return@registerForActivityResult
+            }
+            val position = data.getBundleExtra(ActionActivity.EXTRA_RETURN)!!.getInt(EXTRA_POSITION)
+            mList[position] = action
+            onActionListChanged()
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    private val addEasyLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val data = result.data!!
+            val action = IntentCompat.getParcelableExtra(data, ActionActivity.EXTRA_ACTION, Action::class.java)!!
+            action.forEach {
+                mList.add(Action(it))
+            }
+            onActionListChanged()
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    private val jsonLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val data = result.data!!
+            val actionList = IntentCompat.getParcelableExtra(data, ActionStringActivity.EXTRA_ACTION, ActionList::class.java)!!
+            mList.clear()
+            mList.addAll(actionList)
+            onActionListChanged()
+            adapter.notifyDataSetChanged()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.action_list, menu)
+                applyIconColor(menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.sort -> {
+                        val next = !adapter.isSortMode
+                        adapter.isSortMode = next
+
+                        Toast.makeText(activity, if (next) R.string.start_sort else R.string.end_sort, Toast.LENGTH_SHORT).show()
+                        return true
+                    }
+                    R.id.actionToJson -> {
+                        val intent = Intent(activity, ActionStringActivity::class.java)
+                        intent.putExtra(ActionStringActivity.EXTRA_ACTION, mList as Parcelable?)
+                        jsonLauncher.launch(intent)
+                        return true
+                    }
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         val arguments = arguments ?: return
 
-        mActionNameArray = arguments.getParcelable(ActionNameArray.INTENT_EXTRA)!!
+        mActionNameArray = BundleCompat.getParcelable(arguments, ActionNameArray.INTENT_EXTRA, ActionNameArray::class.java)!!
         names = ActionNameMap(resources)
         icons = ActionIconMap(resources)
 
-        val actions = arguments.getParcelable<ActionList>(EXTRA_ACTION_LIST)
+        val actions = BundleCompat.getParcelable(arguments, EXTRA_ACTION_LIST, ActionList::class.java)
         setActionList(actions)
     }
 
@@ -66,7 +148,7 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
                 .setTitle(R.string.edit_action)
                 .setReturnData(bundle)
                 .create()
-        startActivityForResult(intent, RESULT_REQUEST_EDIT)
+        editLauncher.launch(intent)
     }
 
     override fun onRecyclerItemLongClicked(v: View, position: Int): Boolean {
@@ -89,7 +171,7 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
                 .setActionNameArray(mActionNameArray)
                 .create()
 
-        startActivityForResult(intent, RESULT_REQUEST_ADD)
+        addLauncher.launch(intent)
     }
 
     override fun onAddButtonLongClick(): Boolean {
@@ -143,68 +225,20 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
                 .setActionNameArray(mActionNameArray)
                 .create()
 
-        startActivityForResult(intent, RESULT_REQUEST_ADD_EASY)
+        addEasyLauncher.launch(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.action_list, menu)
-        applyIconColor(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.sort -> {
-                val next = !adapter.isSortMode
-                adapter.isSortMode = next
-
-                Toast.makeText(activity, if (next) R.string.start_sort else R.string.end_sort, Toast.LENGTH_SHORT).show()
-                return true
-            }
-            R.id.actionToJson -> {
-                val intent = Intent(activity, ActionStringActivity::class.java)
-                intent.putExtra(ActionStringActivity.EXTRA_ACTION, mList as Parcelable?)
-                startActivityForResult(intent, RESULT_REQUEST_JSON)
-                return true
-            }
-        }
         return false
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == RESULT_OK && data != null) {
-
-            when (requestCode) {
-                RESULT_REQUEST_ADD -> {
-                    val action = data.getParcelableExtra<Action>(ActionActivity.EXTRA_ACTION)!!
-                    mList.add(action)
-                }
-                RESULT_REQUEST_EDIT -> {
-                    val action = data.getParcelableExtra<Action>(ActionActivity.EXTRA_ACTION)!!
-                    if (action.isEmpty()) {
-                        Snackbar.make(rootView, R.string.action_cant_empty, Snackbar.LENGTH_SHORT)
-                            .applyAppTheme()
-                            .show()
-                        return
-                    }
-                    val position = data.getBundleExtra(ActionActivity.EXTRA_RETURN)!!.getInt(EXTRA_POSITION)
-                    mList[position] = action
-                }
-                RESULT_REQUEST_ADD_EASY -> {
-                    val action = data.getParcelableExtra<Action>(ActionActivity.EXTRA_ACTION)!!
-                    action.forEach {
-                        mList.add(Action(it))
-                    }
-                }
-                RESULT_REQUEST_JSON -> {
-                    val actionList = data.getParcelableExtra<ActionList>(ActionStringActivity.EXTRA_ACTION)!!
-                    mList.clear()
-                    mList.addAll(actionList)
-                }
-            }
-
-            onActionListChanged()
-            adapter.notifyDataSetChanged()
-        }
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override val isNeedDivider: Boolean

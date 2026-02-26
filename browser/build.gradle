@@ -69,6 +69,7 @@ dependencies {
     implementation AndroidX.documentFile
     implementation AndroidX.webkit
     implementation AndroidX.swipeRefreshLayout
+    implementation AndroidX.lifecycleRuntime
 
     implementation Libs.okhttp
     implementation Libs.okio

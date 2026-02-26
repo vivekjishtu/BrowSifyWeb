@@ -31,6 +31,7 @@ import android.view.View
 import android.webkit.*
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import jp.hazuki.yuzubrowser.adblock.*
 import jp.hazuki.yuzubrowser.adblock.filter.mining.MiningProtector
 import jp.hazuki.yuzubrowser.adblock.repository.abp.AbpDatabase
@@ -169,6 +170,7 @@ class WebClient(
         webUploadHandler = null
         speedDialManager.destroy()
         faviconManager.destroy()
+        adBlockController?.destroy()
     }
 
     fun webUploadResult(resultCode: Int, data: Intent?) {
@@ -438,7 +440,7 @@ class WebClient(
                             }
                         } else {
                             val userAgent = data.mWebView.getUserAgent()
-                            GlobalScope.launch(Dispatchers.IO) {
+                            activity.lifecycleScope.launch(Dispatchers.IO) {
                                 val cookie = CookieManager.getInstance().getCookie(url)
                                 val icon = controller.okHttpClient
                                     .getImage(iconUrl, userAgent, url, cookie)

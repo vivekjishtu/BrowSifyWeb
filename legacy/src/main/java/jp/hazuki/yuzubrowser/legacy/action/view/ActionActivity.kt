@@ -26,6 +26,8 @@ import android.view.Menu
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.IntentCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.hazuki.yuzubrowser.core.utility.log.Logger
 import jp.hazuki.yuzubrowser.legacy.Constants
@@ -50,6 +52,39 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
 
     private lateinit var binding: ActionActivityBinding
 
+    private val preferenceLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        mOnActivityResultListener?.invoke(this, result.resultCode, result.data)
+        mOnActivityResultListener = null
+    }
+
+    private val jsonLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val data = result.data!!
+            val resultAction = IntentCompat.getParcelableExtra(data, ActionStringActivity.EXTRA_ACTION, Action::class.java)!!
+            mAction.clear()
+            mAction.addAll(resultAction)
+
+            adapter.clearChoices()
+            var initialPosition = -1
+            val actionNameArray = adapter.nameArray
+            for (action in mAction) {
+                val id = action.id
+                val size = actionNameArray.actionValues.size
+                for (i in 0 until size) {
+                    if (actionNameArray.actionValues[i] == id) {
+                        adapter.setChecked(i, true)
+
+                        if (initialPosition == -1)
+                            initialPosition = i
+                    }
+                }
+            }
+            adapter.notifyDataSetChanged()
+            if (initialPosition != -1)
+                binding.recyclerView.scrollToPosition(adapter.getAdapterPosition(initialPosition))
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActionActivityBinding.inflate(layoutInflater)
@@ -72,7 +107,7 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
             requestedOrientation = orientation
         }
 
-        actionNameArray = intent.getParcelableExtra(ActionNameArray.INTENT_EXTRA)
+        actionNameArray = IntentCompat.getParcelableExtra(intent, ActionNameArray.INTENT_EXTRA, ActionNameArray::class.java)
             ?: ActionNameArray(this)
 
         adapter = ActionNameArrayAdapter(this, actionNameArray, this)
@@ -91,7 +126,7 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
             }
         } else {
             mActionManager = null
-            mAction = intent.getParcelableExtra(EXTRA_ACTION) ?: Action()
+            mAction = IntentCompat.getParcelableExtra(intent, EXTRA_ACTION, Action::class.java) ?: Action()
         }
 
         title = intent.getStringExtra(Intent.EXTRA_TITLE)
@@ -201,42 +236,14 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
         if (screen == null)
             return false
         mOnActivityResultListener = screen.onActivityResultListener
-        startActivityForResult(screen.intent, RESULT_REQUEST_PREFERENCE)
+        preferenceLauncher.launch(screen.intent)
         return true
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            RESULT_REQUEST_PREFERENCE -> if (mOnActivityResultListener != null) {
-                mOnActivityResultListener!!.invoke(this, resultCode, data)
-                mOnActivityResultListener = null
-            }
-            RESULT_REQUEST_JSON -> if (resultCode == Activity.RESULT_OK && data != null) {
-                val result = data.getParcelableExtra<Action>(ActionStringActivity.EXTRA_ACTION)!!
-                mAction.clear()
-                mAction.addAll(result)
-
-                adapter.clearChoices()
-                var initialPosition = -1
-                val actionNameArray = adapter.nameArray
-                for (action in mAction) {
-                    val id = action.id
-                    val size = actionNameArray.actionValues.size
-                    for (i in 0 until size) {
-                        if (actionNameArray.actionValues[i] == id) {
-                            adapter.setChecked(i, true)
-
-                            if (initialPosition == -1)
-                                initialPosition = i
-                        }
-                    }
-                }
-                adapter.notifyDataSetChanged()
-                if (initialPosition != -1)
-                    binding.recyclerView.scrollToPosition(adapter.getAdapterPosition(initialPosition))
-            }
-            else -> super.onActivityResult(requestCode, resultCode, data)
-        }
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -250,7 +257,7 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
     private fun startJsonStringActivity() {
         val intent = Intent(applicationContext, ActionStringActivity::class.java)
         intent.putExtra(ActionStringActivity.EXTRA_ACTION, mAction as Parcelable?)
-        startActivityForResult(intent, RESULT_REQUEST_JSON)
+        jsonLauncher.launch(intent)
     }
 
     class Builder(private val mContext: Context) {

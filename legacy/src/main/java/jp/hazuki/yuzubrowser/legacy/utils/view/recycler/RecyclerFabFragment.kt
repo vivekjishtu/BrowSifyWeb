@@ -33,7 +33,6 @@ abstract class RecyclerFabFragment : Fragment() {
         get() = viewBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        setHasOptionsMenu(true)
         viewBinding = RecyclerWithFabBinding.inflate(layoutInflater, container, false)
         return binding.root
     }

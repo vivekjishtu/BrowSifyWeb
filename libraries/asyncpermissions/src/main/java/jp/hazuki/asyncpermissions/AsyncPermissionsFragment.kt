@@ -19,6 +19,7 @@ package jp.hazuki.asyncpermissions
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.PermissionChecker
 import kotlinx.coroutines.CancellableContinuation
@@ -28,18 +29,12 @@ class AsyncPermissionsFragment : androidx.fragment.app.Fragment() {
 
     private lateinit var queue: PermissionsContinuationQueue
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        queue = PermissionsContinuationQueue()
-    }
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+        val permissions = results.keys.toTypedArray()
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode != REQUEST_CODE) return
+        val cont = queue.poll(permissions) ?: return@registerForActivityResult
 
-        val cont = queue.poll(permissions) ?: return
-
-        if (grantResults.all { it.isGranted }) {
+        if (results.values.all { it }) {
             PermissionResult.Granted(permissions.toList()).let { cont.resume(it) }
         } else {
             if (shouldShowRequestPermissionsRationale(permissions)) {
@@ -48,6 +43,17 @@ class AsyncPermissionsFragment : androidx.fragment.app.Fragment() {
                 PermissionResult.NeverAskAgain(permissions.toList()).let { cont.resume(it) }
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        queue = PermissionsContinuationQueue()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        @Suppress("DEPRECATION")
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     internal fun request(
@@ -64,7 +70,7 @@ class AsyncPermissionsFragment : androidx.fragment.app.Fragment() {
             PermissionResult.ShouldShowRationale(permissions.toList(), this).let { cont.resume(it) }
         } else {
             queue.offer(permissions, cont)
-            requestPermissions(permissions, REQUEST_CODE)
+            permissionLauncher.launch(permissions as Array<String>)
         }
     }
 
@@ -73,7 +79,7 @@ class AsyncPermissionsFragment : androidx.fragment.app.Fragment() {
             cont: CancellableContinuation<PermissionResult>
     ) {
         queue.offer(permissions, cont)
-        requestPermissions(permissions, REQUEST_CODE)
+        permissionLauncher.launch(permissions as Array<String>)
     }
 
     private fun shouldShowRequestPermissionsRationale(permissions: Array<out String>): Boolean =

@@ -33,9 +33,11 @@ import android.text.TextUtils
 import android.view.*
 import android.webkit.*
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
+import androidx.core.content.IntentCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
@@ -120,8 +122,8 @@ import jp.hazuki.yuzubrowser.webview.WebViewFactory
 import jp.hazuki.yuzubrowser.webview.WebViewType
 import jp.hazuki.yuzubrowser.webview.listener.OnScrollChangedListener
 import jp.hazuki.yuzubrowser.webview.listener.OnScrollableChangeListener
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -200,6 +202,117 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     private lateinit var menuWindow: MenuWindow
     private lateinit var uiController: SystemUiController
     private var scrollSlop: Int = 0
+
+    private val webUploadLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        webClient.webUploadResult(result.resultCode, result.data)
+    }
+
+    private val searchBoxLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK || result.data == null) return@registerForActivityResult
+        val data = result.data!!
+        val query = data.getStringExtra(SearchActivity.EXTRA_QUERY)!!
+        val searchUrl = data.getStringExtra(SearchActivity.EXTRA_SEARCH_URL)!!
+
+        if (TextUtils.isEmpty(query)) return@registerForActivityResult
+
+        val url = when (data.getIntExtra(SearchActivity.EXTRA_SEARCH_MODE, SearchActivity.SEARCH_MODE_AUTO)) {
+            SearchActivity.SEARCH_MODE_URL -> query.makeUrl()
+            SearchActivity.SEARCH_MODE_WORD -> WebUtils.makeSearchUrlFromQuery(query, searchUrl, "%s")
+            else -> query.makeUrlFromQuery(searchUrl, "%s")
+        }
+        val appdata = data.getBundleExtra(SearchActivity.EXTRA_APP_DATA)!!
+        val target = appdata.getInt(EXTRA_DATA_TARGET, -1)
+        val tab = tabManagerIn.get(target)
+        if (tab == null) {
+            openInNewTab(url, TabType.DEFAULT)
+        } else {
+            when (data.getIntExtra(SearchActivity.EXTRA_OPEN_NEW_TAB, 0)) {
+                SearchActivity.TAB_TYPE_CURRENT -> loadUrl(tab, url)
+                SearchActivity.TAB_TYPE_NEW_TAB -> openInNewTab(url, TabType.DEFAULT)
+                SearchActivity.TAB_TYPE_NEW_RIGHT_TAB -> openInRightNewTab(url, TabType.WINDOW)
+            }
+        }
+    }
+
+    private val bookmarkHistoryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK || result.data == null) return@registerForActivityResult
+        val openable = IntentCompat.getParcelableExtra(result.data!!, INTENT_EXTRA_OPENABLE, BrowserOpenable::class.java)
+            ?: return@registerForActivityResult
+        openable.forEach { loadUrl(it, openable.target) }
+    }
+
+    private val settingLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        AppData.init(applicationContext, moshi, abpDatabase)
+        onPreferenceReset()
+    }
+
+    private val userAgentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK || result.data == null) return@registerForActivityResult
+        val ua = result.data!!.getStringExtra(Intent.EXTRA_TEXT)
+        val tab = tabManagerIn.currentTabData
+        tab.mWebView.webSettings.userAgentString = getRealUserAgent(ua, AppPrefs.fake_chrome.get())
+        tab.mWebView.reload()
+    }
+
+    private val defaultUserAgentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK || result.data == null) return@registerForActivityResult
+        val ua = result.data!!.getStringExtra(Intent.EXTRA_TEXT)
+        AppPrefs.user_agent.set(ua)
+        val browserUA = getRealUserAgent(ua, AppPrefs.fake_chrome.get())
+        AppPrefs.commit(this, AppPrefs.user_agent)
+        for (tabData in tabManagerIn.loadedData) {
+            tabData.mWebView.webSettings.userAgentString = browserUA
+            tabData.mWebView.reload()
+        }
+    }
+
+    private val userJsSettingLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        webClient.resetUserScript(AppPrefs.userjs_enable.get())
+    }
+
+    private val webEncodeSettingLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK || result.data == null) return@registerForActivityResult
+        val encoding = result.data!!.getStringExtra(Intent.EXTRA_TEXT) ?: return@registerForActivityResult
+        val tab = tabManagerIn.currentTabData
+        tab.mWebView.webSettings.defaultTextEncodingName = encoding
+        tab.mWebView.reload()
+    }
+
+    private val shareImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK || result.data == null) return@registerForActivityResult
+        val data = result.data!!
+        var uri = data.data ?: return@registerForActivityResult
+        val mineType = data.getStringExtra(FastDownloadActivity.EXTRA_MINE_TYPE)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && uri.scheme == "file") {
+            val provider = (applicationContext as BrowserApplication).providerManager.downloadFileProvider
+            uri = provider.getUriFromPath(uri.path ?: "")
+        }
+
+        val open = Intent(Intent.ACTION_SEND)
+        if (mineType != null)
+            open.type = mineType
+        else
+            open.type = "image/*"
+
+        open.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+        open.putExtra(Intent.EXTRA_STREAM, uri)
+        open.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(Intent.createChooser(open, getText(R.string.share)))
+    }
+
+    private val actionListLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK || result.data == null) return@registerForActivityResult
+        val action = IntentCompat.getParcelableExtra(result.data!!, ActionActivity.EXTRA_ACTION, Action::class.java)
+        if (action == null) {
+            Logger.w(TAG, "Action is null")
+            return@registerForActivityResult
+        }
+        if (isResumed)
+            actionController.run(action)
+        else
+            delayAction = action
+    }
 
     private var isActivityDestroyed = false
     private var isResumed = false
@@ -441,7 +554,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         handler.removeCallbacks(saveTabsRunnable)
         faviconManager.save()
 
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             CookieManager.getInstance().flush()
         }
 
@@ -557,105 +670,10 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         videoLoadingProgressView = null
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            BrowserController.REQUEST_WEB_UPLOAD -> webClient.webUploadResult(resultCode, data)
-            BrowserController.REQUEST_SEARCHBOX -> {
-                if (resultCode != RESULT_OK || data == null) return
-                val query = data.getStringExtra(SearchActivity.EXTRA_QUERY)!!
-                val searchUrl = data.getStringExtra(SearchActivity.EXTRA_SEARCH_URL)!!
-
-                if (TextUtils.isEmpty(query)) return
-
-                val url = when (data.getIntExtra(SearchActivity.EXTRA_SEARCH_MODE, SearchActivity.SEARCH_MODE_AUTO)) {
-                    SearchActivity.SEARCH_MODE_URL -> query.makeUrl()
-                    SearchActivity.SEARCH_MODE_WORD -> WebUtils.makeSearchUrlFromQuery(query, searchUrl, "%s")
-                    else -> query.makeUrlFromQuery(searchUrl, "%s")
-                }
-                val appdata = data.getBundleExtra(SearchActivity.EXTRA_APP_DATA)!!
-                val target = appdata.getInt(EXTRA_DATA_TARGET, -1)
-                val tab = tabManagerIn.get(target)
-                if (tab == null) {
-                    openInNewTab(url, TabType.DEFAULT)
-                } else {
-                    when (data.getIntExtra(SearchActivity.EXTRA_OPEN_NEW_TAB, 0)) {
-                        SearchActivity.TAB_TYPE_CURRENT -> loadUrl(tab, url)
-                        SearchActivity.TAB_TYPE_NEW_TAB -> openInNewTab(url, TabType.DEFAULT)
-                        SearchActivity.TAB_TYPE_NEW_RIGHT_TAB -> openInRightNewTab(url, TabType.WINDOW)
-                    }
-                }
-            }
-            BrowserController.REQUEST_BOOKMARK, BrowserController.REQUEST_HISTORY -> {
-                if (resultCode != RESULT_OK || data == null) return
-                val openable = data.getParcelableExtra<BrowserOpenable>(INTENT_EXTRA_OPENABLE)
-                    ?: return
-                openable.forEach { loadUrl(it, openable.target) }
-            }
-            BrowserController.REQUEST_SETTING -> {
-                AppData.init(applicationContext, moshi, abpDatabase)
-                onPreferenceReset()
-            }
-            BrowserController.REQUEST_USERAGENT -> {
-                if (resultCode != RESULT_OK || data == null) return
-                val ua = data.getStringExtra(Intent.EXTRA_TEXT)
-                val tab = tabManagerIn.currentTabData
-                tab.mWebView.webSettings.userAgentString = getRealUserAgent(ua, AppPrefs.fake_chrome.get())
-                tab.mWebView.reload()
-            }
-            BrowserController.REQUEST_DEFAULT_USERAGENT -> {
-                if (resultCode != RESULT_OK || data == null) return
-                val ua = data.getStringExtra(Intent.EXTRA_TEXT)
-                AppPrefs.user_agent.set(ua)
-                val browserUA = getRealUserAgent(ua, AppPrefs.fake_chrome.get())
-                AppPrefs.commit(this, AppPrefs.user_agent)
-                for (tabData in tabManagerIn.loadedData) {
-                    tabData.mWebView.webSettings.userAgentString = browserUA
-                    tabData.mWebView.reload()
-                }
-            }
-            BrowserController.REQUEST_USERJS_SETTING -> webClient.resetUserScript(AppPrefs.userjs_enable.get())
-            BrowserController.REQUEST_WEB_ENCODE_SETTING -> {
-                if (resultCode != RESULT_OK || data == null) return
-                val encoding = data.getStringExtra(Intent.EXTRA_TEXT) ?: return
-                val tab = tabManagerIn.currentTabData
-                tab.mWebView.webSettings.defaultTextEncodingName = encoding
-                tab.mWebView.reload()
-            }
-            BrowserController.REQUEST_SHARE_IMAGE -> {
-                if (resultCode != RESULT_OK || data == null) return
-                var uri = data.data ?: return
-                val mineType = data.getStringExtra(FastDownloadActivity.EXTRA_MINE_TYPE)
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && uri.scheme == "file") {
-                    val provider = (applicationContext as BrowserApplication).providerManager.downloadFileProvider
-                    uri = provider.getUriFromPath(uri.path ?: "")
-                }
-
-                val open = Intent(Intent.ACTION_SEND)
-                if (mineType != null)
-                    open.type = mineType
-                else
-                    open.type = "image/*"
-
-                open.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
-                open.putExtra(Intent.EXTRA_STREAM, uri)
-                open.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                startActivity(Intent.createChooser(open, getText(R.string.share)))
-            }
-            BrowserController.REQUEST_ACTION_LIST -> {
-                if (resultCode != RESULT_OK || data == null) return
-                val action = data.getParcelableExtra<Action>(ActionActivity.EXTRA_ACTION)
-                if (action == null) {
-                    Logger.w(TAG, "Action is null")
-                    return
-                }
-                if (isResumed)
-                    actionController.run(action)
-                else
-                    delayAction = action
-            }
-            else -> super.onActivityResult(requestCode, resultCode, data)
-        }
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -798,13 +816,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
     private fun restartBrowser() {
         browserState.isNeedLoad = true
-        if (parent == null) {
-            ActivityCompat.recreate(this)
-        } else {
-            val restart = Intent(this, BrowserActivity::class.java)
-            finish()
-            startActivity(restart)
-        }
+        ActivityCompat.recreate(this)
     }
 
     private fun initTheme() {
@@ -1506,7 +1518,22 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun startActivity(intent: Intent, @RequestCause cause: Int) {
-        startActivityForResult(intent, cause)
+        when (cause) {
+            BrowserController.REQUEST_WEB_UPLOAD -> webUploadLauncher.launch(intent)
+            BrowserController.REQUEST_SEARCHBOX -> searchBoxLauncher.launch(intent)
+            BrowserController.REQUEST_BOOKMARK, BrowserController.REQUEST_HISTORY -> bookmarkHistoryLauncher.launch(intent)
+            BrowserController.REQUEST_SETTING -> settingLauncher.launch(intent)
+            BrowserController.REQUEST_USERAGENT -> userAgentLauncher.launch(intent)
+            BrowserController.REQUEST_DEFAULT_USERAGENT -> defaultUserAgentLauncher.launch(intent)
+            BrowserController.REQUEST_USERJS_SETTING -> userJsSettingLauncher.launch(intent)
+            BrowserController.REQUEST_WEB_ENCODE_SETTING -> webEncodeSettingLauncher.launch(intent)
+            BrowserController.REQUEST_SHARE_IMAGE -> shareImageLauncher.launch(intent)
+            BrowserController.REQUEST_ACTION_LIST -> actionListLauncher.launch(intent)
+            else -> {
+                @Suppress("DEPRECATION")
+                startActivityForResult(intent, cause)
+            }
+        }
     }
 
     override fun showActionName(text: String?) {

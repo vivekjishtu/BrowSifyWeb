@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.content.IntentCompat
 import jp.hazuki.yuzubrowser.core.utility.log.Logger
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.ActionList
@@ -47,9 +48,9 @@ open class ActionListActivity : ThemeActivity() {
             val title = intent.getStringExtra(Intent.EXTRA_TITLE)
             setTitle(title)
 
-            mActionNameArray = intent.getParcelableExtra(ActionNameArray.INTENT_EXTRA)
+            mActionNameArray = IntentCompat.getParcelableExtra(intent, ActionNameArray.INTENT_EXTRA, ActionNameArray::class.java)
             if (mList == null)
-                mList = intent.getParcelableExtra(EXTRA_ACTION_LIST)
+                mList = IntentCompat.getParcelableExtra(intent, EXTRA_ACTION_LIST, ActionList::class.java)
         }
 
         if (mList == null)
@@ -97,7 +98,7 @@ open class ActionListActivity : ThemeActivity() {
                     return@listener
                 }
 
-                val actionList = intent.getParcelableExtra<ActionList>(EXTRA_ACTION_LIST)
+                val actionList = IntentCompat.getParcelableExtra(intent, EXTRA_ACTION_LIST, ActionList::class.java)
                 if (actionList == null) {
                     Logger.w(RESULT_TAG, "Action is null")
                     return@listener

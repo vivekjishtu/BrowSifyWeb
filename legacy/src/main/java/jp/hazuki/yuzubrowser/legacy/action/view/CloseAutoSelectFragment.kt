@@ -23,9 +23,11 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.Action
 import jp.hazuki.yuzubrowser.legacy.databinding.ActionActivityBinding
@@ -43,6 +45,30 @@ class CloseAutoSelectFragment : Fragment(), OnRecyclerListener {
     private val binding: ActionActivityBinding
         get() = viewBinding!!
 
+    private val defaultActionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            IntentCompat.getParcelableExtra(result.data!!, ActionActivity.EXTRA_ACTION, Action::class.java)?.let {
+                defaultAction = it
+            }
+        }
+    }
+
+    private val intentActionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            IntentCompat.getParcelableExtra(result.data!!, ActionActivity.EXTRA_ACTION, Action::class.java)?.let {
+                intentAction = it
+            }
+        }
+    }
+
+    private val windowActionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            IntentCompat.getParcelableExtra(result.data!!, ActionActivity.EXTRA_ACTION, Action::class.java)?.let {
+                windowAction = it
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewBinding = ActionActivityBinding.inflate(inflater, container, false)
         return binding.root
@@ -57,9 +83,9 @@ class CloseAutoSelectFragment : Fragment(), OnRecyclerListener {
         val activity = requireActivity()
         val arguments = arguments ?: throw IllegalArgumentException()
 
-        defaultAction = arguments.getParcelable(DEFAULT) ?: Action()
-        intentAction = arguments.getParcelable(INTENT) ?: Action()
-        windowAction = arguments.getParcelable(WINDOW) ?: Action()
+        defaultAction = BundleCompat.getParcelable(arguments, DEFAULT, Action::class.java) ?: Action()
+        intentAction = BundleCompat.getParcelable(arguments, INTENT, Action::class.java) ?: Action()
+        windowAction = BundleCompat.getParcelable(arguments, WINDOW, Action::class.java) ?: Action()
 
 
         binding.resetButton.visibility = View.INVISIBLE
@@ -98,18 +124,15 @@ class CloseAutoSelectFragment : Fragment(), OnRecyclerListener {
     override fun onRecyclerItemClicked(v: View, position: Int) {
         val builder = ActionActivity.Builder(requireActivity())
         when (position) {
-            0 -> startActivityForResult(builder.setDefaultAction(defaultAction)
+            0 -> defaultActionLauncher.launch(builder.setDefaultAction(defaultAction)
                     .setTitle(R.string.pref_close_default)
-                    .create(),
-                    REQUEST_DEFAULT)
-            1 -> startActivityForResult(builder.setDefaultAction(intentAction)
+                    .create())
+            1 -> intentActionLauncher.launch(builder.setDefaultAction(intentAction)
                     .setTitle(R.string.pref_close_intent)
-                    .create(),
-                    REQUEST_INTENT)
-            2 -> startActivityForResult(builder.setDefaultAction(windowAction)
+                    .create())
+            2 -> windowActionLauncher.launch(builder.setDefaultAction(windowAction)
                     .setTitle(R.string.pref_close_window)
-                    .create(),
-                    REQUEST_WINDOW)
+                    .create())
             else -> throw IllegalArgumentException("Unknown position:$position")
         }
     }
@@ -118,14 +141,10 @@ class CloseAutoSelectFragment : Fragment(), OnRecyclerListener {
         return false
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == AppCompatActivity.RESULT_OK && data != null) {
-            when (requestCode) {
-                REQUEST_DEFAULT -> defaultAction = data.getParcelableExtra(ActionActivity.EXTRA_ACTION)!!
-                REQUEST_INTENT -> intentAction = data.getParcelableExtra(ActionActivity.EXTRA_ACTION)!!
-                REQUEST_WINDOW -> windowAction = data.getParcelableExtra(ActionActivity.EXTRA_ACTION)!!
-            }
-        }
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     companion object {
