@@ -24,6 +24,10 @@ import android.os.Bundle;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 import jp.hazuki.yuzubrowser.legacy.R;
 
 public class SelectActionDialog extends DialogFragment {
@@ -34,6 +38,7 @@ public class SelectActionDialog extends DialogFragment {
     public static final int EDIT = 0;
     public static final int DELETE = 1;
 
+    @Retention(RetentionPolicy.SOURCE)
     @IntDef({EDIT, DELETE})
     public @interface ActionMode {
     }
