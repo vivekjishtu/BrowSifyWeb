@@ -59,6 +59,7 @@ object Versions {
     const val jsoup = "1.18.3"
     const val re2j = "1.8"
     const val webkit = "1.12.1"
+    const val work = "2.10.1"
 }
 
 object AndroidX {
@@ -79,6 +80,7 @@ object AndroidX {
     const val lifecycle = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifeCycle}"
     const val print = "androidx.print:print:${Versions.print}"
     const val webkit = "androidx.webkit:webkit:${Versions.webkit}"
+    const val workRuntime = "androidx.work:work-runtime-ktx:${Versions.work}"
 }
 
 object Libs {

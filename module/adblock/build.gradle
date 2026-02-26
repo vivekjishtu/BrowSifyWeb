@@ -77,6 +77,7 @@ dependencies {
     implementation AndroidX.roomKtx
     implementation AndroidX.fix_preference
     implementation AndroidX.fragmentKtx
+    implementation AndroidX.workRuntime
     ksp AndroidX.roomCompiler
 
     implementation Libs.kotlin_stdlib

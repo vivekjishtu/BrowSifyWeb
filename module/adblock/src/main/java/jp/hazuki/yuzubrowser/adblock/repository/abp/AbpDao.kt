@@ -24,6 +24,9 @@ interface AbpDao {
     @Query("SELECT * from abp")
     suspend fun getAll(): List<AbpEntity>
 
+    @Query("SELECT * from abp where entityId = :entityId limit 1")
+    suspend fun getById(entityId: Int): AbpEntity?
+
     @Insert
     suspend fun inset(abpEntity: AbpEntity): Long
 
