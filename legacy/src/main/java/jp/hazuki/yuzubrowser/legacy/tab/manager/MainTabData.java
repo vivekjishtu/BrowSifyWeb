@@ -27,6 +27,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
 import jp.hazuki.yuzubrowser.favicon.FaviconManager;
 import jp.hazuki.yuzubrowser.legacy.R;
@@ -43,7 +44,7 @@ public class MainTabData extends TabData {
         titleTextView = view.findViewById(R.id.textView);
         privateLabelTextView = view.findViewById(R.id.privateLabelTextView);
         context = view.getContext();
-        loadingIcon = (AnimatedVectorDrawable) context.getDrawable(R.drawable.ic_loading_circle_24dp);
+        loadingIcon = (AnimatedVectorDrawable) AppCompatResources.getDrawable(context, R.drawable.ic_loading_circle_24dp);
         setPrivateLabelVisibility();
     }
 
@@ -53,7 +54,7 @@ public class MainTabData extends TabData {
         titleTextView = view.findViewById(R.id.textView);
         privateLabelTextView = view.findViewById(R.id.privateLabelTextView);
         context = view.getContext();
-        loadingIcon = (AnimatedVectorDrawable) context.getDrawable(R.drawable.ic_loading_circle_24dp);
+        loadingIcon = (AnimatedVectorDrawable) AppCompatResources.getDrawable(context, R.drawable.ic_loading_circle_24dp);
         setPrivateLabelVisibility();
     }
 
@@ -87,7 +88,7 @@ public class MainTabData extends TabData {
 //                mWebView.onPause();
         }
         if (AppPrefs.toolbar_show_favicon.get() && !url.startsWith("bsw:") && !iconReceived) {
-            setIcon(context.getDrawable(R.drawable.ic_page_white_24px));
+            setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_page_white_24px));
         }
     }
 
@@ -152,7 +153,7 @@ public class MainTabData extends TabData {
         if (themedata != null && themedata.tabBackgroundSelect != null)
             mTabView.setBackground(themedata.tabBackgroundSelect);
         else if (themedata != null && themedata.tabAccentColor != 0) {
-            LayerDrawable drawable = (LayerDrawable) res.getDrawable(R.drawable.tab_background_selected, theme);
+            LayerDrawable drawable = (LayerDrawable) ResourcesCompat.getDrawable(res, R.drawable.tab_background_selected, theme);
             GradientDrawable accent = (GradientDrawable) drawable.findDrawableByLayerId(R.id.tabAccent);
             int px = (int) (res.getDisplayMetrics().density * 3 + 0.5f);
             accent.setStroke(px, themedata.tabAccentColor);
@@ -205,20 +206,22 @@ public class MainTabData extends TabData {
 
     private void setIcon(Drawable drawable) {
         if (getTabType() == TabType.PRIVATE) {
-            drawable = context.getDrawable(R.drawable.ic_private_white_24dp);
+            drawable = AppCompatResources.getDrawable(context, R.drawable.ic_private_white_24dp);
         }
         if (drawable == null) {
             removeIcon();
             return;
         }
         int size = titleTextView.getHeight() - titleTextView.getPaddingTop() - titleTextView.getPaddingBottom();
-        drawable.setBounds(0, 0, size, size);
+        if (drawable != null) {
+            drawable.setBounds(0, 0, size, size);
+        }
         titleTextView.setCompoundDrawables(drawable, null, null, null);
     }
 
     private void removeIcon() {
         if (getTabType() == TabType.PRIVATE) {
-            setIcon(context.getDrawable(R.drawable.ic_private_white_24dp));
+            setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_private_white_24dp));
         } else {
             titleTextView.setCompoundDrawables(null, null, null, null);
         }
