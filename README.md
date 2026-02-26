@@ -3,13 +3,27 @@
 &nbsp;Stable: [![GitHub release](https://img.shields.io/github/release/vivekjishtu/BrowSifyWeb.svg)](https://play.google.com/store/apps/details?id=com.vivekjishtu.browsifyweb)
 &nbsp;Latest: [![GitHub release](https://img.shields.io/github/v/release/vivekjishtu/BrowSifyWeb?include_prereleases)](https://github.com/vivekjishtu/BrowSifyWeb/releases)
 
-<img src="app/src/main/ic_launcher-web.png" width="192" height="192">
+<img src="app/src/main/ic_launcher-web.png" width="192" height="192" alt="BrowSifyWeb app icon">
 
-BrowSifyWeb browser is a fork of [Yuzu browser](https://github.com/hazuki0x0/YuzuBrowser) which was an open source power full web browser.
+BrowSifyWeb browser is a fork of [Yuzu browser](https://github.com/hazuki0x0/YuzuBrowser), an open source power user web browser.
 
 You can create your own browser using custom UI and custom buttons.
 
 Yuzu Browser in turn was based on Mikan Browser.
+
+## Version
+Current major version: **7**
+
+BrowSifyWeb continues from where Yuzu Browser left off.
+Versioning is intentionally kept as a legacy continuation so users can understand this project as the line of the same browser family in a different fork.
+
+## New in BrowSifyWeb
+- Private tab workflow improvements with clear private tab markers and private-start-page handling.
+- Private tabs are excluded from session restore after app relaunch.
+- New tabs opened from private tabs stay private.
+- Speed dial pages now refresh live after add/edit/delete/reorder actions.
+- Snackbar/theme behavior has been aligned for more reliable day/night color consistency.
+- Ongoing updates for modern Android/Gradle/Kotlin toolchains while preserving legacy browser behavior.
 
 ## Download and install
 **Android 6.0 or higher is required.**
@@ -21,41 +35,6 @@ Or prebuilt apk file is here
 
 https://github.com/vivekjishtu/BrowSifyWeb/releases
 
-## Theme
-BrowSifyWeb Browser supports custom theme.
-
-You can create custom theme with [theme creator app](https://play.google.com/store/apps/details?id=jp.hazuki.yuzubrowser.themecreator).
-
-You can use it if you have the theme of Mikan Browser.
-
-However, as the theme has been expanded, not all displays change.
-
-#### New theme pack sample
-for version 2.3 or later
-
-Just download the theme pack and tap it to import!
-
-You can unzip and edit this theme.
-
-[Theme material dark](https://github.com/hazuki0x0/YuzuBrowser/releases/download/v3.1.1/theme_material_dark.yuzutheme)
-(default theme)
-
-[Theme material light](https://github.com/hazuki0x0/YuzuBrowser/releases/download/v3.1.1/theme_material_light.yuzutheme)
-
-> Aug. 14, 2017 update for 3.1.1
-
-
-##### Classic theme sample
-For versions prior to version 2.3
-
-For installation method and specifications, please check the Readme.txt in the archive.
-
-You should use new theme pack if you are using version 2.3 or later
-
-[Theme material dark](https://github.com/Hazuki0x0/YuzuBrowser/releases/download/v1.1.0/yuzu_theme_material_dark.zip)
-
-[Theme material light](https://github.com/Hazuki0x0/YuzuBrowser/releases/download/v1.1.0/yuzu_theme_material_light.zip)
-
 ## Contributing
 Contributions are always welcome
 
@@ -64,7 +43,7 @@ TL;DR
 - Create a branch for your patch.
 - Create a pull request on the dev branch.
 
-Details are in [Contributing.md](https://github.com/hazuki0x0/YuzuBrowser/blob/dev/Contributing.md)
+Details are in [Contributing.md](Contributing.md)
 
 ## License BSW Browser
     Copyright (C) 2024 Vivek Jishtu
