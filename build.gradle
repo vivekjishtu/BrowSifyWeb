@@ -21,7 +21,7 @@ buildscript {
     repositories {
         mavenCentral()
        // jcenter()
-        maven { url 'https://jitpack.io' }
+        maven { url = uri('https://jitpack.io') }
         google()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
@@ -78,11 +78,17 @@ allprojects {
     repositories {
         mavenCentral()
        // jcenter()
-        maven { url 'https://jitpack.io' }
+        maven { url = uri('https://jitpack.io') }
         google()
     }
 }
 
 tasks.register('clean', Delete) {
     delete rootProject.layout.buildDirectory
+}
+
+[':libraries', ':module'].each { parentPath ->
+    project(parentPath).tasks.register('clean', Delete) {
+        delete project(parentPath).layout.buildDirectory
+    }
 }
