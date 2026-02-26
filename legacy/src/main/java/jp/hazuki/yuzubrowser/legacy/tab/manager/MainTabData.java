@@ -154,10 +154,16 @@ public class MainTabData extends TabData {
             mTabView.setBackground(themedata.tabBackgroundSelect);
         else if (themedata != null && themedata.tabAccentColor != 0) {
             LayerDrawable drawable = (LayerDrawable) ResourcesCompat.getDrawable(res, R.drawable.tab_background_selected, theme);
-            GradientDrawable accent = (GradientDrawable) drawable.findDrawableByLayerId(R.id.tabAccent);
-            int px = (int) (res.getDisplayMetrics().density * 3 + 0.5f);
-            accent.setStroke(px, themedata.tabAccentColor);
-            mTabView.setBackground(drawable);
+            if (drawable != null) {
+                GradientDrawable accent = (GradientDrawable) drawable.findDrawableByLayerId(R.id.tabAccent);
+                if (accent != null) {
+                    int px = (int) (res.getDisplayMetrics().density * 3 + 0.5f);
+                    accent.setStroke(px, themedata.tabAccentColor);
+                }
+                mTabView.setBackground(drawable);
+            } else {
+                mTabView.setBackgroundResource(R.drawable.tab_background_selected);
+            }
         } else
             mTabView.setBackgroundResource(R.drawable.tab_background_selected);
 
@@ -213,9 +219,7 @@ public class MainTabData extends TabData {
             return;
         }
         int size = titleTextView.getHeight() - titleTextView.getPaddingTop() - titleTextView.getPaddingBottom();
-        if (drawable != null) {
-            drawable.setBounds(0, 0, size, size);
-        }
+        drawable.setBounds(0, 0, size, size);
         titleTextView.setCompoundDrawables(drawable, null, null, null);
     }
 
