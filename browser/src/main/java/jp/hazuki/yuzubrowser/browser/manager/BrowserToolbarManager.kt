@@ -188,17 +188,26 @@ open class BrowserToolbarManager(
         customBar.onThemeChanged(themeData)
 
         binding.apply {
-            if (themeData != null && themeData.toolbarBackgroundColor != 0) {
-                topToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
-                bottomOverlayToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
-                bottomAlwaysOverlayToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
-                webToolbarLayout.setBackgroundColor(themeData.toolbarBackgroundColor)
-                fixedWebToolbarLayout.setBackgroundColor(themeData.toolbarBackgroundColor)
-                leftToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
-                rightToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
-                topAlwaysToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
-                bottomToolbarAlwaysLayout.setBackgroundColor(themeData.toolbarBackgroundColor)
+            if (themeData != null) {
+                if (themeData.statusBarColor != 0) {
+                    appbar.setBackgroundColor(themeData.statusBarColor)
+                } else if (themeData.toolbarBackgroundColor != 0) {
+                    appbar.setBackgroundColor(themeData.toolbarBackgroundColor)
+                }
+                
+                if (themeData.toolbarBackgroundColor != 0) {
+                    topToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
+                    bottomOverlayToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
+                    bottomAlwaysOverlayToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
+                    webToolbarLayout.setBackgroundColor(themeData.toolbarBackgroundColor)
+                    fixedWebToolbarLayout.setBackgroundColor(themeData.toolbarBackgroundColor)
+                    leftToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
+                    rightToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
+                    topAlwaysToolbar.setBackgroundColor(themeData.toolbarBackgroundColor)
+                    bottomToolbarAlwaysLayout.setBackgroundColor(themeData.toolbarBackgroundColor)
+                }
             } else {
+                appbar.setBackgroundResource(R.color.toolbar_tab_bg)
                 topToolbar.setBackgroundResource(R.color.deep_gray)
                 bottomOverlayToolbar.setBackgroundResource(R.color.deep_gray)
                 bottomAlwaysOverlayToolbar.setBackgroundResource(R.color.deep_gray)

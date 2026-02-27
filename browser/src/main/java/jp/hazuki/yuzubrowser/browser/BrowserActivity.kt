@@ -368,6 +368,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
         binding = BrowserActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.appbar.setBackgroundResource(jp.hazuki.yuzubrowser.legacy.R.color.toolbar_tab_bg)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.superFrameLayout) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
