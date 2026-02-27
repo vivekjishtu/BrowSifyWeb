@@ -16,6 +16,7 @@
 
 package jp.hazuki.yuzubrowser.ui.app
 
+import android.graphics.Color
 import android.os.Build
 import android.view.*
 import androidx.annotation.CallSuper
@@ -101,15 +102,9 @@ sealed class SystemUiController(
             super.updateConfigure()
 
             window.also {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                    // On Android 15+, we don't manually set these colors to non-transparent if we want edge-to-edge.
-                    // But we still apply them if requested, though the system might ignore them or apply scrim.
-                    it.statusBarColor = statusBarColor
-                    it.navigationBarColor = navigationBarColor
-                } else {
-                    it.statusBarColor = statusBarColor
-                    it.navigationBarColor = navigationBarColor
-                }
+                // Set transparent bars for edge-to-edge.
+                it.statusBarColor = Color.TRANSPARENT
+                it.navigationBarColor = Color.TRANSPARENT
 
                 var appearance = 0
                 if (isLightStatusBar) {
@@ -189,8 +184,8 @@ sealed class SystemUiController(
             window.also {
                 it.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                 it.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                it.statusBarColor = statusBarColor
-                it.navigationBarColor = navigationBarColor
+                it.statusBarColor = Color.TRANSPARENT
+                it.navigationBarColor = Color.TRANSPARENT
 
                 it.decorView.systemUiVisibility = getFlags()
             }

@@ -29,11 +29,11 @@
     <color name="float_bottom_background">#FFBBBBBB</color>
     <color name="yuzu_orange">#FFF6BC1E</color>
     <color name="action_mode_background">#0d87c6</color>
-    <color name="browser_primary_dark">#101010</color>
-    <color name="default_nav_color">#000000</color>
+    <color name="browser_primary_dark">#FF101010</color>
+    <color name="default_nav_color">#FF000000</color>
 
-    <color name="deep_gray">#FF35363A</color> <!-- 222222 -->
-    <color name="white">#FFFFFF</color>
+    <color name="deep_gray">#FF35363A</color>
+    <color name="white">#FFFFFFFF</color>
     <color name="ripple">#42ffffff</color>
     <color name="tab_list_background">#f5222222</color>
     <color name="white_gray">#e6e6e6</color>

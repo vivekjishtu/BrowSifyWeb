@@ -27,6 +27,7 @@
     <color name="divider">#474747</color>
     <color name="content_normal">#848484</color>
     <color name="iconColor">@color/deep_gray</color>
+    <color name="deep_gray">#DADCE0</color>
     <color name="urlBarBoxColor">@color/chrome_omnibox_bg_light</color>
     <color name="urlBarBoxBorderColor">@color/chrome_omnibox_border_light</color>
     <color name="progressBarBackground">#47272727</color>
@@ -40,7 +41,7 @@
     <color name="toolbar_tab_bg">#888888</color>
     <color name="tab_strip_bg">@android:color/transparent</color> <!-- #E8EAED -->
     <color name="tab_bg_normal">#C5C5C5</color>
-    <color name="tab_bg_selected">#DADCE0</color> <!-- #FFFFFF-->
+    <color name="tab_bg_selected">#DDDDDD</color>
     <color name="tab_border_normal">#BDBDBD</color>
-    <color name="tab_border_selected">#DADCE0</color> <!-- 3C4043 -->
+    <color name="tab_border_selected">#DDDDDD</color>
 </resources>
