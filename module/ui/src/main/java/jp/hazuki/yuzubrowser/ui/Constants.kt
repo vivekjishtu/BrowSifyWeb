@@ -39,3 +39,6 @@ const val BROWSER_LOAD_URL_TAB_BG = 2
 const val BROWSER_LOAD_URL_TAB_NEW_RIGHT = 3
 const val BROWSER_LOAD_URL_TAB_BG_RIGHT = 4
 const val BROWSER_LOAD_URL_TAB_CURRENT_FORCE = 5
+
+val PENDING_INTENT_FLAG_MUTABLE = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) android.app.PendingIntent.FLAG_MUTABLE else 0
+val PENDING_INTENT_FLAG_IMMUTABLE = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) android.app.PendingIntent.FLAG_IMMUTABLE else 0

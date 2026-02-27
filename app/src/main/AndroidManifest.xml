@@ -24,6 +24,8 @@
         android:largeScreens="true"
         android:xlargeScreens="true" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <application
         android:name=".YuzuBrowserApplication"
         android:allowBackup="true"
@@ -188,7 +190,8 @@
 
         <service
             android:name="jp.hazuki.yuzubrowser.download.service.DownloadService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <activity
             android:name="jp.hazuki.yuzubrowser.download.ui.FastDownloadActivity"
