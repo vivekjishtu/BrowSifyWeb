@@ -1119,6 +1119,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             })
         }
         binding.superFrameLayout.addView(tabListView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        ViewCompat.requestApplyInsets(tabListView!!)
     }
 
     override fun showTabHistory(target: Int) {

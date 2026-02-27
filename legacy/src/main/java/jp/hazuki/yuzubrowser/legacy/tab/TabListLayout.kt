@@ -23,7 +23,11 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
+import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -67,6 +71,18 @@ constructor(context: Context, attrs: AttributeSet?, mode: Int, left: Boolean, va
 
         if (left) {
             bottomBar.gravity = Gravity.LEFT
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(this) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            if (reverse || horizontal) {
+                updatePadding(left = insets.left, right = insets.right, bottom = insets.bottom)
+                bottomBar.updatePadding(top = 0)
+            } else {
+                updatePadding(left = insets.left, right = insets.right, top = insets.top)
+                bottomBar.updatePadding(bottom = 0)
+            }
+            windowInsets
         }
     }
 
