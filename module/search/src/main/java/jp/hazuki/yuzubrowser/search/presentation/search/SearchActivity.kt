@@ -26,6 +26,9 @@ import android.speech.RecognizerIntent
 import android.view.*
 import android.widget.AdapterView
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,10 +60,21 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
     private var appData: Bundle? = null
     private var openNewTab: Int = 0
 
+    override fun shouldApplySystemBarPadding(): Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = SearchActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.topBox.updatePadding(top = insets.top)
+            binding.bottomBox.updatePadding(bottom = insets.bottom)
+            binding.root.updatePadding(left = insets.left, right = insets.right)
+            windowInsets
+        }
+
         barBinding = SearchSeachBarBinding.inflate(layoutInflater, binding.rootLayout, false)
 
         val intent = intent ?: throw IllegalStateException("Intent is null")

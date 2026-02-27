@@ -21,9 +21,13 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.updatePadding
 import jp.hazuki.yuzubrowser.core.utility.utils.createLanguageConfig
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
@@ -32,10 +36,31 @@ import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 open class ThemeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Keep app content below system bars by default on Android 15+.
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        // Enable edge-to-edge display.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
     }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        if (shouldApplySystemBarPadding()) {
+            val content = findViewById<View>(android.R.id.content)
+            if (content != null) {
+                ViewCompat.setOnApplyWindowInsetsListener(content) { v, windowInsets ->
+                    val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                    v.updatePadding(
+                        left = insets.left,
+                        right = insets.right,
+                        top = insets.top,
+                        bottom = insets.bottom
+                    )
+                    windowInsets
+                }
+            }
+        }
+    }
+
+    protected open fun shouldApplySystemBarPadding(): Boolean = true
 
     override fun attachBaseContext(newBase: Context) {
         val application = newBase.applicationContext

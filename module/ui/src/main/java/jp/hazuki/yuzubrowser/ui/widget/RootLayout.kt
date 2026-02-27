@@ -22,6 +22,9 @@ import android.graphics.Color
 import android.util.AttributeSet
 import androidx.annotation.AttrRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import jp.hazuki.yuzubrowser.core.utility.extensions.getResColor
 import jp.hazuki.yuzubrowser.core.utility.extensions.isImeShown
 import jp.hazuki.yuzubrowser.ui.R
@@ -34,6 +37,14 @@ class RootLayout @JvmOverloads constructor(
     private var isWhiteMode = false
 
     private var onImeShownListener: ((Boolean) -> Unit)? = null
+
+    init {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            updatePadding(left = insets.left, right = insets.right)
+            windowInsets
+        }
+    }
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

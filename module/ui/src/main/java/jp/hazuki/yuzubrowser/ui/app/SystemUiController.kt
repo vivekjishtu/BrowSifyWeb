@@ -101,8 +101,15 @@ sealed class SystemUiController(
             super.updateConfigure()
 
             window.also {
-                it.statusBarColor = statusBarColor
-                it.navigationBarColor = navigationBarColor
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                    // On Android 15+, we don't manually set these colors to non-transparent if we want edge-to-edge.
+                    // But we still apply them if requested, though the system might ignore them or apply scrim.
+                    it.statusBarColor = statusBarColor
+                    it.navigationBarColor = navigationBarColor
+                } else {
+                    it.statusBarColor = statusBarColor
+                    it.navigationBarColor = navigationBarColor
+                }
 
                 var appearance = 0
                 if (isLightStatusBar) {

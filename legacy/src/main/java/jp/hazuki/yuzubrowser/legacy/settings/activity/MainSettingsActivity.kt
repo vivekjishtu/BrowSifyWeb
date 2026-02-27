@@ -22,6 +22,10 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +52,13 @@ class MainSettingsActivity : ThemeActivity(), PreferenceFragmentCompat.OnPrefere
 
         setContentView(R.layout.activity_settings)
         setupActionBar()
+
+        val rootView = findViewById<View>(android.R.id.content)
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(left = insets.left, right = insets.right, top = insets.top, bottom = insets.bottom)
+            windowInsets
+        }
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()

@@ -38,6 +38,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.IntentCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.documentfile.provider.DocumentFile
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
@@ -334,6 +337,8 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     private var lastSpeedDialUpdateTime: Long = -1L
     private var lastUiMode: Int = 0
 
+    override fun shouldApplySystemBarPadding(): Boolean = false
+
     @Inject
     internal lateinit var webViewFactory: WebViewFactory
 
@@ -363,6 +368,16 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
         binding = BrowserActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.superFrameLayout) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.appbar.updatePadding(top = insets.top)
+            binding.bottomAlwaysToolbar.updatePadding(bottom = insets.bottom)
+            binding.leftToolbar.updatePadding(left = insets.left)
+            binding.rightToolbar.updatePadding(right = insets.right)
+            windowInsets
+        }
+
         lastUiMode = resources.configuration.uiMode
         uiController = SystemUiController.create(window)
         //Crash workaround for pagePaddingHeight...

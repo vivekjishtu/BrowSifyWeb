@@ -28,6 +28,9 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.IntentCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.hazuki.yuzubrowser.core.utility.log.Logger
 import jp.hazuki.yuzubrowser.legacy.Constants
@@ -51,6 +54,8 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
     private lateinit var adapter: ActionNameArrayAdapter
 
     private lateinit var binding: ActionActivityBinding
+
+    override fun shouldApplySystemBarPadding(): Boolean = false
 
     private val preferenceLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         mOnActivityResultListener?.invoke(this, result.resultCode, result.data)
@@ -89,6 +94,13 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
         super.onCreate(savedInstanceState)
         binding = ActionActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.recyclerView.updatePadding(top = insets.top)
+            binding.root.updatePadding(bottom = insets.bottom, left = insets.left, right = insets.right)
+            windowInsets
+        }
 
         val intent = intent ?: throw NullPointerException("intent is null")
 
