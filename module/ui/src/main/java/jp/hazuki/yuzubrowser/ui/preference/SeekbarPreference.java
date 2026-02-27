@@ -33,6 +33,7 @@ public class SeekbarPreference extends DialogPreference {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         setValue(restoreValue ? getPersistedInt(mController.getValue()) : (Integer) defaultValue);
     }

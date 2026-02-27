@@ -62,6 +62,7 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
 
     override fun shouldApplySystemBarPadding(): Boolean = false
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = SearchActivityBinding.inflate(layoutInflater)

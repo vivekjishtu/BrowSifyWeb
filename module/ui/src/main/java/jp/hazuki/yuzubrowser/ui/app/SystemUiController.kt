@@ -33,6 +33,7 @@ sealed class SystemUiController(
             if (isUpdated) isNeedUpdate = true
         }
 
+    @Suppress("DEPRECATION")
     var statusBarColor = window.statusBarColor
         set(value) {
             val isUpdated = field != value
@@ -49,6 +50,7 @@ sealed class SystemUiController(
             if (isUpdated) isNeedUpdate = true
         }
 
+    @Suppress("DEPRECATION")
     open var navigationBarColor = window.navigationBarColor
         set(value) {
             val isUpdated = field != value
@@ -98,6 +100,7 @@ sealed class SystemUiController(
     @RequiresApi(Build.VERSION_CODES.R)
     private class ControllerApi30(window: Window) : SystemUiController(window) {
 
+        @Suppress("DEPRECATION")
         override fun updateConfigure() {
             super.updateConfigure()
 
@@ -150,6 +153,7 @@ sealed class SystemUiController(
     @RequiresApi(Build.VERSION_CODES.O)
     @Suppress("DEPRECATION")
     private class ControllerApi26(window: Window) : ControllerApi23(window) {
+        @Suppress("DEPRECATION")
         override var navigationBarColor = window.navigationBarColor
             set(value) {
                 val isUpdated = field != value

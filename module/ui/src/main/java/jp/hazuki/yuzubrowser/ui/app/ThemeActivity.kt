@@ -37,6 +37,7 @@ import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 @SuppressLint("Registered")
 open class ThemeActivity : AppCompatActivity() {
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         // Enable edge-to-edge display.
         WindowCompat.setDecorFitsSystemWindows(window, false)

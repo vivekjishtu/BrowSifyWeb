@@ -443,6 +443,7 @@ public class ThemeData {
         return sInstance != null && (sInstance.statusBarDarkIcon || sInstance.isLightStatusBar());
     }
 
+    @SuppressWarnings("deprecation")
     public static int getSystemUiVisibilityFlag() {
         if (isUseLightStatusBar()) {
             return View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;

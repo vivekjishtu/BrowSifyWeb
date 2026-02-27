@@ -162,6 +162,7 @@ public class MultiTouchGestureDetector implements OnTouchEventListener {
         private final MultiTouchGestureDetector mDetector;
 
         GestureHandler(MultiTouchGestureDetector detector) {
+            super(android.os.Looper.getMainLooper());
             mDetector = detector;
         }
 

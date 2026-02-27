@@ -61,6 +61,7 @@ open class LongPressFixActivity : ThemeActivity() {
         handler.removeCallbacks(longPress)
     }
 
+    @Deprecated("Deprecated in Java", ReplaceWith("onBackKeyPressed()"))
     override fun onBackPressed() {}
 
     open fun onBackKeyPressed() {

@@ -29,6 +29,7 @@ public class WifiDependentBooleanPreference extends IntContainer {
         super(name, def_value);
     }
 
+    @SuppressWarnings("deprecation")
     public boolean getBoolean(Context context) {
         switch (get()) {
             case ENABLE:

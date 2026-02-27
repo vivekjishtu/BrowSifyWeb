@@ -129,10 +129,17 @@ fun Context.getBitmap(drawableId: Int): Bitmap {
 }
 
 fun Context.getDisplayHeight(): Int {
-    val display = (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
-    val point = Point()
-    display.getSize(point)
-    return point.y
+    val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        windowManager.currentWindowMetrics.bounds.height()
+    } else {
+        @Suppress("DEPRECATION")
+        val display = windowManager.defaultDisplay
+        val point = Point()
+        @Suppress("DEPRECATION")
+        display.getSize(point)
+        point.y
+    }
 }
 
 val Context.appCacheFile: File

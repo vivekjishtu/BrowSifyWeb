@@ -74,11 +74,11 @@ class PublicSuffix {
         if (domainLabels.size < 2 || domainLabels.contains("")) return null
 
         val rule = findMatchingRule(domainLabels)
-        if (domainLabels.size == rule.size && rule[0][0] != EXCEPTION_MARKER) {
+        if (domainLabels.size == rule.size && rule[0][0].code.toByte() != EXCEPTION_MARKER) {
             return null // The domain is a public suffix.
         }
 
-        val firstLabelOffset = if (rule[0][0] == EXCEPTION_MARKER) {
+        val firstLabelOffset = if (rule[0][0].code.toByte() == EXCEPTION_MARKER) {
             // Exception rules hold the effective TLD plus one.
             domainLabels.size - rule.size
         } else {
@@ -97,7 +97,7 @@ class PublicSuffix {
         if (rule.size == 1 && rule[0] == "*") {
             return false
         }
-        if (domainLabels.size == rule.size && rule[0][0] != EXCEPTION_MARKER) {
+        if (domainLabels.size == rule.size && rule[0][0].code.toByte() != EXCEPTION_MARKER) {
             return false // The domain is a public suffix.
         }
 
@@ -261,10 +261,10 @@ class PublicSuffix {
     companion object {
         const val PUBLIC_SUFFIX_RESOURCE = "/okhttp3/internal/publicsuffix/publicsuffixes.gz"
 
-        private val WILDCARD_LABEL = byteArrayOf('*'.toByte())
+        private val WILDCARD_LABEL = byteArrayOf('*'.code.toByte())
         private val PREVAILING_RULE = listOf("*")
 
-        private const val EXCEPTION_MARKER = '!'
+        private val EXCEPTION_MARKER = '!'.code.toByte()
 
         private val instance = PublicSuffix()
 
@@ -283,14 +283,14 @@ class PublicSuffix {
                 var mid = (low + high) / 2
                 // Search for a '\n' that marks the start of a value. Don't go back past the start of the
                 // array.
-                while (mid > -1 && this[mid] != '\n'.toByte()) {
+                while (mid > -1 && this[mid] != '\n'.code.toByte()) {
                     mid--
                 }
                 mid++
 
                 // Now look for the ending '\n'.
                 var end = 1
-                while (this[mid + end] != '\n'.toByte()) {
+                while (this[mid + end] != '\n'.code.toByte()) {
                     end++
                 }
                 val publicSuffixLength = mid + end - mid
@@ -306,7 +306,7 @@ class PublicSuffix {
                 while (true) {
                     val byte0: Int
                     if (expectDot) {
-                        byte0 = '.'.toInt()
+                        byte0 = '.'.code
                         expectDot = false
                     } else {
                         byte0 = labels[currentLabelIndex][currentLabelByteIndex] and 0xff

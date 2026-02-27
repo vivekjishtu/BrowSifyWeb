@@ -51,7 +51,7 @@ private fun Configuration.getLocaleIfNeed(lang: String?): Locale? {
     }
 
     return if (sysLocale.language != language || sysLocale.country != country) {
-        Locale(language, country)
+        Locale.Builder().setLanguage(language).setRegion(country).build()
     } else {
         null
     }
