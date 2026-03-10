@@ -1,6 +1,6 @@
 # BrowSifyWeb Browser
 [![license](https://img.shields.io/github/license/vivekjishtu/BrowSifyWeb.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-&nbsp;Stable: [![GitHub release](https://img.shields.io/github/release/vivekjishtu/BrowSifyWeb.svg)](https://play.google.com/store/apps/details?id=com.vivekjishtu.browsifyweb)
+&nbsp;Stable: [![GitHub release](https://img.shields.io/github/release/vivekjishtu/BrowSifyWeb.svg)](https://play.google.com/store/apps/details?id=com.vivekjishtu.bswbrowser)
 &nbsp;Latest: [![GitHub release](https://img.shields.io/github/v/release/vivekjishtu/BrowSifyWeb?include_prereleases)](https://github.com/vivekjishtu/BrowSifyWeb/releases)
 
 <img src="app/src/main/ic_launcher-web.png" width="192" height="192" alt="BrowSifyWeb app icon">
