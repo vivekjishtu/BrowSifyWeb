@@ -28,7 +28,7 @@ Versioning is intentionally kept as a legacy continuation so users can understan
 ## Download and install
 **Android 6.0 or higher is required.**
 
-<a href="https://play.google.com/store/apps/details?id=com.vivekjishtu.browsifyweb">
+<a href="https://play.google.com/store/apps/details?id=com.vivekjishtu.bswbrowser">
 <img src="https://cloud.githubusercontent.com/assets/15681348/25552469/9d87214c-2cd5-11e7-8ada-6cf0c69df419.png" width="200px"></a>
 
 Or prebuilt apk file is here
