@@ -31,8 +31,6 @@ buildscript {
         classpath 'com.android.tools.build:gradle:8.9.1'
         classpath Dagger.hiltPlugin
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.50.0'
-        classpath 'com.google.gms:google-services:4.4.4'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.10'
         classpath 'com.google.android.gms:oss-licenses-plugin:0.10.6'
 

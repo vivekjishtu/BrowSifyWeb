@@ -24,9 +24,6 @@ import android.os.Bundle
 import android.webkit.WebView
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
-import androidx.preference.SwitchPreferenceCompat
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import jp.hazuki.yuzubrowser.core.utility.extensions.getVersionName
 import jp.hazuki.yuzubrowser.legacy.Constants
@@ -70,12 +67,6 @@ class AboutFragment : YuzuPreferenceFragment() {
             true
         }
 
-        findPreference<SwitchPreferenceCompat>("send_usage")!!.setOnPreferenceChangeListener { _, newValue ->
-            val isSwitched = newValue as Boolean
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(isSwitched)
-            FirebaseAnalytics.getInstance(requireContext()).setAnalyticsCollectionEnabled(isSwitched)
-            true
-        }
     }
 
     class TranslationDialog : DialogFragment() {
