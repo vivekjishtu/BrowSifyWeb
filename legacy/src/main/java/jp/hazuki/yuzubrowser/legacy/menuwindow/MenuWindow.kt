@@ -16,6 +16,8 @@
 
 package jp.hazuki.yuzubrowser.legacy.menuwindow
 
+import android.content.Context
+import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -25,12 +27,16 @@ import jp.hazuki.yuzubrowser.core.utility.extensions.convertDpToFloatPx
 import jp.hazuki.yuzubrowser.core.utility.extensions.convertDpToPx
 import jp.hazuki.yuzubrowser.core.utility.utils.FontUtils
 import jp.hazuki.yuzubrowser.legacy.R
+import jp.hazuki.yuzubrowser.legacy.action.Action
 import jp.hazuki.yuzubrowser.legacy.action.ActionList
 import jp.hazuki.yuzubrowser.legacy.action.ActionNameArray
+import jp.hazuki.yuzubrowser.legacy.action.SingleAction
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionController
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionIconManager
 import jp.hazuki.yuzubrowser.ui.app.ThemeActivity
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import kotlin.math.max
+import kotlin.math.min
 
 typealias OnMenuCloseListener = () -> Unit
 
@@ -44,7 +50,8 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
 
     init {
         val inflater = LayoutInflater.from(context)
-        val v = inflater.inflate(R.layout.drop_down_list, null) as ScrollView
+        val v = inflater.inflate(R.layout.drop_down_list, null, false) as ViewGroup
+        val quickActions = v.findViewById<LinearLayout>(R.id.quickActions)
         val layout = v.findViewById<LinearLayout>(R.id.items)
         val array = ActionNameArray(context)
 
@@ -65,7 +72,32 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
         }
 
         val fontSize = FontUtils.getTextSize(AppPrefs.font_size.menu.get())
+        val quickActionItems = listOf(
+            SingleAction.GO_FORWARD,
+            SingleAction.ADD_BOOKMARK,
+            SingleAction.SHOW_DOWNLOADS,
+            SingleAction.PAGE_INFO,
+            SingleAction.WEB_RELOAD_STOP
+        )
+        for (id in quickActionItems) {
+            val action = SingleAction.makeInstance(id)
+            val child = inflater.inflate(R.layout.menu_quick_action_item, quickActions, false)
+            val icon = child.findViewById<ImageView>(R.id.quickActionIcon)
+            icon.setImageDrawable(iconManager[action])
+            child.setOnClickListener {
+                controller.run(action)
+                window.dismiss()
+            }
+            quickActions.addView(child)
+        }
+
+        var lastGroup = Int.MIN_VALUE
         for (action in actionList) {
+            val group = getMenuGroup(action)
+            if (lastGroup != Int.MIN_VALUE && group != lastGroup) {
+              //  layout.addView(createDivider(v.context))
+            }
+            lastGroup = group
             val child = inflater.inflate(R.layout.menu_list_item, v, false)
             val icon = child.findViewById<ImageView>(R.id.iconImageView)
             val name = child.findViewById<TextView>(R.id.actionNameTextView)
@@ -118,6 +150,71 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
             window.isFocusable = false
 
             window.showAsDropDown(anchor)
+
+            //Reset focusable
+            window.isFocusable = true
+        }
+    }
+
+    private fun getMenuGroup(action: Action): Int {
+        if (action.isEmpty()) return 999
+        val id = action[0].id
+        return when {
+            id in 1000..1999 -> 0 // navigation
+            id in 5000..5999 -> 1 // page info / page actions
+            id in 10000..10999 -> 2 // tab actions
+            id in 35000..35999 -> 3 // app screens
+            id in 35300..35399 -> 4 // settings/tools
+            else -> 5
+        }
+    }
+
+    private fun createDivider(context: Context): View {
+        return View(context).apply {
+            background = context.getDrawable(R.drawable.divider)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+    }
+
+    fun showAsDropDownAuto(anchor: View, root: View) {
+        if (!locking) {
+            //This is a magic!
+            window.isFocusable = false
+
+            val content = window.contentView
+            content.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            val popupWidth = content.measuredWidth
+            val popupHeight = content.measuredHeight
+
+            val anchorLocation = IntArray(2)
+            anchor.getLocationOnScreen(anchorLocation)
+            val anchorLeft = anchorLocation[0]
+            val anchorTop = anchorLocation[1]
+            val anchorBottom = anchorTop + anchor.height
+
+            val frame = Rect()
+            root.rootView.getWindowVisibleDisplayFrame(frame)
+            val spaceBelow = frame.bottom - anchorBottom
+            val spaceAbove = anchorTop - frame.top
+
+            if (spaceBelow >= popupHeight + windowMargin) {
+                window.showAsDropDown(anchor)
+            } else if (spaceAbove >= popupHeight + windowMargin) {
+                val centeredX = anchorLeft + (anchor.width - popupWidth) / 2
+                val minX = frame.left + windowMargin
+                val maxX = frame.right - popupWidth - windowMargin
+                val clampedX = max(minX, min(centeredX, maxX))
+                val y = anchorTop - popupHeight
+                window.showAtLocation(root, Gravity.TOP or Gravity.START, clampedX, y)
+            } else {
+                window.showAsDropDown(anchor)
+            }
 
             //Reset focusable
             window.isFocusable = true
