@@ -18,8 +18,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'dagger.hilt.android.plugin'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
 */
 
 buildscript {
@@ -38,8 +36,6 @@ plugins {
     id 'kotlin-android'
     id 'dagger.hilt.android.plugin'
     id 'com.google.android.gms.oss-licenses-plugin'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
     id 'com.google.devtools.ksp'
 }
 
@@ -76,17 +72,13 @@ android {
             minifyEnabled = true
             shrinkResources = true
             proguardFiles(getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro')
-            manifestPlaceholders = [crashlyticsCollectionEnabled:"false"]
             lint {
                 disable 'MissingTranslation', 'GoogleAppIndexingWarning', 'ClickableViewAccessibility'
             }
         }
         debug {
-            ext.enableCrashlytics = false
-            ext.alwaysUpdateBuildId = false
             applicationIdSuffix = ".debug"
             resValue("string", "package_name", "${defaultConfig.applicationId}.debug")
-            manifestPlaceholders = [crashlyticsCollectionEnabled: "false"]
         }
     }
     packaging {
@@ -114,14 +106,6 @@ android {
     }
     namespace = 'jp.hazuki.yuzubrowser'
 }
-
-// must be after the plugin is applied otherwise no tasks will be found
-android.applicationVariants.configureEach { variant ->
-    def googleTask = tasks.findByName("process${variant.name.capitalize()}GoogleServices")
-    googleTask.enabled = true
-}
-
-
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -158,11 +142,4 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-oss-licenses:17.1.0'
 
-    // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:33.1.1')
-
-    // Declare the dependencies for the Crashlytics and Analytics libraries
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-crashlytics'
-    implementation 'com.google.firebase:firebase-analytics'
 }
