@@ -30,28 +30,34 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.Action
 import jp.hazuki.yuzubrowser.legacy.action.ActionList
 import jp.hazuki.yuzubrowser.legacy.action.ActionNameArray
-import jp.hazuki.yuzubrowser.legacy.action.SingleAction
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionController
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionIconManager
+import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionFile
+import jp.hazuki.yuzubrowser.legacy.action.manager.ToolbarActionManager
+import jp.hazuki.yuzubrowser.legacy.toolbar.main.MenuCustomToolbar
 import jp.hazuki.yuzubrowser.ui.app.ThemeActivity
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.settings.PreferenceConstants
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 import kotlin.math.max
 import kotlin.math.min
 
 typealias OnMenuCloseListener = () -> Unit
 
-class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: ActionController, iconManager: ActionIconManager) : PopupWindow.OnDismissListener {
+class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: ActionController, private val iconManager: ActionIconManager) : PopupWindow.OnDismissListener {
 
     private val windowMargin = context.convertDpToPx(4)
     private val window = PopupWindow(context)
     private val handler = Handler(Looper.getMainLooper())
     private var locking = false
     private var mListener: OnMenuCloseListener? = null
+    private var menuCustomToolbar: MenuCustomToolbar? = null
 
     init {
         val inflater = LayoutInflater.from(context)
         val v = inflater.inflate(R.layout.drop_down_list, null, false) as ViewGroup
-        val quickActions = v.findViewById<LinearLayout>(R.id.quickActions)
+        val customToolbarContainer = v.findViewById<LinearLayout>(R.id.customToolbarContainer)
+        val customToolbarDivider = v.findViewById<View>(R.id.customToolbarDivider)
         val layout = v.findViewById<LinearLayout>(R.id.items)
         val array = ActionNameArray(context)
 
@@ -72,23 +78,23 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
         }
 
         val fontSize = FontUtils.getTextSize(AppPrefs.font_size.menu.get())
-        val quickActionItems = listOf(
-            SingleAction.GO_FORWARD,
-            SingleAction.ADD_BOOKMARK,
-            SingleAction.SHOW_DOWNLOADS,
-            SingleAction.PAGE_INFO,
-            SingleAction.WEB_RELOAD_STOP
-        )
-        for (id in quickActionItems) {
-            val action = SingleAction.makeInstance(id)
-            val child = inflater.inflate(R.layout.menu_quick_action_item, quickActions, false)
-            val icon = child.findViewById<ImageView>(R.id.quickActionIcon)
-            icon.setImageDrawable(iconManager[action])
-            child.setOnClickListener {
-                controller.run(action)
+        val customToolbarActions = ToolbarActionManager.getInstance(context).custombar1.list
+        if (shouldShowCustomToolbar(customToolbarActions)) {
+            val toolbar = MenuCustomToolbar(context, controller, iconManager) {
                 window.dismiss()
+            }.apply {
+                onThemeChanged(ThemeData.getInstance())
             }
-            quickActions.addView(child)
+            menuCustomToolbar = toolbar
+            customToolbarContainer.visibility = View.VISIBLE
+            customToolbarDivider.visibility = View.VISIBLE
+            customToolbarContainer.addView(
+                toolbar,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    context.convertDpToPx(AppPrefs.toolbar_custom1.size.get())
+                )
+            )
         }
 
         var lastGroup = Int.MIN_VALUE
@@ -134,6 +140,8 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
 
     fun show(root: View, gravity: Int) {
         if (!locking) {
+            refreshCustomToolbar()
+
             //This is a magic!
             window.isFocusable = false
 
@@ -146,6 +154,8 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
 
     fun showAsDropDown(anchor: View) {
         if (!locking) {
+            refreshCustomToolbar()
+
             //This is a magic!
             window.isFocusable = false
 
@@ -169,6 +179,20 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
         }
     }
 
+    private fun shouldShowCustomToolbar(actions: List<SoftButtonActionFile>): Boolean {
+        return AppPrefs.toolbar_custom1_placement.get() == PreferenceConstants.CUSTOM_TOOLBAR_PLACEMENT_MAIN_MENU &&
+            actions.any { it.hasAnyAction() }
+    }
+
+    private fun SoftButtonActionFile.hasAnyAction(): Boolean {
+        return !press.isEmpty() ||
+            !lpress.isEmpty() ||
+            !up.isEmpty() ||
+            !down.isEmpty() ||
+            !left.isEmpty() ||
+            !right.isEmpty()
+    }
+
     private fun createDivider(context: Context): View {
         return View(context).apply {
             background = context.getDrawable(R.drawable.divider)
@@ -181,6 +205,8 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
 
     fun showAsDropDownAuto(anchor: View, root: View) {
         if (!locking) {
+            refreshCustomToolbar()
+
             //This is a magic!
             window.isFocusable = false
 
@@ -224,6 +250,10 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
     fun setSystemUiVisibility(flags: Int) {
         @Suppress("DEPRECATION")
         window.contentView.systemUiVisibility = flags
+    }
+
+    private fun refreshCustomToolbar() {
+        menuCustomToolbar?.notifyChangeWebState(iconManager.info.currentTabData)
     }
 
     val isShowing: Boolean

@@ -294,6 +294,13 @@
                 android:title="@string/pref_custom_bar"
                 app:iconSpaceReserved="false">
                 <jp.hazuki.yuzubrowser.ui.preference.StrToIntListPreference
+                    android:entries="@array/pref_custom_toolbar_placement_list"
+                    android:entryValues="@array/pref_custom_toolbar_placement_values"
+                    android:key="toolbar_placement_custom1"
+                    android:title="@string/pref_custom_bar_placement"
+                    app:iconSpaceReserved="false" />
+
+                <jp.hazuki.yuzubrowser.ui.preference.StrToIntListPreference
                     android:entries="@array/pref_toolbar_location_custom_list"
                     android:entryValues="@array/pref_toolbar_location_custom_values"
                     android:key="toolbar_location_custom1"

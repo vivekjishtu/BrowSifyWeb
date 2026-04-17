@@ -32,7 +32,14 @@ import jp.hazuki.yuzubrowser.legacy.utils.view.swipebutton.SwipeImageButton
 import jp.hazuki.yuzubrowser.ui.settings.container.ToolbarContainer
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 
-open class CustomToolbarBase(context: Context, toolbarContainer: ToolbarContainer, controller: ActionController, iconManager: ActionIconManager, request_callback: RequestCallback) : ToolbarBase(context, toolbarContainer, request_callback) {
+open class CustomToolbarBase(
+    context: Context,
+    toolbarContainer: ToolbarContainer,
+    controller: ActionController,
+    iconManager: ActionIconManager,
+    request_callback: RequestCallback,
+    onActionRun: (() -> Unit)? = null
+) : ToolbarBase(context, toolbarContainer, request_callback) {
     private val mButtonController: ButtonToolbarController
 
     init {
@@ -47,6 +54,7 @@ open class CustomToolbarBase(context: Context, toolbarContainer: ToolbarContaine
                 return view.findViewById(R.id.button)
             }
         }
+        mButtonController.onActionRun = onActionRun
         addButtons()
     }
 

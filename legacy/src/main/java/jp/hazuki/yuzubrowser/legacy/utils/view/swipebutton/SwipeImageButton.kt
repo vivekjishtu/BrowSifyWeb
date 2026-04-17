@@ -59,6 +59,10 @@ class SwipeImageButton @JvmOverloads constructor(context: Context, attrs: Attrib
         mController.setSense(sense)
     }
 
+    fun setOnActionRunListener(listener: (() -> Unit)?) {
+        mController.setOnActionRunListener(listener)
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         mController.onTouchEvent(event)
         return super.onTouchEvent(event)

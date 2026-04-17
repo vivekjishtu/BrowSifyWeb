@@ -48,6 +48,7 @@ import jp.hazuki.yuzubrowser.legacy.toolbar.ToolbarManager.Companion.LOCATION_WE
 import jp.hazuki.yuzubrowser.legacy.toolbar.main.*
 import jp.hazuki.yuzubrowser.legacy.utils.view.tab.TabLayout
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.settings.PreferenceConstants
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 import jp.hazuki.yuzubrowser.webview.CustomWebView
 import kotlin.math.max
@@ -101,7 +102,9 @@ open class BrowserToolbarManager(
             addSingleToolbarView(i, tabBar, isPortrait)
             addSingleToolbarView(i, urlBar, isPortrait)
             addSingleToolbarView(i, progressBar, isPortrait)
-            addSingleToolbarView(i, customBar, isPortrait)
+            if (isCustomToolbarInBrowserUi()) {
+                addSingleToolbarView(i, customBar, isPortrait)
+            }
         }
     }
 
@@ -167,7 +170,11 @@ open class BrowserToolbarManager(
         tabBar.onPreferenceReset()
         urlBar.onPreferenceReset()
         progressBar.onPreferenceReset()
-        customBar.onPreferenceReset()
+        if (isCustomToolbarInBrowserUi()) {
+            customBar.onPreferenceReset()
+        } else {
+            (customBar.parent as? ViewGroup)?.removeView(customBar)
+        }
 
         val params = binding.topToolbar.layoutParams as AppBarLayout.LayoutParams
         params.scrollFlags = if (AppPrefs.snap_toolbar.get()) {
@@ -235,13 +242,17 @@ open class BrowserToolbarManager(
         onActivityConfigurationChangedSingle(tabBar, config)
         onActivityConfigurationChangedSingle(urlBar, config)
         onActivityConfigurationChangedSingle(progressBar, config)
-        onActivityConfigurationChangedSingle(customBar, config)
+        if (isCustomToolbarInBrowserUi()) {
+            onActivityConfigurationChangedSingle(customBar, config)
+        } else {
+            (customBar.parent as? ViewGroup)?.removeView(customBar)
+        }
 
         addToolbarView(config.orientation == Configuration.ORIENTATION_PORTRAIT)
     }
 
     private fun onActivityConfigurationChangedSingle(toolbar: ToolbarBase, config: Configuration) {
-        val parent = toolbar.parent as? ViewGroup ?: throw NullPointerException()
+        val parent = toolbar.parent as? ViewGroup ?: return
         if (parent === binding.leftToolbar || parent === binding.rightToolbar)
             (toolbar.findViewById<View>(R.id.linearLayout) as LinearLayout).orientation = LinearLayout.HORIZONTAL
         parent.removeView(toolbar)
@@ -362,5 +373,9 @@ open class BrowserToolbarManager(
             animator.duration = duration.toLong()
             animator.start()
         }
+    }
+
+    private fun isCustomToolbarInBrowserUi(): Boolean {
+        return AppPrefs.toolbar_custom1_placement.get() == PreferenceConstants.CUSTOM_TOOLBAR_PLACEMENT_BROWSER_UI
     }
 }

@@ -30,6 +30,7 @@ import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 
 open class ButtonToolbarController(private val linearLayout: ViewGroup, private val controller: ActionController, private val iconManager: ActionIconManager, private val TOOLBAR_SIZE_Y: Int) {
     private val mButtonList: ArrayList<SwipeImageButton> = ArrayList(1)
+    var onActionRun: (() -> Unit)? = null
 
     fun addButtons(list: List<SoftButtonActionFile>) {
         val size = list.size
@@ -37,9 +38,11 @@ open class ButtonToolbarController(private val linearLayout: ViewGroup, private 
             for ((i, btn) in mButtonList.withIndex()) {
                 btn.setActionData(list[i], controller, iconManager)
                 btn.setSense(AppPrefs.swipebtn_sensitivity.get())
+                btn.setOnActionRunListener(onActionRun)
             }
         } else {
             linearLayout.removeAllViews()
+            mButtonList.clear()
 
             val inflater = LayoutInflater.from(linearLayout.context)
 
@@ -48,6 +51,7 @@ open class ButtonToolbarController(private val linearLayout: ViewGroup, private 
                 mButtonList.add(btn)
                 btn.setActionData(list[i], controller, iconManager)
                 btn.setSense(AppPrefs.swipebtn_sensitivity.get())
+                btn.setOnActionRunListener(onActionRun)
                 settingButtonSize(btn, TOOLBAR_SIZE_Y)
             }
         }
@@ -78,7 +82,7 @@ open class ButtonToolbarController(private val linearLayout: ViewGroup, private 
 
     fun setBackgroundDrawable(background: Drawable?) {
         for (btn in mButtonList)
-            btn.setImageDrawable(background)
+            btn.background = background
     }
 
     companion object {
