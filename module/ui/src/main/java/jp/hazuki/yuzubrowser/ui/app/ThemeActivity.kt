@@ -33,6 +33,7 @@ import androidx.core.view.updatePadding
 import jp.hazuki.yuzubrowser.core.utility.utils.createLanguageConfig
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
+import jp.hazuki.yuzubrowser.ui.theme.ThemeRepository
 
 @SuppressLint("Registered")
 open class ThemeActivity : AppCompatActivity() {
@@ -69,8 +70,9 @@ open class ThemeActivity : AppCompatActivity() {
 
     override fun attachBaseContext(newBase: Context) {
         val application = newBase.applicationContext
-        val selectedTheme = PrefPool.getSharedPref(application).getString(theme_setting, ThemeData.THEME_AUTO)
-            ?: ThemeData.THEME_AUTO
+        val selectedTheme = ThemeRepository.normalizeThemeId(
+            PrefPool.getSharedPref(application).getString(theme_setting, ThemeData.THEME_AUTO)
+        )
         if (selectedTheme == ThemeData.THEME_AUTO) {
             // Recreate auto theme on each attach so it tracks system day/night changes.
             ThemeData.createInstance(newBase, ThemeData.THEME_AUTO)

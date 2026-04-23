@@ -117,6 +117,7 @@ import jp.hazuki.yuzubrowser.ui.extensions.applyAppTheme
 import jp.hazuki.yuzubrowser.ui.BROADCAST_ACTION_NOTIFY_REFRESH_SPEED_DIAL
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
+import jp.hazuki.yuzubrowser.ui.theme.ThemeRepository
 import jp.hazuki.yuzubrowser.ui.utils.*
 import jp.hazuki.yuzubrowser.ui.widget.PointerView
 import jp.hazuki.yuzubrowser.webview.CustomWebHistoryItem
@@ -670,7 +671,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         super.onConfigurationChanged(newConfig)
         if ((newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK) != (lastUiMode and Configuration.UI_MODE_NIGHT_MASK)) {
             lastUiMode = newConfig.uiMode
-            if (AppPrefs.theme_setting.get() == ThemeData.THEME_AUTO) {
+            if (ThemeRepository.normalizeThemeId(AppPrefs.theme_setting.get()) == ThemeData.THEME_AUTO) {
                 Snackbar.make(binding.coordinator, R.string.theme_changed_message, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.theme_changed_restart) {
                         ActivityCompat.recreate(this)

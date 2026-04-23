@@ -21,7 +21,7 @@ import android.util.AttributeSet
 import androidx.preference.ListPreference
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
-import jp.hazuki.yuzubrowser.ui.theme.ThemeManifest
+import jp.hazuki.yuzubrowser.ui.theme.ThemeRepository
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -53,29 +53,28 @@ class ThemePreference(context: Context, attrs: AttributeSet) : ListPreference(co
 
         }
 
-        val themes = dir.listFiles()
-
         val themeList = ArrayList<String>()
         val valueList = ArrayList<String>()
 
-        //Add default
-        themeList.add(context.getString(R.string.pref_system_theme))
-        valueList.add(ThemeData.THEME_AUTO)
-        themeList.add(context.getString(R.string.pref_dark_theme))
-        valueList.add(ThemeData.THEME_DARK)
-        themeList.add(context.getString(R.string.pref_light_theme))
-        valueList.add(ThemeData.THEME_LIGHT)
-
-        if (themes != null) {
-            for (theme in themes) {
-                if (theme.isDirectory) {
-                    val manifest = ThemeManifest.getManifest(theme)
-                    themeList.add(manifest?.name ?: theme.name)
-                    valueList.add(theme.name)
-                }
+        ThemeRepository.listThemes(context).forEach { theme ->
+            val name = when (theme.id) {
+                ThemeData.THEME_AUTO -> context.getString(R.string.pref_system_theme)
+                ThemeData.THEME_DARK -> context.getString(R.string.pref_dark_theme)
+                ThemeData.THEME_LIGHT -> context.getString(R.string.pref_light_theme)
+                else -> theme.name
             }
+            themeList.add(name)
+            valueList.add(theme.id)
         }
 
+        val currentValue = ThemeRepository.normalizeThemeId(value)
+        if (currentValue != value) {
+            value = currentValue
+        }
+
+        if (!valueList.contains(value)) {
+            value = ThemeData.THEME_AUTO
+        }
 
         entries = themeList.toTypedArray()
         entryValues = valueList.toTypedArray()

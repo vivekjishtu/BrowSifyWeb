@@ -1,0 +1,18 @@
+{
+  "colors": {
+    "toolbarBackground": "#FFDDDDDD",
+    "toolbarText": "#FF222222",
+    "toolbarIcon": "#FF444444",
+    "toolbarButtonPress": "#FFB5B5B5",
+    "tabTextNormal": "#FF444444",
+    "tabTextLock": "#FF00B53C",
+    "tabTextPin": "#FF3B4EF9",
+    "tabTextSelected": "#FF222222",
+    "statusBar": "#FF888888"
+  },
+  "flags": {
+    "showTabDivider": true,
+    "statusBarDarkIcon": true,
+    "pullToRefreshDark": false
+  }
+}

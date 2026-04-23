@@ -22,9 +22,19 @@ import okio.buffer
 import okio.source
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 
 class ThemeManifest @Throws(IllegalManifestException::class, IOException::class)
-private constructor(val version: String, val name: String, val id: String) {
+private constructor(
+    val version: String,
+    val name: String,
+    val id: String,
+    val base: String,
+    val author: String?,
+    val description: String?,
+    val preview: String?,
+    val builtIn: Boolean
+) {
 
     class IllegalManifestException internal constructor(message: String, val errorType: Int) : Exception(message)
 
@@ -37,6 +47,11 @@ private constructor(val version: String, val name: String, val id: String) {
         private const val FIELD_VERSION = "version"
         private const val FIELD_NAME = "name"
         private const val FIELD_ID = "id"
+        private const val FIELD_BASE = "base"
+        private const val FIELD_AUTHOR = "author"
+        private const val FIELD_DESCRIPTION = "description"
+        private const val FIELD_PREVIEW = "preview"
+        private const val FIELD_BUILTIN = "builtin"
 
         fun getManifest(themeFolder: File): ThemeManifest? {
             try {
@@ -63,6 +78,16 @@ private constructor(val version: String, val name: String, val id: String) {
             }
         }
 
+        @Throws(IllegalManifestException::class)
+        fun decodeManifest(inputStream: InputStream): ThemeManifest {
+            try {
+                JsonReader.of(inputStream.source().buffer()).use { return decode(it) }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                throw IllegalManifestException("unknown error", 0)
+            }
+        }
+
         @Throws(IllegalManifestException::class, IOException::class)
         private fun decode(reader: JsonReader): ThemeManifest {
             if (reader.peek() != JsonReader.Token.BEGIN_OBJECT)
@@ -72,6 +97,11 @@ private constructor(val version: String, val name: String, val id: String) {
             var version: String? = null
             var name: String? = null
             var id: String? = null
+            var base: String? = null
+            var author: String? = null
+            var description: String? = null
+            var preview: String? = null
+            var builtIn = false
             while (reader.hasNext()) {
                 if (reader.peek() != JsonReader.Token.NAME)
                     throw IllegalManifestException("broken manifest file", 1)
@@ -113,6 +143,34 @@ private constructor(val version: String, val name: String, val id: String) {
                     }
                     continue
                 }
+                if (FIELD_BASE.equals(field, ignoreCase = true)) {
+                    try {
+                        base = reader.nextString().trim { it <= ' ' }
+                    } catch (e: JsonDataException) {
+                        throw IllegalManifestException("broken manifest file", 1)
+                    }
+                    continue
+                }
+                if (FIELD_AUTHOR.equals(field, ignoreCase = true)) {
+                    author = reader.nextString().trim { it <= ' ' }
+                    continue
+                }
+                if (FIELD_DESCRIPTION.equals(field, ignoreCase = true)) {
+                    description = reader.nextString().trim { it <= ' ' }
+                    continue
+                }
+                if (FIELD_PREVIEW.equals(field, ignoreCase = true)) {
+                    preview = reader.nextString().trim { it <= ' ' }
+                    continue
+                }
+                if (FIELD_BUILTIN.equals(field, ignoreCase = true)) {
+                    builtIn = try {
+                        if (reader.peek() == JsonReader.Token.BOOLEAN) reader.nextBoolean() else reader.nextString().toBoolean()
+                    } catch (e: JsonDataException) {
+                        throw IllegalManifestException("broken manifest file", 1)
+                    }
+                    continue
+                }
                 reader.skipValue()
             }
             reader.endObject()
@@ -120,7 +178,11 @@ private constructor(val version: String, val name: String, val id: String) {
             if (version == null || name == null || id == null)
                 throw IllegalManifestException("broken manifest file", 1)
 
-            return ThemeManifest(version, name, id)
+            val resolvedBase = base ?: ThemeRepository.THEME_DARK
+            if (resolvedBase != ThemeRepository.THEME_LIGHT && resolvedBase != ThemeRepository.THEME_DARK)
+                throw IllegalManifestException("broken manifest file", 1)
+
+            return ThemeManifest(version, name, id, resolvedBase, author, description, preview, builtIn)
         }
     }
 }

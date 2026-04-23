@@ -133,14 +133,18 @@ private fun importThemeDirectory(context: Context, root: File, tmpFolder: File):
         return Result(false, context.getString(text))
     }
 
-
-    val name = FileUtils.replaceProhibitionWord(manifest.name)
-    if (name.isEmpty()) {
+    if (!File(tmpFolder, "theme.json").isFile) {
         FileUtils.deleteFile(tmpFolder)
         return Result(false, context.getString(R.string.theme_broken_manifest))
     }
 
-    val theme = File(root, name)
+    val folderName = FileUtils.replaceProhibitionWord(manifest.id)
+    if (folderName.isEmpty()) {
+        FileUtils.deleteFile(tmpFolder)
+        return Result(false, context.getString(R.string.theme_broken_manifest))
+    }
+
+    val theme = File(root, folderName)
 
     if (theme.exists()) {
         if (theme.isDirectory) {

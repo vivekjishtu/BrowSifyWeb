@@ -51,9 +51,9 @@ import jp.hazuki.yuzubrowser.ui.R;
 import okio.Okio;
 
 public class ThemeData {
-    public static final String THEME_LIGHT = "theme://internal/light";
-    public static final String THEME_DARK = "";
-    public static final String THEME_AUTO = "auto";
+    public static final String THEME_LIGHT = ThemeRepository.THEME_LIGHT;
+    public static final String THEME_DARK = ThemeRepository.THEME_DARK;
+    public static final String THEME_AUTO = ThemeRepository.THEME_SYSTEM;
 
     public Drawable tabBackgroundNormal, tabBackgroundSelect;
     public int tabTextColorNormal, tabTextColorLock, tabTextColorPin, tabTextColorSelect, tabAccentColor, tabDividerColor;
@@ -70,6 +70,48 @@ public class ThemeData {
     public boolean lightTheme;
 
     private ThemeData() {
+    }
+
+    private ThemeData(Context context, ResolvedTheme theme) {
+        lightTheme = theme.isLight();
+
+        tabTextColorNormal = theme.color("tabTextNormal");
+        tabTextColorLock = theme.color("tabTextLock");
+        tabTextColorPin = theme.color("tabTextPin");
+        tabTextColorSelect = theme.color("tabTextSelected");
+        tabAccentColor = theme.color("tabAccent");
+        tabDividerColor = theme.color("tabDivider");
+        scrollbarAccentColor = theme.color("scrollbarAccent");
+        showTabDivider = theme.flag("showTabDivider");
+
+        progressColor = theme.color("progress");
+        progressIndeterminateColor = theme.color("progressIndeterminate");
+
+        toolbarBackgroundColor = theme.color("toolbarBackground");
+        toolbarTextColor = theme.color("toolbarText");
+        toolbarImageColor = theme.color("toolbarIcon");
+
+        int toolbarButtonPress = theme.color("toolbarButtonPress");
+        if (toolbarButtonPress != 0) {
+            int padding = context.getResources().getDimensionPixelOffset(R.dimen.dimen_theme_padding);
+            Rect paddingRect = new Rect(padding, padding, padding, padding);
+            Rect textPaddingRect = new Rect(padding, 0, padding, 0);
+
+            toolbarButtonBackgroundPress = new ShapeDrawable(new RectShape());
+            toolbarButtonBackgroundPress.setPadding(paddingRect);
+            toolbarButtonBackgroundPress.getPaint().setColor(toolbarButtonPress);
+
+            toolbarTextButtonBackgroundPress = new ShapeDrawable(new RectShape());
+            toolbarTextButtonBackgroundPress.setPadding(textPaddingRect);
+            toolbarTextButtonBackgroundPress.getPaint().setColor(toolbarButtonPress);
+        }
+
+        qcItemBackgroundColorNormal = theme.color("qcItemBackgroundNormal");
+        qcItemBackgroundColorSelect = theme.color("qcItemBackgroundSelected");
+        qcItemColor = theme.color("qcItem");
+        statusBarColor = theme.color("statusBar");
+        statusBarDarkIcon = theme.flag("statusBarDarkIcon");
+        refreshUseDark = theme.flag("pullToRefreshDark");
     }
 
     private ThemeData(Context context, File folder) throws IOException {
@@ -378,7 +420,8 @@ public class ThemeData {
 
     @Nullable
     public static ThemeData createInstanceIfNeed(@NonNull Context context, @Nullable String folder) {
-        if (!isLoaded || !Objects.equals(folder, loadedTheme)) {
+        String normalizedTheme = ThemeRepository.normalizeThemeId(folder);
+        if (!isLoaded || !Objects.equals(normalizedTheme, loadedTheme)) {
             return createInstance(context, folder);
         } else {
             return sInstance;
@@ -388,30 +431,14 @@ public class ThemeData {
     @Nullable
     public static ThemeData createInstance(@NonNull Context context, @Nullable String folder) {
         isLoaded = true;
-        if (TextUtils.isEmpty(folder)) {
+        String normalizedTheme = ThemeRepository.normalizeThemeId(folder);
+        ResolvedTheme resolvedTheme = ThemeRepository.resolve(context, normalizedTheme);
+        if (resolvedTheme != null) {
+            sInstance = new ThemeData(context, resolvedTheme);
+            loadedTheme = normalizedTheme;
+        } else {
             sInstance = null;
             loadedTheme = null;
-        } else if (THEME_AUTO.equals(folder)) {
-            sInstance = isSystemInLightMode(context) ? createLightTheme(context) : null;
-            loadedTheme = folder;
-        } else if (THEME_LIGHT.equals(folder)) {
-            sInstance = createLightTheme(context);
-            loadedTheme = folder;
-        } else {
-            File file = new File(context.getExternalFilesDir("theme"), folder);
-            if (!file.exists() || !file.isDirectory()) {
-                sInstance = null;
-                loadedTheme = null;
-            } else {
-                try {
-                    sInstance = new ThemeData(context, file);
-                    loadedTheme = folder;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    sInstance = null;
-                    loadedTheme = null;
-                }
-            }
         }
         return sInstance;
     }

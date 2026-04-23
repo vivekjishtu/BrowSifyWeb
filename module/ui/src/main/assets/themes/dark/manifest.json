@@ -1,0 +1,8 @@
+{
+  "format_version": 1,
+  "id": "dark",
+  "name": "Dark",
+  "version": "1.0.0",
+  "base": "dark",
+  "builtin": true
+}
