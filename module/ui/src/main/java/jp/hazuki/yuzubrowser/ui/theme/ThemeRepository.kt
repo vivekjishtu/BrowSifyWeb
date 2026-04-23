@@ -8,6 +8,7 @@ package jp.hazuki.yuzubrowser.ui.theme
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
@@ -17,6 +18,7 @@ import okio.source
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.util.Locale
 
 data class ThemeOption(
     val id: String,
@@ -37,6 +39,11 @@ data class ResolvedTheme(
     fun flag(name: String): Boolean = flags[name] ?: false
 }
 
+data class ThemeValidationResult(
+    val isValid: Boolean,
+    val reason: String? = null
+)
+
 object ThemeRepository {
     const val THEME_SYSTEM = "system"
     const val THEME_LIGHT = "light"
@@ -44,10 +51,17 @@ object ThemeRepository {
 
     private const val ASSET_THEME_ROOT = "themes"
     private const val THEME_FILE = "theme.json"
+    private const val MAX_FILE_COUNT = 100
+    private const val MAX_TOTAL_BYTES = 10L * 1024L * 1024L
+    private const val MAX_FILE_BYTES = 5L * 1024L * 1024L
+    private const val MAX_IMAGE_SIDE = 4096
 
     private const val LEGACY_AUTO = "auto"
     private const val LEGACY_LIGHT = "theme://internal/light"
     private const val LEGACY_DARK = ""
+
+    private val reservedThemeIds = setOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK)
+    private val allowedExtensions = setOf("json", "png", "jpg", "jpeg", "webp")
 
     @JvmStatic
     fun normalizeThemeId(id: String?): String {
@@ -85,6 +99,63 @@ object ThemeRepository {
         return themes.distinctBy { it.id }
     }
 
+    @JvmStatic
+    fun validateThemeFolder(themeFolder: File): ThemeValidationResult {
+        if (!themeFolder.isDirectory) {
+            return ThemeValidationResult(false, "Theme package is not a folder")
+        }
+
+        val files = themeFolder.walkTopDown()
+            .filter { it.isFile }
+            .toList()
+
+        if (files.size > MAX_FILE_COUNT) {
+            return ThemeValidationResult(false, "Theme package has too many files")
+        }
+
+        var totalBytes = 0L
+        val rootPath = themeFolder.canonicalPath + File.separator
+        files.forEach { file ->
+            if (!file.canonicalPath.startsWith(rootPath)) {
+                return ThemeValidationResult(false, "Theme package contains an unsafe path")
+            }
+
+            if (file.length() > MAX_FILE_BYTES) {
+                return ThemeValidationResult(false, "Theme package contains a file that is too large")
+            }
+            totalBytes += file.length()
+            if (totalBytes > MAX_TOTAL_BYTES) {
+                return ThemeValidationResult(false, "Theme package is too large")
+            }
+
+            val extension = file.extension.lowercase(Locale.US)
+            if (extension !in allowedExtensions) {
+                return ThemeValidationResult(false, "Theme package contains an unsupported file type")
+            }
+
+            if (extension in setOf("png", "jpg", "jpeg", "webp") && !isValidImage(file)) {
+                return ThemeValidationResult(false, "Theme package contains an invalid image")
+            }
+        }
+
+        val manifest = try {
+            ThemeManifest.decodeManifest(File(themeFolder, ThemeManifest.MANIFEST))
+        } catch (e: ThemeManifest.IllegalManifestException) {
+            return ThemeValidationResult(false, "Theme manifest is invalid")
+        } ?: return ThemeValidationResult(false, "Theme manifest is missing")
+
+        if (manifest.id in reservedThemeIds) {
+            return ThemeValidationResult(false, "Theme id is reserved")
+        }
+
+        val themeFile = File(themeFolder, THEME_FILE)
+        if (!themeFile.isFile) {
+            return ThemeValidationResult(false, "Theme data is missing")
+        }
+
+        return validateThemeJson(themeFile)
+    }
+
     private fun listBuiltInThemes(context: Context): List<ThemeOption> {
         return listOf(THEME_DARK, THEME_LIGHT).mapNotNull { id ->
             loadBuiltInManifest(context, id)?.let { manifest ->
@@ -98,6 +169,7 @@ object ThemeRepository {
         val files = root.listFiles() ?: return emptyList()
         return files.asSequence()
             .filter { it.isDirectory && it.name != ".nomedia" }
+            .filter { validateThemeFolder(it).isValid }
             .mapNotNull { folder ->
                 ThemeManifest.getManifest(folder)?.let { manifest ->
                     ThemeOption(manifest.id, manifest.name, false)
@@ -143,6 +215,8 @@ object ThemeRepository {
                 ?.firstOrNull { it.isDirectory && ThemeManifest.getManifest(it)?.id == id }
                 ?: return null
         }
+        if (!validateThemeFolder(folder).isValid) return null
+
         val manifest = ThemeManifest.getManifest(folder) ?: return null
         return try {
             val theme = File(folder, THEME_FILE).inputStream().use {
@@ -158,6 +232,8 @@ object ThemeRepository {
                 theme
             }
         } catch (e: IOException) {
+            null
+        } catch (e: JsonDataException) {
             null
         }
     }
@@ -241,6 +317,91 @@ object ThemeRepository {
         } catch (e: JsonDataException) {
             null
         }
+    }
+
+    private fun validateThemeJson(themeFile: File): ThemeValidationResult {
+        return try {
+            JsonReader.of(themeFile.source().buffer()).use { reader ->
+                if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
+                    return ThemeValidationResult(false, "Theme data must be a JSON object")
+                }
+
+                reader.beginObject()
+                while (reader.hasNext()) {
+                    when (val field = reader.nextName()) {
+                        "colors" -> {
+                            if (!validateColorObject(reader)) {
+                                return ThemeValidationResult(false, "Theme colors are invalid")
+                            }
+                        }
+                        "flags" -> {
+                            if (!validateFlagObject(reader)) {
+                                return ThemeValidationResult(false, "Theme flags are invalid")
+                            }
+                        }
+                        else -> {
+                            if (isColorField(field)) {
+                                if (readColor(reader) == null) {
+                                    return ThemeValidationResult(false, "Theme color is invalid")
+                                }
+                            } else if (isFlagField(field)) {
+                                if (readFlag(reader) == null) {
+                                    return ThemeValidationResult(false, "Theme flag is invalid")
+                                }
+                            } else {
+                                return ThemeValidationResult(false, "Theme contains an unknown token")
+                            }
+                        }
+                    }
+                }
+                reader.endObject()
+            }
+            ThemeValidationResult(true)
+        } catch (e: IOException) {
+            ThemeValidationResult(false, "Theme data is unreadable")
+        } catch (e: JsonDataException) {
+            ThemeValidationResult(false, "Theme data is invalid")
+        }
+    }
+
+    private fun validateColorObject(reader: JsonReader): Boolean {
+        if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
+            reader.skipValue()
+            return false
+        }
+        reader.beginObject()
+        while (reader.hasNext()) {
+            val key = reader.nextName()
+            if (!isColorField(key) || readColor(reader) == null) {
+                return false
+            }
+        }
+        reader.endObject()
+        return true
+    }
+
+    private fun validateFlagObject(reader: JsonReader): Boolean {
+        if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
+            reader.skipValue()
+            return false
+        }
+        reader.beginObject()
+        while (reader.hasNext()) {
+            val key = reader.nextName()
+            if (!isFlagField(key) || readFlag(reader) == null) {
+                return false
+            }
+        }
+        reader.endObject()
+        return true
+    }
+
+    private fun isValidImage(file: File): Boolean {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        BitmapFactory.decodeFile(file.absolutePath, options)
+        return options.outWidth in 1..MAX_IMAGE_SIDE && options.outHeight in 1..MAX_IMAGE_SIDE
     }
 
     private fun isColorField(field: String): Boolean {

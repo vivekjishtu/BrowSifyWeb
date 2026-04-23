@@ -25,6 +25,7 @@ import jp.hazuki.yuzubrowser.core.utility.log.ErrorReport
 import jp.hazuki.yuzubrowser.core.utility.utils.FileUtils
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.ui.theme.ThemeManifest
+import jp.hazuki.yuzubrowser.ui.theme.ThemeRepository
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -133,7 +134,8 @@ private fun importThemeDirectory(context: Context, root: File, tmpFolder: File):
         return Result(false, context.getString(text))
     }
 
-    if (!File(tmpFolder, "theme.json").isFile) {
+    val validation = ThemeRepository.validateThemeFolder(tmpFolder)
+    if (!validation.isValid) {
         FileUtils.deleteFile(tmpFolder)
         return Result(false, context.getString(R.string.theme_broken_manifest))
     }
