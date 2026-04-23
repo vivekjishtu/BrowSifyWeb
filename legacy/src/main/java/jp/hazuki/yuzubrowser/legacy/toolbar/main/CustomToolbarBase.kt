@@ -40,7 +40,7 @@ open class CustomToolbarBase(
     request_callback: RequestCallback,
     onActionRun: (() -> Unit)? = null
 ) : ToolbarBase(context, toolbarContainer, request_callback) {
-    private val mButtonController: ButtonToolbarController
+    protected val mButtonController: ButtonToolbarController
 
     init {
         ToolbarCustomBinding.inflate(LayoutInflater.from(context), this, true)

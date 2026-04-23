@@ -101,7 +101,7 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
         for (action in actionList) {
             val group = getMenuGroup(action)
             if (lastGroup != Int.MIN_VALUE && group != lastGroup) {
-              //  layout.addView(createDivider(v.context))
+                layout.addView(createDivider(v.context))
             }
             lastGroup = group
             val child = inflater.inflate(R.layout.menu_list_item, v, false)
@@ -195,11 +195,16 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
 
     private fun createDivider(context: Context): View {
         return View(context).apply {
-            background = context.getDrawable(R.drawable.divider)
+            background = context.getDrawable(R.drawable.menu_divider)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+                context.convertDpToPx(1)
+            ).apply {
+                marginStart = context.convertDpToPx(16)
+                marginEnd = context.convertDpToPx(16)
+                topMargin = context.convertDpToPx(6)
+                bottomMargin = context.convertDpToPx(6)
+            }
         }
     }
 
