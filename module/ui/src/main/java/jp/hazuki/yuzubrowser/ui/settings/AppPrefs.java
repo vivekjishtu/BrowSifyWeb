@@ -35,6 +35,7 @@ import jp.hazuki.yuzubrowser.ui.settings.container.LongContainer;
 import jp.hazuki.yuzubrowser.ui.settings.container.StringContainer;
 import jp.hazuki.yuzubrowser.ui.settings.container.ToolbarContainer;
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData;
+import jp.hazuki.yuzubrowser.ui.theme.ThemeRepository;
 
 import static jp.hazuki.yuzubrowser.core.utility.storage.DocumentFileKt.DEFAULT_DOWNLOAD_PATH;
 import static jp.hazuki.yuzubrowser.ui.ConstantsKt.BROWSER_LOAD_URL_TAB_CURRENT;
@@ -211,6 +212,7 @@ public class AppPrefs {
 
 
     public static boolean load(Context context) {
+        ThemeRepository.migrateStoredThemeSetting(context);
         SharedPreferences shared_preference = getPreference(context);
         for (Containable pref : getPreferenceList()) {
             pref.read(shared_preference);

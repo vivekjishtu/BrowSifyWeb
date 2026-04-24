@@ -13,6 +13,7 @@ import android.graphics.Color
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import jp.hazuki.yuzubrowser.core.THEME_DIR
+import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import okio.buffer
 import okio.source
 import java.io.File
@@ -49,6 +50,7 @@ object ThemeRepository {
     const val THEME_LIGHT = "light"
     const val THEME_DARK = "dark"
 
+    private const val THEME_SETTING_KEY = "theme_setting"
     private const val ASSET_THEME_ROOT = "themes"
     private const val THEME_FILE = "theme.json"
     private const val MAX_FILE_COUNT = 100
@@ -71,6 +73,21 @@ object ThemeRepository {
             LEGACY_LIGHT, THEME_LIGHT -> THEME_LIGHT
             else -> id
         }
+    }
+
+    @JvmStatic
+    fun migrateStoredThemeSetting(context: Context): String {
+        val preferences = context.getSharedPreferences(AppPrefs.PREFERENCE_NAME, Context.MODE_PRIVATE)
+        val storedTheme = preferences.getString(THEME_SETTING_KEY, THEME_SYSTEM)
+        val normalizedTheme = normalizeThemeId(storedTheme)
+
+        if (storedTheme != normalizedTheme) {
+            preferences.edit()
+                .putString(THEME_SETTING_KEY, normalizedTheme)
+                .apply()
+        }
+
+        return normalizedTheme
     }
 
     @JvmStatic

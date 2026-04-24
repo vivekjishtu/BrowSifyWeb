@@ -70,9 +70,7 @@ open class ThemeActivity : AppCompatActivity() {
 
     override fun attachBaseContext(newBase: Context) {
         val application = newBase.applicationContext
-        val selectedTheme = ThemeRepository.normalizeThemeId(
-            PrefPool.getSharedPref(application).getString(theme_setting, ThemeData.THEME_AUTO)
-        )
+        val selectedTheme = ThemeRepository.migrateStoredThemeSetting(application)
         if (selectedTheme == ThemeData.THEME_AUTO) {
             // Recreate auto theme on each attach so it tracks system day/night changes.
             ThemeData.createInstance(newBase, ThemeData.THEME_AUTO)
@@ -136,9 +134,5 @@ open class ThemeActivity : AppCompatActivity() {
         override fun getSystemServiceName(serviceClass: Class<*>): String? {
             return baseActivityContext.getSystemServiceName(serviceClass)
         }
-    }
-
-    companion object {
-        private const val theme_setting = "theme_setting"
     }
 }

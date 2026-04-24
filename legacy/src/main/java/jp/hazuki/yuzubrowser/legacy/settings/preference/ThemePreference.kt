@@ -67,7 +67,7 @@ class ThemePreference(context: Context, attrs: AttributeSet) : ListPreference(co
             valueList.add(theme.id)
         }
 
-        val currentValue = ThemeRepository.normalizeThemeId(value)
+        val currentValue = ThemeRepository.migrateStoredThemeSetting(context)
         if (currentValue != value) {
             value = currentValue
         }
