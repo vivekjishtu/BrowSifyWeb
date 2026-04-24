@@ -21,6 +21,12 @@ import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -35,6 +41,10 @@ import jp.hazuki.yuzubrowser.legacy.theme.importTheme
 import jp.hazuki.yuzubrowser.legacy.theme.importThemeDirectory
 import jp.hazuki.yuzubrowser.ui.dialog.ConfirmDialog
 import jp.hazuki.yuzubrowser.ui.extensions.registerForStartActivityForResult
+import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData
+import jp.hazuki.yuzubrowser.ui.theme.ThemeOption
+import jp.hazuki.yuzubrowser.ui.theme.ThemeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -121,6 +131,62 @@ class ThemeManagementFragment : YuzuPreferenceFragment(), ConfirmDialog.OnConfir
             .show(childFragmentManager, "")
     }
 
+    private fun showThemeDetails(theme: ThemeOption) {
+        val context = requireContext()
+        val view = LayoutInflater.from(context).inflate(R.layout.theme_detail_dialog, null, false)
+        view.findViewById<ImageView>(R.id.previewImage).setImageDrawable(
+            ThemeRepository.createPreviewDrawable(context, theme.id)
+        )
+        view.findViewById<TextView>(R.id.metadataView).text = buildMetadataText(theme)
+        view.findViewById<TextView>(R.id.descriptionView).text =
+            theme.description?.takeIf { it.isNotBlank() } ?: getString(R.string.theme_no_description)
+
+        AlertDialog.Builder(context)
+            .setTitle(theme.name)
+            .setView(view)
+            .setPositiveButton(android.R.string.ok, null)
+            .apply {
+                val deleteKey = theme.deleteKey
+                if (deleteKey != null) {
+                    setNeutralButton(R.string.theme_delete) { _, _ ->
+                        deleteThemes(listOf(deleteKey))
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun buildMetadataText(theme: ThemeOption): String {
+        val lines = ArrayList<String>(5)
+        lines += getString(R.string.theme_label_source, themeSource(theme))
+        lines += getString(R.string.theme_label_base, themeBase(theme))
+        theme.version?.let { lines += getString(R.string.theme_label_version, it) }
+        lines += getString(
+            R.string.theme_label_author,
+            theme.author?.takeIf { it.isNotBlank() } ?: getString(R.string.theme_unknown_author)
+        )
+        if (ThemeRepository.normalizeThemeId(AppPrefs.theme_setting.get()) == theme.id) {
+            lines += getString(R.string.theme_current_applied)
+        }
+        return lines.joinToString("\n")
+    }
+
+    private fun themeSource(theme: ThemeOption): String {
+        return when {
+            theme.id == ThemeData.THEME_AUTO -> getString(R.string.theme_source_system)
+            theme.builtIn -> getString(R.string.theme_source_builtin)
+            else -> getString(R.string.theme_source_imported)
+        }
+    }
+
+    private fun themeBase(theme: ThemeOption): String {
+        return when (theme.base) {
+            ThemeRepository.THEME_LIGHT -> getString(R.string.theme_base_light)
+            ThemeRepository.THEME_DARK -> getString(R.string.theme_base_dark)
+            else -> getString(R.string.theme_base_system)
+        }
+    }
+
     override fun onConfirmed(id: Int, data: Bundle?) {
         if (data == null) return
         when (id) {
@@ -155,30 +221,53 @@ class ThemeManagementFragment : YuzuPreferenceFragment(), ConfirmDialog.OnConfir
 
     class ManageThemeDialog : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val items = requireContext()
-                .getExternalFilesDir(THEME_DIR)!!
-                .listFiles()!!
-                .asSequence()
-                .filter { it.name != ".nomedia" }
-                .map { it.name }
-                .toList()
-                .toTypedArray()
+            val fragment = parentFragment as ThemeManagementFragment
+            val context = requireContext()
+            val items = ThemeRepository.listThemes(context)
 
-            val checked = BooleanArray(items.size)
-
-            return AlertDialog.Builder(requireContext())
-                .setTitle(R.string.delete_theme)
-                .setMultiChoiceItems(items, checked) { _, which, isChecked ->
-                    checked[which] = isChecked
-                }
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    val files = items.asSequence()
-                        .filterIndexed { index, _ -> checked[index] }
-                        .toList()
-                    (parentFragment as ThemeManagementFragment).deleteThemes(files)
+            return AlertDialog.Builder(context)
+                .setTitle(R.string.theme_management)
+                .setAdapter(ThemeListAdapter(context, items)) { _, which ->
+                    fragment.showThemeDetails(items[which])
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
+        }
+
+        private class ThemeListAdapter(
+            context: android.content.Context,
+            objects: List<ThemeOption>
+        ) : ArrayAdapter<ThemeOption>(context, 0, objects) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = convertView ?: LayoutInflater.from(context)
+                    .inflate(R.layout.theme_list_item, parent, false)
+
+                val item = getItem(position) ?: return view
+                view.findViewById<ImageView>(R.id.previewImage).setImageDrawable(
+                    ThemeRepository.createPreviewDrawable(context, item.id)
+                )
+                view.findViewById<TextView>(R.id.titleView).text = item.name
+                view.findViewById<TextView>(R.id.summaryView).text = buildSummary(item)
+
+                return view
+            }
+
+            private fun buildSummary(item: ThemeOption): String {
+                val parts = ArrayList<String>(4)
+                parts += when {
+                    item.id == ThemeData.THEME_AUTO -> context.getString(R.string.theme_source_system)
+                    item.builtIn -> context.getString(R.string.theme_source_builtin)
+                    else -> context.getString(R.string.theme_source_imported)
+                }
+                parts += when (item.base) {
+                    ThemeRepository.THEME_LIGHT -> context.getString(R.string.theme_base_light)
+                    ThemeRepository.THEME_DARK -> context.getString(R.string.theme_base_dark)
+                    else -> context.getString(R.string.theme_base_system)
+                }
+                item.version?.let { parts += "v$it" }
+                item.author?.takeIf { it.isNotBlank() }?.let { parts += it }
+                return parts.joinToString(" • ")
+            }
         }
     }
 

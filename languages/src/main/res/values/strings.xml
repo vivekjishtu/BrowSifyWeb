@@ -338,6 +338,7 @@
     <string name="theme_import">Import theme</string>
     <string name="theme_management">Theme management</string>
     <string name="delete_theme">Delete themes</string>
+    <string name="theme_delete">Delete theme</string>
     <string name="theme_importer">Yuzu Browser theme importer</string>
     <string name="theme_imported">%1$s is imported.</string>
     <string name="theme_installed_version">This version of theme is already installed.</string>
@@ -356,6 +357,19 @@
     <string name="theme_invalid_image">Theme package contains an invalid image.</string>
     <string name="theme_same_name">There is already a theme with the same name as \"%1$s\"</string>
     <string name="theme_unknown_version">It does not support the theme of the format of this version.</string>
+    <string name="theme_source_system">System</string>
+    <string name="theme_source_builtin">Built-in</string>
+    <string name="theme_source_imported">Imported</string>
+    <string name="theme_base_light">Light</string>
+    <string name="theme_base_dark">Dark</string>
+    <string name="theme_base_system">Follow device setting</string>
+    <string name="theme_unknown_author">Unknown author</string>
+    <string name="theme_no_description">No description.</string>
+    <string name="theme_label_source">Source: %1$s</string>
+    <string name="theme_label_base">Base: %1$s</string>
+    <string name="theme_label_version">Version: %1$s</string>
+    <string name="theme_label_author">Author: %1$s</string>
+    <string name="theme_current_applied">Currently selected</string>
     <string name="page_not_found">Page not found</string>
     <string name="pinned_tab_warning">This tab is pinned.</string>
     <string name="select_file">Select file</string>

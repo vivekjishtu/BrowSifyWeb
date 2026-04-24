@@ -8,8 +8,13 @@ package jp.hazuki.yuzubrowser.ui.theme
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import jp.hazuki.yuzubrowser.core.THEME_DIR
@@ -24,7 +29,12 @@ import java.util.Locale
 data class ThemeOption(
     val id: String,
     val name: String,
-    val builtIn: Boolean
+    val builtIn: Boolean,
+    val version: String? = null,
+    val author: String? = null,
+    val description: String? = null,
+    val base: String? = null,
+    val deleteKey: String? = null
 )
 
 data class ResolvedTheme(
@@ -137,6 +147,47 @@ object ThemeRepository {
     }
 
     @JvmStatic
+    fun createPreviewDrawable(context: Context, themeId: String): Drawable? {
+        val theme = resolve(context, themeId) ?: return null
+        val density = context.resources.displayMetrics.density
+        val width = (56 * density).toInt().coerceAtLeast(1)
+        val height = (36 * density).toInt().coerceAtLeast(1)
+        val corner = 6 * density
+
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        val background = theme.color("toolbarBackground").orFallback(
+            if (theme.isLight) 0xFFDDDDDD.toInt() else 0xFF121212.toInt()
+        )
+        val status = theme.color("statusBar").orFallback(background)
+        val accent = theme.color("tabAccent")
+            .orFallback(theme.color("progress"))
+            .orFallback(theme.color("toolbarText"))
+            .orFallback(if (theme.isLight) Color.BLACK else Color.WHITE)
+
+        paint.color = background
+        canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), corner, corner, paint)
+
+        paint.color = status
+        canvas.drawRoundRect(0f, 0f, width.toFloat(), height * 0.28f, corner, corner, paint)
+
+        paint.color = adjustColor(background, if (theme.isLight) 0.92f else 1.12f)
+        canvas.drawRect(0f, height * 0.45f, width.toFloat(), height.toFloat(), paint)
+
+        paint.color = accent
+        val inset = 6 * density
+        val lineTop = height - 8 * density
+        canvas.drawRoundRect(inset, lineTop, width - inset, lineTop + 3 * density, density, density, paint)
+
+        val dotRadius = 4 * density
+        canvas.drawCircle(width - inset - dotRadius, height * 0.22f, dotRadius, paint)
+
+        return BitmapDrawable(context.resources, bitmap)
+    }
+
+    @JvmStatic
     fun validateThemeFolder(themeFolder: File): ThemeValidationResult {
         if (!themeFolder.isDirectory) {
             return ThemeValidationResult(false, VALIDATION_NOT_DIRECTORY)
@@ -196,7 +247,7 @@ object ThemeRepository {
     private fun listBuiltInThemes(context: Context): List<ThemeOption> {
         return listOf(THEME_DARK, THEME_LIGHT).mapNotNull { id ->
             loadBuiltInManifest(context, id)?.let { manifest ->
-                ThemeOption(manifest.id, manifest.name, true)
+                manifest.toThemeOption(deleteKey = null)
             }
         }
     }
@@ -209,7 +260,7 @@ object ThemeRepository {
             .filter { validateThemeFolder(it).isValid }
             .mapNotNull { folder ->
                 ThemeManifest.getManifest(folder)?.let { manifest ->
-                    ThemeOption(manifest.id, manifest.name, false)
+                    manifest.toThemeOption(deleteKey = folder.name)
                 }
             }
             .toList()
@@ -439,6 +490,31 @@ object ThemeRepository {
         }
         BitmapFactory.decodeFile(file.absolutePath, options)
         return options.outWidth in 1..MAX_IMAGE_SIDE && options.outHeight in 1..MAX_IMAGE_SIDE
+    }
+
+    private fun ThemeManifest.toThemeOption(deleteKey: String?): ThemeOption {
+        return ThemeOption(
+            id = id,
+            name = name,
+            builtIn = builtIn,
+            version = version,
+            author = author,
+            description = description,
+            base = base,
+            deleteKey = deleteKey
+        )
+    }
+
+    private fun Int.orFallback(fallback: Int): Int {
+        return if (this != 0) this else fallback
+    }
+
+    private fun adjustColor(color: Int, factor: Float): Int {
+        val alpha = Color.alpha(color)
+        val red = (Color.red(color) * factor).toInt().coerceIn(0, 255)
+        val green = (Color.green(color) * factor).toInt().coerceIn(0, 255)
+        val blue = (Color.blue(color) * factor).toInt().coerceIn(0, 255)
+        return Color.argb(alpha, red, green, blue)
     }
 
     private fun isColorField(field: String): Boolean {
