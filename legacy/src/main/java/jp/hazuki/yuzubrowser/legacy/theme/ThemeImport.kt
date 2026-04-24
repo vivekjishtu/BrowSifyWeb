@@ -189,6 +189,8 @@ private fun ThemeValidationResult.toMessageRes(): Int {
         ThemeRepository.VALIDATION_MISSING_MANIFEST -> R.string.theme_manifest_not_found
         ThemeRepository.VALIDATION_INVALID_MANIFEST -> R.string.theme_broken_manifest
         ThemeRepository.VALIDATION_MISSING_THEME_DATA -> R.string.theme_missing_theme_data
+        ThemeRepository.VALIDATION_MISSING_PREVIEW -> R.string.theme_missing_preview
+        ThemeRepository.VALIDATION_INVALID_PREVIEW -> R.string.theme_invalid_preview
         ThemeRepository.VALIDATION_RESERVED_ID -> R.string.theme_reserved_id
         ThemeRepository.VALIDATION_TOO_MANY_FILES -> R.string.theme_too_many_files
         ThemeRepository.VALIDATION_UNSAFE_PATH -> R.string.theme_unsafe_path

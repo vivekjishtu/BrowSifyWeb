@@ -347,6 +347,8 @@
     <string name="cant_create_folder">Can\'t create folder</string>
     <string name="theme_broken_manifest">Broken manifest file</string>
     <string name="theme_missing_theme_data">Theme data file is missing.</string>
+    <string name="theme_missing_preview">Theme preview image is missing.</string>
+    <string name="theme_invalid_preview">Theme preview image is invalid.</string>
     <string name="theme_invalid_theme_data">Theme data file is invalid.</string>
     <string name="theme_reserved_id">Theme id is reserved.</string>
     <string name="theme_too_many_files">Theme package contains too many files.</string>

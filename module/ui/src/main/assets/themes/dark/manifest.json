@@ -4,5 +4,6 @@
   "name": "Dark",
   "version": "1.0.0",
   "base": "dark",
+  "preview": "preview.png",
   "builtin": true
 }

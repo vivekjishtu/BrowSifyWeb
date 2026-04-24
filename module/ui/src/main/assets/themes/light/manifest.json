@@ -4,5 +4,6 @@
   "name": "Light",
   "version": "1.0.0",
   "base": "light",
+  "preview": "preview.png",
   "builtin": true
 }

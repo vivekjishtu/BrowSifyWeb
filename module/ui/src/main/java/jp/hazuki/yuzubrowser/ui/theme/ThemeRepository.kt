@@ -34,6 +34,7 @@ data class ThemeOption(
     val author: String? = null,
     val description: String? = null,
     val base: String? = null,
+    val preview: String? = null,
     val deleteKey: String? = null
 )
 
@@ -83,6 +84,8 @@ object ThemeRepository {
     const val VALIDATION_MISSING_MANIFEST = "missing_manifest"
     const val VALIDATION_RESERVED_ID = "reserved_id"
     const val VALIDATION_MISSING_THEME_DATA = "missing_theme_data"
+    const val VALIDATION_MISSING_PREVIEW = "missing_preview"
+    const val VALIDATION_INVALID_PREVIEW = "invalid_preview"
     const val VALIDATION_THEME_NOT_OBJECT = "theme_not_object"
     const val VALIDATION_INVALID_COLORS = "invalid_colors"
     const val VALIDATION_INVALID_FLAGS = "invalid_flags"
@@ -148,6 +151,23 @@ object ThemeRepository {
 
     @JvmStatic
     fun createPreviewDrawable(context: Context, themeId: String): Drawable? {
+        loadPreviewDrawable(context, themeId)?.let { return it }
+        return createGeneratedPreviewDrawable(context, themeId)
+    }
+
+    @JvmStatic
+    fun loadPreviewDrawable(context: Context, themeId: String): Drawable? {
+        val normalized = normalizeThemeId(themeId)
+        val resolvedId = if (normalized == THEME_SYSTEM) {
+            if (isSystemInLightMode(context)) THEME_LIGHT else THEME_DARK
+        } else {
+            normalized
+        }
+        return loadBuiltInPreview(context, resolvedId)
+            ?: loadInstalledPreview(context, resolvedId)
+    }
+
+    private fun createGeneratedPreviewDrawable(context: Context, themeId: String): Drawable? {
         val theme = resolve(context, themeId) ?: return null
         val density = context.resources.displayMetrics.density
         val width = (56 * density).toInt().coerceAtLeast(1)
@@ -236,6 +256,20 @@ object ThemeRepository {
             return ThemeValidationResult(false, VALIDATION_RESERVED_ID)
         }
 
+        manifest.preview?.takeIf { it.isNotBlank() }?.let { preview ->
+            val previewFile = File(themeFolder, preview)
+            if (!previewFile.isFile) {
+                return ThemeValidationResult(false, VALIDATION_MISSING_PREVIEW)
+            }
+            if (!previewFile.canonicalPath.startsWith(rootPath)) {
+                return ThemeValidationResult(false, VALIDATION_UNSAFE_PATH)
+            }
+            val extension = previewFile.extension.lowercase(Locale.US)
+            if (!isImageExtension(extension) || !isValidImage(previewFile)) {
+                return ThemeValidationResult(false, VALIDATION_INVALID_PREVIEW)
+            }
+        }
+
         val themeFile = File(themeFolder, THEME_FILE)
         if (!themeFile.isFile) {
             return ThemeValidationResult(false, VALIDATION_MISSING_THEME_DATA)
@@ -293,6 +327,20 @@ object ThemeRepository {
         }
     }
 
+    private fun loadBuiltInPreview(context: Context, id: String): Drawable? {
+        val manifest = loadBuiltInManifest(context, id) ?: return null
+        val preview = manifest.preview?.takeIf { it.isNotBlank() } ?: return null
+        return try {
+            context.assets.open("$ASSET_THEME_ROOT/$id/$preview").use { input ->
+                BitmapFactory.decodeStream(input)?.let { bitmap ->
+                    BitmapDrawable(context.resources, bitmap)
+                }
+            }
+        } catch (e: IOException) {
+            null
+        }
+    }
+
     private fun loadInstalledTheme(context: Context, id: String): ResolvedTheme? {
         val root = context.getExternalFilesDir(THEME_DIR) ?: return null
         val directFolder = File(root, id)
@@ -323,6 +371,27 @@ object ThemeRepository {
             null
         } catch (e: JsonDataException) {
             null
+        }
+    }
+
+    private fun loadInstalledPreview(context: Context, id: String): Drawable? {
+        val root = context.getExternalFilesDir(THEME_DIR) ?: return null
+        val directFolder = File(root, id)
+        val folder = if (directFolder.isDirectory) {
+            directFolder
+        } else {
+            root.listFiles()
+                ?.firstOrNull { it.isDirectory && ThemeManifest.getManifest(it)?.id == id }
+                ?: return null
+        }
+        if (!validateThemeFolder(folder).isValid) return null
+
+        val manifest = ThemeManifest.getManifest(folder) ?: return null
+        val preview = manifest.preview?.takeIf { it.isNotBlank() } ?: return null
+        val previewFile = File(folder, preview)
+        if (!previewFile.isFile) return null
+        return BitmapFactory.decodeFile(previewFile.absolutePath)?.let { bitmap ->
+            BitmapDrawable(context.resources, bitmap)
         }
     }
 
@@ -492,6 +561,10 @@ object ThemeRepository {
         return options.outWidth in 1..MAX_IMAGE_SIDE && options.outHeight in 1..MAX_IMAGE_SIDE
     }
 
+    private fun isImageExtension(extension: String): Boolean {
+        return extension in setOf("png", "jpg", "jpeg", "webp")
+    }
+
     private fun ThemeManifest.toThemeOption(deleteKey: String?): ThemeOption {
         return ThemeOption(
             id = id,
@@ -501,6 +574,7 @@ object ThemeRepository {
             author = author,
             description = description,
             base = base,
+            preview = preview,
             deleteKey = deleteKey
         )
     }

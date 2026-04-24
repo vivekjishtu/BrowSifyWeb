@@ -14,7 +14,7 @@
         android:layout_height="120dp"
         android:adjustViewBounds="true"
         android:contentDescription="@null"
-        android:scaleType="fitXY" />
+        android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/metadataView"
