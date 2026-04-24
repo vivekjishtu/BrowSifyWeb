@@ -842,15 +842,22 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             userActionManager.onThemeChanged(themeData)
             toolbar.notifyChangeWebState()
 
-            if (themeData.statusBarColor != 0) {
-                window.run {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-                        @Suppress("DEPRECATION")
-                        clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                    }
-                    addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                    uiController.statusBarColor = themeData.statusBarColor
-                    uiController.isLightStatusBar = themeData.isLightStatusBar
+            window.run {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                    @Suppress("DEPRECATION")
+                    clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                }
+                addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                val statusBarColor = when {
+                    themeData.statusBarColor != 0 -> themeData.statusBarColor
+                    themeData.toolbarBackgroundColor != 0 -> themeData.toolbarBackgroundColor
+                    else -> getResColor(R.color.deep_gray)
+                }
+                uiController.statusBarColor = statusBarColor
+                uiController.isLightStatusBar = if (themeData.statusBarColor != 0) {
+                    themeData.useLightStatusBarAppearance()
+                } else {
+                    ThemeData.isColorLight(statusBarColor)
                 }
             }
 

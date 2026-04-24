@@ -16,7 +16,6 @@
 
 package jp.hazuki.yuzubrowser.ui.app
 
-import android.graphics.Color
 import android.os.Build
 import android.view.*
 import androidx.annotation.CallSuper
@@ -105,9 +104,11 @@ sealed class SystemUiController(
             super.updateConfigure()
 
             window.also {
-                // Set transparent bars for edge-to-edge.
-                it.statusBarColor = Color.TRANSPARENT
-                it.navigationBarColor = Color.TRANSPARENT
+                it.statusBarColor = statusBarColor
+                it.navigationBarColor = navigationBarColor
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    it.isNavigationBarContrastEnforced = false
+                }
 
                 var appearance = 0
                 if (isLightStatusBar) {
@@ -188,8 +189,8 @@ sealed class SystemUiController(
             window.also {
                 it.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                 it.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                it.statusBarColor = Color.TRANSPARENT
-                it.navigationBarColor = Color.TRANSPARENT
+                it.statusBarColor = statusBarColor
+                it.navigationBarColor = navigationBarColor
 
                 it.decorView.systemUiVisibility = getFlags()
             }

@@ -311,7 +311,7 @@ class YuzuWebSettings(private val origin: WebSettings) {
 
     var webTheme: Int = 0
         set(value) {
-            if (value !in 0..4) throw IllegalArgumentException("webTheme")
+            if (value !in WEB_THEME_LIGHT..WEB_THEME_FORCE_DARK) throw IllegalArgumentException("webTheme")
             field = value
 
             setWebTheme()
@@ -386,21 +386,33 @@ class YuzuWebSettings(private val origin: WebSettings) {
     @SuppressLint("RequiresFeature")
     @Suppress("DEPRECATION")
     private fun setWebTheme() {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) &&
-            WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
-
-            if (webTheme == WEB_THEME_LIGHT) {
-                WebSettingsCompat.setForceDark(origin, WebSettingsCompat.FORCE_DARK_OFF)
-            } else {
-                WebSettingsCompat.setForceDark(origin, WebSettingsCompat.FORCE_DARK_ON)
-                val strategy = when (webTheme) {
-                    WEB_THEME_DARK -> WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
-                    WEB_THEME_PREFER_WEB_OVER_FORCE_DARK -> WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING
-                    WEB_THEME_FORCE_DARK -> WebSettingsCompat.DARK_STRATEGY_USER_AGENT_DARKENING_ONLY
-                    else -> throw IllegalStateException()
-                }
-                WebSettingsCompat.setForceDarkStrategy(origin, strategy)
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+            val allowAlgorithmicDarkening = when (webTheme) {
+                WEB_THEME_LIGHT, WEB_THEME_DARK -> false
+                WEB_THEME_PREFER_WEB_OVER_FORCE_DARK, WEB_THEME_FORCE_DARK -> true
+                else -> throw IllegalStateException("Invalid web theme: $webTheme")
             }
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(origin, allowAlgorithmicDarkening)
+        }
+
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+            return
+        }
+
+        if (webTheme == WEB_THEME_LIGHT) {
+            WebSettingsCompat.setForceDark(origin, WebSettingsCompat.FORCE_DARK_OFF)
+            return
+        }
+
+        WebSettingsCompat.setForceDark(origin, WebSettingsCompat.FORCE_DARK_ON)
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
+            val strategy = when (webTheme) {
+                WEB_THEME_DARK -> WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
+                WEB_THEME_PREFER_WEB_OVER_FORCE_DARK -> WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING
+                WEB_THEME_FORCE_DARK -> WebSettingsCompat.DARK_STRATEGY_USER_AGENT_DARKENING_ONLY
+                else -> throw IllegalStateException("Invalid web theme: $webTheme")
+            }
+            WebSettingsCompat.setForceDarkStrategy(origin, strategy)
         }
     }
 

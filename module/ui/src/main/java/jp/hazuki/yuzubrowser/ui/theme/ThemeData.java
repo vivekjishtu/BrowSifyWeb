@@ -134,6 +134,10 @@ public class ThemeData {
         return sInstance != null && (sInstance.statusBarDarkIcon || sInstance.isLightStatusBar());
     }
 
+    public boolean useLightStatusBarAppearance() {
+        return statusBarDarkIcon || isLightStatusBar();
+    }
+
     @SuppressWarnings("deprecation")
     public static int getSystemUiVisibilityFlag() {
         if (isUseLightStatusBar()) {
