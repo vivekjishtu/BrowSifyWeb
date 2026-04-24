@@ -345,6 +345,15 @@
     <string name="theme_manifest_not_found">Manifest not found</string>
     <string name="cant_create_folder">Can\'t create folder</string>
     <string name="theme_broken_manifest">Broken manifest file</string>
+    <string name="theme_missing_theme_data">Theme data file is missing.</string>
+    <string name="theme_invalid_theme_data">Theme data file is invalid.</string>
+    <string name="theme_reserved_id">Theme id is reserved.</string>
+    <string name="theme_too_many_files">Theme package contains too many files.</string>
+    <string name="theme_unsafe_path">Theme package contains an unsafe path.</string>
+    <string name="theme_file_too_large">Theme package contains a file that is too large.</string>
+    <string name="theme_package_too_large">Theme package is too large.</string>
+    <string name="theme_unsupported_file_type">Theme package contains an unsupported file type.</string>
+    <string name="theme_invalid_image">Theme package contains an invalid image.</string>
     <string name="theme_same_name">There is already a theme with the same name as \"%1$s\"</string>
     <string name="theme_unknown_version">It does not support the theme of the format of this version.</string>
     <string name="page_not_found">Page not found</string>

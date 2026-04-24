@@ -62,6 +62,26 @@ object ThemeRepository {
     private const val LEGACY_LIGHT = "theme://internal/light"
     private const val LEGACY_DARK = ""
 
+    const val VALIDATION_NOT_DIRECTORY = "not_directory"
+    const val VALIDATION_TOO_MANY_FILES = "too_many_files"
+    const val VALIDATION_UNSAFE_PATH = "unsafe_path"
+    const val VALIDATION_FILE_TOO_LARGE = "file_too_large"
+    const val VALIDATION_PACKAGE_TOO_LARGE = "package_too_large"
+    const val VALIDATION_UNSUPPORTED_FILE_TYPE = "unsupported_file_type"
+    const val VALIDATION_INVALID_IMAGE = "invalid_image"
+    const val VALIDATION_INVALID_MANIFEST = "invalid_manifest"
+    const val VALIDATION_MISSING_MANIFEST = "missing_manifest"
+    const val VALIDATION_RESERVED_ID = "reserved_id"
+    const val VALIDATION_MISSING_THEME_DATA = "missing_theme_data"
+    const val VALIDATION_THEME_NOT_OBJECT = "theme_not_object"
+    const val VALIDATION_INVALID_COLORS = "invalid_colors"
+    const val VALIDATION_INVALID_FLAGS = "invalid_flags"
+    const val VALIDATION_INVALID_COLOR = "invalid_color"
+    const val VALIDATION_INVALID_FLAG = "invalid_flag"
+    const val VALIDATION_UNKNOWN_TOKEN = "unknown_token"
+    const val VALIDATION_UNREADABLE_THEME_DATA = "unreadable_theme_data"
+    const val VALIDATION_INVALID_THEME_DATA = "invalid_theme_data"
+
     private val reservedThemeIds = setOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK)
     private val allowedExtensions = setOf("json", "png", "jpg", "jpeg", "webp")
 
@@ -119,7 +139,7 @@ object ThemeRepository {
     @JvmStatic
     fun validateThemeFolder(themeFolder: File): ThemeValidationResult {
         if (!themeFolder.isDirectory) {
-            return ThemeValidationResult(false, "Theme package is not a folder")
+            return ThemeValidationResult(false, VALIDATION_NOT_DIRECTORY)
         }
 
         val files = themeFolder.walkTopDown()
@@ -127,47 +147,47 @@ object ThemeRepository {
             .toList()
 
         if (files.size > MAX_FILE_COUNT) {
-            return ThemeValidationResult(false, "Theme package has too many files")
+            return ThemeValidationResult(false, VALIDATION_TOO_MANY_FILES)
         }
 
         var totalBytes = 0L
         val rootPath = themeFolder.canonicalPath + File.separator
         files.forEach { file ->
             if (!file.canonicalPath.startsWith(rootPath)) {
-                return ThemeValidationResult(false, "Theme package contains an unsafe path")
+                return ThemeValidationResult(false, VALIDATION_UNSAFE_PATH)
             }
 
             if (file.length() > MAX_FILE_BYTES) {
-                return ThemeValidationResult(false, "Theme package contains a file that is too large")
+                return ThemeValidationResult(false, VALIDATION_FILE_TOO_LARGE)
             }
             totalBytes += file.length()
             if (totalBytes > MAX_TOTAL_BYTES) {
-                return ThemeValidationResult(false, "Theme package is too large")
+                return ThemeValidationResult(false, VALIDATION_PACKAGE_TOO_LARGE)
             }
 
             val extension = file.extension.lowercase(Locale.US)
             if (extension !in allowedExtensions) {
-                return ThemeValidationResult(false, "Theme package contains an unsupported file type")
+                return ThemeValidationResult(false, VALIDATION_UNSUPPORTED_FILE_TYPE)
             }
 
             if (extension in setOf("png", "jpg", "jpeg", "webp") && !isValidImage(file)) {
-                return ThemeValidationResult(false, "Theme package contains an invalid image")
+                return ThemeValidationResult(false, VALIDATION_INVALID_IMAGE)
             }
         }
 
         val manifest = try {
             ThemeManifest.decodeManifest(File(themeFolder, ThemeManifest.MANIFEST))
         } catch (e: ThemeManifest.IllegalManifestException) {
-            return ThemeValidationResult(false, "Theme manifest is invalid")
-        } ?: return ThemeValidationResult(false, "Theme manifest is missing")
+            return ThemeValidationResult(false, VALIDATION_INVALID_MANIFEST)
+        } ?: return ThemeValidationResult(false, VALIDATION_MISSING_MANIFEST)
 
         if (manifest.id in reservedThemeIds) {
-            return ThemeValidationResult(false, "Theme id is reserved")
+            return ThemeValidationResult(false, VALIDATION_RESERVED_ID)
         }
 
         val themeFile = File(themeFolder, THEME_FILE)
         if (!themeFile.isFile) {
-            return ThemeValidationResult(false, "Theme data is missing")
+            return ThemeValidationResult(false, VALIDATION_MISSING_THEME_DATA)
         }
 
         return validateThemeJson(themeFile)
@@ -340,7 +360,7 @@ object ThemeRepository {
         return try {
             JsonReader.of(themeFile.source().buffer()).use { reader ->
                 if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
-                    return ThemeValidationResult(false, "Theme data must be a JSON object")
+                    return ThemeValidationResult(false, VALIDATION_THEME_NOT_OBJECT)
                 }
 
                 reader.beginObject()
@@ -348,25 +368,25 @@ object ThemeRepository {
                     when (val field = reader.nextName()) {
                         "colors" -> {
                             if (!validateColorObject(reader)) {
-                                return ThemeValidationResult(false, "Theme colors are invalid")
+                                return ThemeValidationResult(false, VALIDATION_INVALID_COLORS)
                             }
                         }
                         "flags" -> {
                             if (!validateFlagObject(reader)) {
-                                return ThemeValidationResult(false, "Theme flags are invalid")
+                                return ThemeValidationResult(false, VALIDATION_INVALID_FLAGS)
                             }
                         }
                         else -> {
                             if (isColorField(field)) {
                                 if (readColor(reader) == null) {
-                                    return ThemeValidationResult(false, "Theme color is invalid")
+                                    return ThemeValidationResult(false, VALIDATION_INVALID_COLOR)
                                 }
                             } else if (isFlagField(field)) {
                                 if (readFlag(reader) == null) {
-                                    return ThemeValidationResult(false, "Theme flag is invalid")
+                                    return ThemeValidationResult(false, VALIDATION_INVALID_FLAG)
                                 }
                             } else {
-                                return ThemeValidationResult(false, "Theme contains an unknown token")
+                                return ThemeValidationResult(false, VALIDATION_UNKNOWN_TOKEN)
                             }
                         }
                     }
@@ -375,9 +395,9 @@ object ThemeRepository {
             }
             ThemeValidationResult(true)
         } catch (e: IOException) {
-            ThemeValidationResult(false, "Theme data is unreadable")
+            ThemeValidationResult(false, VALIDATION_UNREADABLE_THEME_DATA)
         } catch (e: JsonDataException) {
-            ThemeValidationResult(false, "Theme data is invalid")
+            ThemeValidationResult(false, VALIDATION_INVALID_THEME_DATA)
         }
     }
 

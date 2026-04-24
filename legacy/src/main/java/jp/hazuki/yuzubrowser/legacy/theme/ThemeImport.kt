@@ -26,6 +26,7 @@ import jp.hazuki.yuzubrowser.core.utility.utils.FileUtils
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.ui.theme.ThemeManifest
 import jp.hazuki.yuzubrowser.ui.theme.ThemeRepository
+import jp.hazuki.yuzubrowser.ui.theme.ThemeValidationResult
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -137,7 +138,7 @@ private fun importThemeDirectory(context: Context, root: File, tmpFolder: File):
     val validation = ThemeRepository.validateThemeFolder(tmpFolder)
     if (!validation.isValid) {
         FileUtils.deleteFile(tmpFolder)
-        return Result(false, context.getString(R.string.theme_broken_manifest))
+        return Result(false, context.getString(validation.toMessageRes()))
     }
 
     val folderName = FileUtils.replaceProhibitionWord(manifest.id)
@@ -182,3 +183,28 @@ private fun importThemeDirectory(context: Context, root: File, tmpFolder: File):
 }
 
 class Result constructor(val isSuccess: Boolean, val message: String)
+
+private fun ThemeValidationResult.toMessageRes(): Int {
+    return when (reason) {
+        ThemeRepository.VALIDATION_MISSING_MANIFEST -> R.string.theme_manifest_not_found
+        ThemeRepository.VALIDATION_INVALID_MANIFEST -> R.string.theme_broken_manifest
+        ThemeRepository.VALIDATION_MISSING_THEME_DATA -> R.string.theme_missing_theme_data
+        ThemeRepository.VALIDATION_RESERVED_ID -> R.string.theme_reserved_id
+        ThemeRepository.VALIDATION_TOO_MANY_FILES -> R.string.theme_too_many_files
+        ThemeRepository.VALIDATION_UNSAFE_PATH -> R.string.theme_unsafe_path
+        ThemeRepository.VALIDATION_FILE_TOO_LARGE -> R.string.theme_file_too_large
+        ThemeRepository.VALIDATION_PACKAGE_TOO_LARGE -> R.string.theme_package_too_large
+        ThemeRepository.VALIDATION_UNSUPPORTED_FILE_TYPE -> R.string.theme_unsupported_file_type
+        ThemeRepository.VALIDATION_INVALID_IMAGE -> R.string.theme_invalid_image
+        ThemeRepository.VALIDATION_THEME_NOT_OBJECT,
+        ThemeRepository.VALIDATION_INVALID_COLORS,
+        ThemeRepository.VALIDATION_INVALID_FLAGS,
+        ThemeRepository.VALIDATION_INVALID_COLOR,
+        ThemeRepository.VALIDATION_INVALID_FLAG,
+        ThemeRepository.VALIDATION_UNKNOWN_TOKEN,
+        ThemeRepository.VALIDATION_UNREADABLE_THEME_DATA,
+        ThemeRepository.VALIDATION_INVALID_THEME_DATA,
+        ThemeRepository.VALIDATION_NOT_DIRECTORY -> R.string.theme_invalid_theme_data
+        else -> R.string.theme_unknown_error
+    }
+}
