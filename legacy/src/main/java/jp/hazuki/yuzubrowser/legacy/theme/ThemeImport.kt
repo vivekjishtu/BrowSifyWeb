@@ -207,6 +207,7 @@ private fun ThemeValidationResult.toMessageRes(): Int {
         ThemeRepository.VALIDATION_UNREADABLE_THEME_DATA,
         ThemeRepository.VALIDATION_INVALID_THEME_DATA,
         ThemeRepository.VALIDATION_NOT_DIRECTORY -> R.string.theme_invalid_theme_data
+        ThemeRepository.VALIDATION_LOW_CONTRAST -> R.string.theme_low_contrast
         else -> R.string.theme_unknown_error
     }
 }

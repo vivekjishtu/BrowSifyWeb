@@ -38,8 +38,11 @@ public class ThemeData {
     private boolean statusBarDarkIcon;
     public boolean refreshUseDark;
     public boolean lightTheme;
+    @Nullable
+    public final ResolvedTheme resolvedTheme;
 
     private ThemeData(Context context, ResolvedTheme theme) {
+        resolvedTheme = theme;
         lightTheme = theme.isLight();
 
         tabTextColorNormal = theme.color("tabTextNormal");

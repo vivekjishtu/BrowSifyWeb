@@ -94,6 +94,7 @@ object ThemeRepository {
     const val VALIDATION_UNKNOWN_TOKEN = "unknown_token"
     const val VALIDATION_UNREADABLE_THEME_DATA = "unreadable_theme_data"
     const val VALIDATION_INVALID_THEME_DATA = "invalid_theme_data"
+    const val VALIDATION_LOW_CONTRAST = "low_contrast"
 
     private val reservedThemeIds = setOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK)
     private val allowedExtensions = setOf("json", "png", "jpg", "jpeg", "webp")
@@ -407,14 +408,15 @@ object ThemeRepository {
 
             reader.beginObject()
             while (reader.hasNext()) {
-                when (val field = reader.nextName()) {
-                    "colors" -> readColors(reader, colors)
-                    "flags" -> readFlags(reader, flags)
+                val name = reader.nextName()
+                when (name) {
+                    "colors", "tokens" -> readColors(reader, colors)
+                    "flags", "systemBars", "web" -> readFlags(reader, flags)
                     else -> {
-                        if (isColorField(field)) {
-                            readColor(reader)?.let { colors[field] = it }
-                        } else if (isFlagField(field)) {
-                            readFlag(reader)?.let { flags[field] = it }
+                        if (isColorField(name)) {
+                            readColor(reader)?.let { colors[name] = it }
+                        } else if (isFlagField(name)) {
+                            readFlag(reader)?.let { flags[name] = it }
                         } else {
                             reader.skipValue()
                         }
@@ -477,7 +479,8 @@ object ThemeRepository {
     }
 
     private fun validateThemeJson(themeFile: File): ThemeValidationResult {
-        return try {
+        val colors = mutableMapOf<String, Int>()
+        try {
             JsonReader.of(themeFile.source().buffer()).use { reader ->
                 if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
                     return ThemeValidationResult(false, VALIDATION_THEME_NOT_OBJECT)
@@ -485,22 +488,25 @@ object ThemeRepository {
 
                 reader.beginObject()
                 while (reader.hasNext()) {
-                    when (val field = reader.nextName()) {
-                        "colors" -> {
-                            if (!validateColorObject(reader)) {
+                    val field = reader.nextName()
+                    when (field) {
+                        "colors", "tokens" -> {
+                            if (!validateColorObject(reader, colors)) {
                                 return ThemeValidationResult(false, VALIDATION_INVALID_COLORS)
                             }
                         }
-                        "flags" -> {
+                        "flags", "systemBars", "web" -> {
                             if (!validateFlagObject(reader)) {
                                 return ThemeValidationResult(false, VALIDATION_INVALID_FLAGS)
                             }
                         }
                         else -> {
                             if (isColorField(field)) {
-                                if (readColor(reader) == null) {
+                                val color = readColor(reader)
+                                if (color == null) {
                                     return ThemeValidationResult(false, VALIDATION_INVALID_COLOR)
                                 }
+                                colors[field] = color
                             } else if (isFlagField(field)) {
                                 if (readFlag(reader) == null) {
                                     return ThemeValidationResult(false, VALIDATION_INVALID_FLAG)
@@ -513,15 +519,20 @@ object ThemeRepository {
                 }
                 reader.endObject()
             }
-            ThemeValidationResult(true)
+
+            if (!checkContrast(colors)) {
+                return ThemeValidationResult(false, VALIDATION_LOW_CONTRAST)
+            }
+
+            return ThemeValidationResult(true)
         } catch (e: IOException) {
-            ThemeValidationResult(false, VALIDATION_UNREADABLE_THEME_DATA)
+            return ThemeValidationResult(false, VALIDATION_UNREADABLE_THEME_DATA)
         } catch (e: JsonDataException) {
-            ThemeValidationResult(false, VALIDATION_INVALID_THEME_DATA)
+            return ThemeValidationResult(false, VALIDATION_INVALID_THEME_DATA)
         }
     }
 
-    private fun validateColorObject(reader: JsonReader): Boolean {
+    private fun validateColorObject(reader: JsonReader, colors: MutableMap<String, Int>): Boolean {
         if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
             reader.skipValue()
             return false
@@ -529,12 +540,40 @@ object ThemeRepository {
         reader.beginObject()
         while (reader.hasNext()) {
             val key = reader.nextName()
-            if (!isColorField(key) || readColor(reader) == null) {
+            val color = readColor(reader)
+            if (!isColorField(key) || color == null) {
                 return false
             }
+            colors[key] = color
         }
         reader.endObject()
         return true
+    }
+
+    private fun checkContrast(colors: Map<String, Int>): Boolean {
+        val background = colors["toolbarBackground"] ?: return true
+        val text = colors["toolbarText"] ?: return true
+
+        val contrast = calculateContrast(background, text)
+        return contrast >= 3.0 // WCAG AA for large text/icons
+    }
+
+    private fun calculateContrast(color1: Int, color2: Int): Double {
+        val l1 = calculateLuminance(color1)
+        val l2 = calculateLuminance(color2)
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
+    }
+
+    private fun calculateLuminance(color: Int): Double {
+        var r = Color.red(color) / 255.0
+        var g = Color.green(color) / 255.0
+        var b = Color.blue(color) / 255.0
+
+        r = if (r <= 0.03928) r / 12.92 else Math.pow((r + 0.055) / 1.055, 2.4)
+        g = if (g <= 0.03928) g / 12.92 else Math.pow((g + 0.055) / 1.055, 2.4)
+        b = if (b <= 0.03928) b / 12.92 else Math.pow((b + 0.055) / 1.055, 2.4)
+
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
     }
 
     private fun validateFlagObject(reader: JsonReader): Boolean {

@@ -344,6 +344,7 @@
     <string name="theme_installed_version">This version of theme is already installed.</string>
     <string name="theme_unknown_error">Unknown error</string>
     <string name="theme_manifest_not_found">Manifest not found</string>
+    <string name="theme_low_contrast">Theme has too low contrast to be readable</string>
     <string name="cant_create_folder">Can\'t create folder</string>
     <string name="theme_broken_manifest">Broken manifest file</string>
     <string name="theme_missing_theme_data">Theme data file is missing.</string>

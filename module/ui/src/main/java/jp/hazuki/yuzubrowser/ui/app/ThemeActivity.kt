@@ -17,6 +17,7 @@
 package jp.hazuki.yuzubrowser.ui.app
 
 import android.annotation.SuppressLint
+import android.app.UiModeManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
@@ -29,7 +30,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
+import com.google.android.material.color.DynamicColors
 import jp.hazuki.yuzubrowser.core.utility.utils.createLanguageConfig
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
@@ -44,6 +47,11 @@ open class ThemeActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
+
+        if (isDynamicColorEnabled()) {
+            DynamicColors.applyToActivityIfAvailable(this)
+        }
+
         super.onCreate(savedInstanceState)
     }
 
@@ -64,6 +72,7 @@ open class ThemeActivity : AppCompatActivity() {
                 }
             }
         }
+        updateSystemBarIcons()
     }
 
     protected open fun shouldApplySystemBarPadding(): Boolean = true
@@ -81,7 +90,7 @@ open class ThemeActivity : AppCompatActivity() {
         val isLightMode = isLightMode(selectedTheme, newBase)
         val config = newBase.createLanguageConfig(AppPrefs.language.get())
 
-        applyThemeMode(isLightMode, selectedTheme)
+        applyThemeMode(newBase, isLightMode, selectedTheme)
         if (selectedTheme != ThemeData.THEME_AUTO) {
             config.updateTheme(isLightMode)
         }
@@ -89,21 +98,48 @@ open class ThemeActivity : AppCompatActivity() {
         super.attachBaseContext(ContextCompat(newBase.createConfigurationContext(config), newBase))
     }
 
-    private fun applyThemeMode(isLightMode: Boolean, selectedTheme: String) {
-        if (selectedTheme == ThemeData.THEME_AUTO) {
-            if (AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            }
-            return
+    private fun applyThemeMode(context: Context, isLightMode: Boolean, selectedTheme: String) {
+        val mode = when {
+            selectedTheme == ThemeData.THEME_AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            isLightMode -> AppCompatDelegate.MODE_NIGHT_NO
+            else -> AppCompatDelegate.MODE_NIGHT_YES
         }
-        val defaultMode = AppCompatDelegate.getDefaultNightMode()
-        if (isLightMode) {
-            if (defaultMode != AppCompatDelegate.MODE_NIGHT_NO) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+        if (AppCompatDelegate.getDefaultNightMode() != mode) {
+            AppCompatDelegate.setDefaultNightMode(mode)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+            val appMode = when (mode) {
+                AppCompatDelegate.MODE_NIGHT_YES -> UiModeManager.MODE_NIGHT_YES
+                AppCompatDelegate.MODE_NIGHT_NO -> UiModeManager.MODE_NIGHT_NO
+                else -> UiModeManager.MODE_NIGHT_AUTO
             }
-        } else {
-            if (defaultMode != AppCompatDelegate.MODE_NIGHT_YES) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            try {
+                val getter = uiModeManager.javaClass.getMethod("getApplicationNightMode")
+                val setter = uiModeManager.javaClass.getMethod("setApplicationNightMode", Int::class.javaPrimitiveType)
+                val currentMode = getter.invoke(uiModeManager) as Int
+                if (currentMode != appMode) {
+                    setter.invoke(uiModeManager, appMode)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun updateSystemBarIcons() {
+        val theme = ThemeData.getInstance() ?: return
+        val isLight = theme.lightTheme
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.isAppearanceLightStatusBars = isLight
+        controller.isAppearanceLightNavigationBars = isLight
+
+        // Allow theme override if explicitly set
+        theme.resolvedTheme?.let { resolved ->
+            if (resolved.flags.containsKey("statusBarDarkIcon")) {
+                controller.isAppearanceLightStatusBars = resolved.flag("statusBarDarkIcon")
             }
         }
     }
@@ -120,6 +156,10 @@ open class ThemeActivity : AppCompatActivity() {
         val newNightMode = if (isLightMode) Configuration.UI_MODE_NIGHT_NO else Configuration.UI_MODE_NIGHT_YES
 
         uiMode = newNightMode or (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv())
+    }
+
+    protected open fun isDynamicColorEnabled(): Boolean {
+        return AppPrefs.theme_setting.get() == "dynamic"
     }
 
     private class ContextCompat(

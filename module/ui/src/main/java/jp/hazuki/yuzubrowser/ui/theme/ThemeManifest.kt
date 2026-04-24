@@ -41,7 +41,7 @@ private constructor(
     companion object {
         const val MANIFEST = "manifest.json"
 
-        private const val FORMAT_VERSION = 1
+        private const val FORMAT_VERSION = 2
 
         private const val FIELD_FORMAT_VERSION = "format_version"
         private const val FIELD_VERSION = "version"
