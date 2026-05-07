@@ -32,6 +32,7 @@ public class ThemeData {
     public int progressColor, progressIndeterminateColor;
     public int toolbarBackgroundColor;
     public int toolbarTextColor, toolbarImageColor;
+    public int urlBarBackgroundColor, urlBarBorderColor;
     public Drawable toolbarButtonBackgroundPressDrawable, toolbarTextButtonBackgroundPressDrawable;
     public ShapeDrawable toolbarButtonBackgroundPress, toolbarTextButtonBackgroundPress;
     public int qcItemBackgroundColorNormal, qcItemBackgroundColorSelect, qcItemColor;
@@ -66,6 +67,8 @@ public class ThemeData {
         toolbarBackgroundColor = theme.color("toolbarBackground");
         toolbarTextColor = theme.color("toolbarText");
         toolbarImageColor = theme.color("toolbarIcon");
+        urlBarBackgroundColor = theme.color("urlBarBackground");
+        urlBarBorderColor = theme.color("urlBarBorder");
 
         Drawable toolbarButtonPressDrawable = theme.drawable("toolbarButtonPress");
         if (toolbarButtonPressDrawable != null) {

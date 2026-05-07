@@ -747,6 +747,8 @@ object ThemeRepository {
                 "toolbarText",
                 "toolbarIcon",
                 "toolbarButtonPress",
+                "urlBarBackground",
+                "urlBarBorder",
                 "tabAccent",
                 "tabDivider",
                 "tabTextNormal",

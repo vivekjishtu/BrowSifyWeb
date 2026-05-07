@@ -4,6 +4,8 @@
     "toolbarBackground": "#FFF8E4B8",
     "toolbarText": "#FF2E2210",
     "toolbarIcon": "#FF5D431D",
+    "urlBarBackground": "#FFF7F1E7",
+    "urlBarBorder": "#FFD3B06E",
     "tabTextNormal": "#FF6C542E",
     "tabTextLock": "#FF117B5C",
     "tabTextPin": "#FF9C5B00",

@@ -17,6 +17,8 @@
 package jp.hazuki.yuzubrowser.legacy.toolbar.main
 
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -82,6 +84,7 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
         super.applyTheme(themeData)
         applyTheme(mLeftButtonController)
         applyTheme(mRightButtonController)
+        applyUrlBoxTheme(themeData)
     }
 
     private fun addButtons() {
@@ -114,8 +117,8 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
                     setTypeUrl(true)
                     text = context.getString(R.string.omnibox_placeholder)
                     gravity = Gravity.START or Gravity.CENTER_VERTICAL
-                    setTextColor(ContextCompat.getColor(context, R.color.omnibox_placeholder_color))
-                    setStartIcon(R.drawable.ic_search_white_24dp, R.color.omnibox_placeholder_color)
+                    setTextColor(getPlaceholderTextColor())
+                    setStartIcon(R.drawable.ic_search_white_24dp, null, getPlaceholderTextColor())
                 }
                 return@post
             }
@@ -153,14 +156,14 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
             return
         }
 
-        setStartIcon(iconRes, null)
+        setStartIcon(iconRes, null, centerUrlButton.currentTextColor)
     }
 
-    private fun setStartIcon(drawableRes: Int, tintColorRes: Int?) {
+    private fun setStartIcon(drawableRes: Int, tintColorRes: Int?, explicitTint: Int? = null) {
         val sizePx = context.convertDpToPx(16)
         val drawable = ContextCompat.getDrawable(context, drawableRes)?.mutate()
         if (drawable != null) {
-            val tintColor = tintColorRes?.let { ContextCompat.getColor(context, it) } ?: centerUrlButton.currentTextColor
+            val tintColor = explicitTint ?: tintColorRes?.let { ContextCompat.getColor(context, it) } ?: centerUrlButton.currentTextColor
             DrawableCompat.setTint(drawable, tintColor)
             drawable.setBounds(0, 0, sizePx, sizePx)
         }
@@ -187,6 +190,41 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
             val start = paddingStart
             val end = paddingStart + drawableWidth + drawablePadding
             x >= start && x <= end
+        }
+    }
+
+    private fun applyUrlBoxTheme(themeData: ThemeData?) {
+        if (!AppPrefs.toolbar_url_box.get()) return
+
+        val background = centerUrlButton.background?.mutate() ?: return
+        val fillColor = themeData?.urlBarBackgroundColor ?: 0
+        val borderColor = themeData?.urlBarBorderColor ?: 0
+        val strokeFallback = themeData?.toolbarTextColor ?: 0
+
+        if (background is LayerDrawable) {
+            val mainShape = background.getDrawable(1) as? GradientDrawable
+            if (mainShape != null) {
+                if (fillColor != 0) {
+                    mainShape.setColor(fillColor)
+                }
+                if (borderColor != 0) {
+                    mainShape.setStroke(context.convertDpToPx(1), borderColor)
+                } else if (strokeFallback != 0) {
+                    mainShape.setStroke(context.convertDpToPx(1), strokeFallback and 0x55FFFFFF)
+                }
+            }
+            centerUrlButton.background = background
+        }
+    }
+
+    private fun getPlaceholderTextColor(): Int {
+        val theme = ThemeData.getInstance()
+        val textColor = theme?.toolbarTextColor ?: 0
+        return if (textColor != 0) {
+            val alpha = if (theme?.lightTheme == true) 0x88 else 0xAA
+            (textColor and 0x00FFFFFF) or (alpha shl 24)
+        } else {
+            ContextCompat.getColor(context, R.color.omnibox_placeholder_color)
         }
     }
 
