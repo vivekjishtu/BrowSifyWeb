@@ -26,6 +26,7 @@ public class ThemeData {
     public static final String THEME_AUTO = ThemeRepository.THEME_SYSTEM;
 
     public Drawable tabBackgroundNormal, tabBackgroundSelect;
+    public Drawable tabStripBackgroundDrawable;
     public int tabTextColorNormal, tabTextColorLock, tabTextColorPin, tabTextColorSelect, tabAccentColor, tabDividerColor;
     public int scrollbarAccentColor;
     public boolean showTabDivider;
@@ -56,6 +57,7 @@ public class ThemeData {
         tabDividerColor = theme.color("tabDivider");
         scrollbarAccentColor = theme.color("scrollbarAccent");
         showTabDivider = theme.flag("showTabDivider");
+        tabStripBackgroundDrawable = theme.drawable("tabStripBackgroundDrawable");
         tabBackgroundNormal = theme.drawable("tabBackgroundNormal");
         tabBackgroundSelect = theme.drawable("tabBackgroundSelected");
         if (tabBackgroundSelect == null) {

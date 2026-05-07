@@ -79,6 +79,7 @@ class TabBar(context: Context, controller: ActionController, iconManager: Action
         val data = themeData
         if (data != null) {
             when {
+                data.tabStripBackgroundDrawable != null -> binding.linearLayout.background = data.tabStripBackgroundDrawable
                 data.statusBarColor != 0 -> binding.linearLayout.setBackgroundColor(data.statusBarColor)
                 data.toolbarBackgroundColor != 0 -> binding.linearLayout.setBackgroundColor(data.toolbarBackgroundColor)
                 else -> binding.linearLayout.setBackgroundResource(R.color.toolbar_tab_bg)

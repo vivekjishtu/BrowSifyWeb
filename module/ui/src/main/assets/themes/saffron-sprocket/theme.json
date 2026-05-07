@@ -26,6 +26,7 @@
     "pullToRefreshDark": false
   },
   "drawables": {
+    "tabStripBackgroundDrawable": "tab_strip_bg.png",
     "tabBackgroundNormal": "tab_bg_normal.png",
     "tabBackgroundSelected": "tab_bg_selected.png",
     "toolbarButtonPress": "toolbar_button_press.png",

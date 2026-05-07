@@ -108,6 +108,7 @@ object ThemeRepository {
     private val reservedThemeIds = setOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK)
     private val allowedExtensions = setOf("json", "png", "jpg", "jpeg", "webp")
     private val drawableFields = setOf(
+        "tabStripBackgroundDrawable",
         "tabBackgroundNormal",
         "tabBackgroundSelect",
         "tabBackgroundSelected",
