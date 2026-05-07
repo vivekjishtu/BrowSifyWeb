@@ -1,0 +1,31 @@
+{
+  "tokens": {
+    "accent": "#FFB96B00",
+    "toolbarBackground": "#FFF8E4B8",
+    "toolbarText": "#FF2E2210",
+    "toolbarIcon": "#FF5D431D",
+    "tabTextNormal": "#FF6C542E",
+    "tabTextLock": "#FF117B5C",
+    "tabTextPin": "#FF9C5B00",
+    "tabTextSelected": "#FF24170B",
+    "tabAccent": "#FFE08A00",
+    "tabDivider": "#FFD7B15F",
+    "statusBar": "#FFECCB84",
+    "progress": "#FFCD6E00",
+    "progressIndeterminate": "#FFF0A52E",
+    "scrollbarAccent": "#FFDA7B00",
+    "qcItemBackgroundNormal": "#D9FFF1D1",
+    "qcItemBackgroundSelected": "#FFFFC95B",
+    "qcItem": "#FF4A330A"
+  },
+  "flags": {
+    "showTabDivider": true,
+    "statusBarDarkIcon": true,
+    "pullToRefreshDark": false
+  },
+  "drawables": {
+    "tabBackgroundNormal": "tab_bg_normal.png",
+    "tabBackgroundSelected": "tab_bg_selected.png",
+    "toolbarButtonPress": "toolbar_button_press.png"
+  }
+}

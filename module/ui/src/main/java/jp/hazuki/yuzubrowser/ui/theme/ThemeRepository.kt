@@ -41,7 +41,8 @@ data class ThemeOption(
 data class ResolvedTheme(
     val manifest: ThemeManifest,
     val colors: Map<String, Int>,
-    val flags: Map<String, Boolean>
+    val flags: Map<String, Boolean>,
+    private val drawables: Map<String, Drawable>
 ) {
     val isLight: Boolean
         get() = manifest.base == ThemeRepository.THEME_LIGHT
@@ -49,6 +50,11 @@ data class ResolvedTheme(
     fun color(name: String): Int = colors[name] ?: 0
 
     fun flag(name: String): Boolean = flags[name] ?: false
+
+    fun drawable(name: String): Drawable? {
+        val drawable = drawables[name] ?: return null
+        return drawable.constantState?.newDrawable()?.mutate() ?: drawable.mutate()
+    }
 }
 
 data class ThemeValidationResult(
@@ -95,9 +101,18 @@ object ThemeRepository {
     const val VALIDATION_UNREADABLE_THEME_DATA = "unreadable_theme_data"
     const val VALIDATION_INVALID_THEME_DATA = "invalid_theme_data"
     const val VALIDATION_LOW_CONTRAST = "low_contrast"
+    const val VALIDATION_INVALID_DRAWABLES = "invalid_drawables"
+    const val VALIDATION_INVALID_DRAWABLE = "invalid_drawable"
+    const val VALIDATION_MISSING_DRAWABLE = "missing_drawable"
 
     private val reservedThemeIds = setOf(THEME_SYSTEM, THEME_LIGHT, THEME_DARK)
     private val allowedExtensions = setOf("json", "png", "jpg", "jpeg", "webp")
+    private val drawableFields = setOf(
+        "tabBackgroundNormal",
+        "tabBackgroundSelect",
+        "tabBackgroundSelected",
+        "toolbarButtonPress"
+    )
 
     @JvmStatic
     fun normalizeThemeId(id: String?): String {
@@ -280,11 +295,16 @@ object ThemeRepository {
     }
 
     private fun listBuiltInThemes(context: Context): List<ThemeOption> {
-        return listOf(THEME_DARK, THEME_LIGHT).mapNotNull { id ->
-            loadBuiltInManifest(context, id)?.let { manifest ->
-                manifest.toThemeOption(deleteKey = null)
+        return context.assets.list(ASSET_THEME_ROOT)
+            ?.asSequence()
+            ?.sorted()
+            ?.mapNotNull { id ->
+                loadBuiltInManifest(context, id)?.let { manifest ->
+                    manifest.toThemeOption(deleteKey = null)
+                }
             }
-        }
+            ?.toList()
+            ?: emptyList()
     }
 
     private fun listInstalledThemes(context: Context): List<ThemeOption> {
@@ -307,7 +327,13 @@ object ThemeRepository {
                 ThemeManifest.decodeManifest(it)
             }
             context.assets.open("$ASSET_THEME_ROOT/$id/$THEME_FILE").use {
-                decodeTheme(manifest, it)
+                decodeTheme(manifest, it) { path ->
+                    context.assets.open("$ASSET_THEME_ROOT/$id/$path").use { drawableInput ->
+                        BitmapFactory.decodeStream(drawableInput)?.let { bitmap ->
+                            BitmapDrawable(context.resources, bitmap)
+                        }
+                    }
+                }
             }
         } catch (e: IOException) {
             null
@@ -357,13 +383,23 @@ object ThemeRepository {
         val manifest = ThemeManifest.getManifest(folder) ?: return null
         return try {
             val theme = File(folder, THEME_FILE).inputStream().use {
-                decodeTheme(manifest, it)
+                decodeTheme(manifest, it) { path ->
+                    val file = File(folder, path)
+                    if (!file.isFile) {
+                        null
+                    } else {
+                        BitmapFactory.decodeFile(file.absolutePath)?.let { bitmap ->
+                            BitmapDrawable(context.resources, bitmap)
+                        }
+                    }
+                }
             }
             val baseTheme = loadBuiltInTheme(context, manifest.base)
             if (baseTheme != null) {
                 theme.copy(
                     colors = baseTheme.colors + theme.colors,
-                    flags = baseTheme.flags + theme.flags
+                    flags = baseTheme.flags + theme.flags,
+                    drawables = baseTheme.drawableMap() + theme.drawableMap()
                 )
             } else {
                 theme
@@ -397,14 +433,19 @@ object ThemeRepository {
     }
 
     @Throws(IOException::class)
-    private fun decodeTheme(manifest: ThemeManifest, inputStream: InputStream): ResolvedTheme {
+    private fun decodeTheme(
+        manifest: ThemeManifest,
+        inputStream: InputStream,
+        drawableLoader: (String) -> Drawable?
+    ): ResolvedTheme {
         JsonReader.of(inputStream.source().buffer()).use { reader ->
             if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
-                return ResolvedTheme(manifest, emptyMap(), emptyMap())
+                return ResolvedTheme(manifest, emptyMap(), emptyMap(), emptyMap())
             }
 
             val colors = mutableMapOf<String, Int>()
             val flags = mutableMapOf<String, Boolean>()
+            val drawableRefs = mutableMapOf<String, String>()
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -412,6 +453,7 @@ object ThemeRepository {
                 when (name) {
                     "colors", "tokens" -> readColors(reader, colors)
                     "flags", "systemBars", "web" -> readFlags(reader, flags)
+                    "drawables" -> readDrawables(reader, drawableRefs)
                     else -> {
                         if (isColorField(name)) {
                             readColor(reader)?.let { colors[name] = it }
@@ -425,7 +467,12 @@ object ThemeRepository {
             }
             reader.endObject()
 
-            return ResolvedTheme(manifest, colors, flags)
+            val drawables = mutableMapOf<String, Drawable>()
+            drawableRefs.forEach { (key, value) ->
+                drawableLoader(value)?.let { drawables[key] = it }
+            }
+
+            return ResolvedTheme(manifest, colors, flags, drawables)
         }
     }
 
@@ -455,6 +502,26 @@ object ThemeRepository {
         reader.endObject()
     }
 
+    private fun readDrawables(reader: JsonReader, drawables: MutableMap<String, String>) {
+        if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
+            reader.skipValue()
+            return
+        }
+        reader.beginObject()
+        while (reader.hasNext()) {
+            val key = reader.nextName()
+            val value = try {
+                reader.nextString().trim()
+            } catch (e: JsonDataException) {
+                null
+            }
+            if (isDrawableField(key) && !value.isNullOrEmpty()) {
+                drawables[key] = value
+            }
+        }
+        reader.endObject()
+    }
+
     private fun readColor(reader: JsonReader): Int? {
         return try {
             val value = reader.nextString().trim()
@@ -480,6 +547,7 @@ object ThemeRepository {
 
     private fun validateThemeJson(themeFile: File): ThemeValidationResult {
         val colors = mutableMapOf<String, Int>()
+        val themeFolder = themeFile.parentFile ?: return ThemeValidationResult(false, VALIDATION_INVALID_THEME_DATA)
         try {
             JsonReader.of(themeFile.source().buffer()).use { reader ->
                 if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
@@ -498,6 +566,11 @@ object ThemeRepository {
                         "flags", "systemBars", "web" -> {
                             if (!validateFlagObject(reader)) {
                                 return ThemeValidationResult(false, VALIDATION_INVALID_FLAGS)
+                            }
+                        }
+                        "drawables" -> {
+                            if (!validateDrawableObject(themeFolder, reader)) {
+                                return ThemeValidationResult(false, VALIDATION_INVALID_DRAWABLES)
                             }
                         }
                         else -> {
@@ -592,6 +665,38 @@ object ThemeRepository {
         return true
     }
 
+    private fun validateDrawableObject(themeFolder: File, reader: JsonReader): Boolean {
+        if (reader.peek() != JsonReader.Token.BEGIN_OBJECT) {
+            reader.skipValue()
+            return false
+        }
+        val rootPath = themeFolder.canonicalPath + File.separator
+        reader.beginObject()
+        while (reader.hasNext()) {
+            val key = reader.nextName()
+            val value = try {
+                reader.nextString().trim()
+            } catch (e: JsonDataException) {
+                return false
+            }
+            if (!isDrawableField(key) || value.isEmpty()) {
+                return false
+            }
+            val file = File(themeFolder, value)
+            if (!file.isFile) {
+                return false
+            }
+            if (!file.canonicalPath.startsWith(rootPath)) {
+                return false
+            }
+            if (!isImageExtension(file.extension.lowercase(Locale.US)) || !isValidImage(file)) {
+                return false
+            }
+        }
+        reader.endObject()
+        return true
+    }
+
     private fun isValidImage(file: File): Boolean {
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
@@ -656,6 +761,16 @@ object ThemeRepository {
 
     private fun isFlagField(field: String): Boolean {
         return field in setOf("showTabDivider", "statusBarDarkIcon", "pullToRefreshDark")
+    }
+
+    private fun isDrawableField(field: String): Boolean {
+        return field in drawableFields
+    }
+
+    private fun ResolvedTheme.drawableMap(): Map<String, Drawable> {
+        return drawableFields.mapNotNull { key ->
+            drawable(key)?.let { key to it }
+        }.toMap()
     }
 
     private fun isSystemInLightMode(context: Context): Boolean {

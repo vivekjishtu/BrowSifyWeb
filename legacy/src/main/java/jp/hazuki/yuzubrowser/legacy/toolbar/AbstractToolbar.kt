@@ -39,9 +39,13 @@ open class AbstractToolbar(context: Context) : LinearLayout(context) {
         else
             null
 
-        if (themeData?.toolbarButtonBackgroundPress != null) {
-            val press: Drawable
-            press = themeData.toolbarButtonBackgroundPress
+        if (themeData?.toolbarButtonBackgroundPressDrawable != null) {
+            val drawable = StateListDrawable()
+            drawable.addState(intArrayOf(android.R.attr.state_pressed), themeData.toolbarButtonBackgroundPressDrawable)
+            drawable.addState(StateSet.WILD_CARD, resources.getDrawable(R.drawable.swipebtn_image_background_normal, context.theme))
+            THEME_BUTTON_BG = drawable
+        } else if (themeData?.toolbarButtonBackgroundPress != null) {
+            val press: Drawable = themeData.toolbarButtonBackgroundPress
             val drawable = StateListDrawable()
             drawable.addState(intArrayOf(android.R.attr.state_pressed), press)
             drawable.addState(StateSet.WILD_CARD, resources.getDrawable(R.drawable.swipebtn_image_background_normal, context.theme))

@@ -32,6 +32,7 @@ public class ThemeData {
     public int progressColor, progressIndeterminateColor;
     public int toolbarBackgroundColor;
     public int toolbarTextColor, toolbarImageColor;
+    public Drawable toolbarButtonBackgroundPressDrawable, toolbarTextButtonBackgroundPressDrawable;
     public ShapeDrawable toolbarButtonBackgroundPress, toolbarTextButtonBackgroundPress;
     public int qcItemBackgroundColorNormal, qcItemBackgroundColorSelect, qcItemColor;
     public int statusBarColor;
@@ -53,6 +54,11 @@ public class ThemeData {
         tabDividerColor = theme.color("tabDivider");
         scrollbarAccentColor = theme.color("scrollbarAccent");
         showTabDivider = theme.flag("showTabDivider");
+        tabBackgroundNormal = theme.drawable("tabBackgroundNormal");
+        tabBackgroundSelect = theme.drawable("tabBackgroundSelected");
+        if (tabBackgroundSelect == null) {
+            tabBackgroundSelect = theme.drawable("tabBackgroundSelect");
+        }
 
         progressColor = theme.color("progress");
         progressIndeterminateColor = theme.color("progressIndeterminate");
@@ -61,19 +67,25 @@ public class ThemeData {
         toolbarTextColor = theme.color("toolbarText");
         toolbarImageColor = theme.color("toolbarIcon");
 
-        int toolbarButtonPress = theme.color("toolbarButtonPress");
-        if (toolbarButtonPress != 0) {
-            int padding = context.getResources().getDimensionPixelOffset(R.dimen.dimen_theme_padding);
-            Rect paddingRect = new Rect(padding, padding, padding, padding);
-            Rect textPaddingRect = new Rect(padding, 0, padding, 0);
+        Drawable toolbarButtonPressDrawable = theme.drawable("toolbarButtonPress");
+        if (toolbarButtonPressDrawable != null) {
+            this.toolbarButtonBackgroundPressDrawable = toolbarButtonPressDrawable;
+            this.toolbarTextButtonBackgroundPressDrawable = theme.drawable("toolbarButtonPress");
+        } else {
+            int toolbarButtonPress = theme.color("toolbarButtonPress");
+            if (toolbarButtonPress != 0) {
+                int padding = context.getResources().getDimensionPixelOffset(R.dimen.dimen_theme_padding);
+                Rect paddingRect = new Rect(padding, padding, padding, padding);
+                Rect textPaddingRect = new Rect(padding, 0, padding, 0);
 
-            toolbarButtonBackgroundPress = new ShapeDrawable(new RectShape());
-            toolbarButtonBackgroundPress.setPadding(paddingRect);
-            toolbarButtonBackgroundPress.getPaint().setColor(toolbarButtonPress);
+                toolbarButtonBackgroundPress = new ShapeDrawable(new RectShape());
+                toolbarButtonBackgroundPress.setPadding(paddingRect);
+                toolbarButtonBackgroundPress.getPaint().setColor(toolbarButtonPress);
 
-            toolbarTextButtonBackgroundPress = new ShapeDrawable(new RectShape());
-            toolbarTextButtonBackgroundPress.setPadding(textPaddingRect);
-            toolbarTextButtonBackgroundPress.getPaint().setColor(toolbarButtonPress);
+                toolbarTextButtonBackgroundPress = new ShapeDrawable(new RectShape());
+                toolbarTextButtonBackgroundPress.setPadding(textPaddingRect);
+                toolbarTextButtonBackgroundPress.getPaint().setColor(toolbarButtonPress);
+            }
         }
 
         qcItemBackgroundColorNormal = theme.color("qcItemBackgroundNormal");

@@ -204,6 +204,9 @@ private fun ThemeValidationResult.toMessageRes(): Int {
         ThemeRepository.VALIDATION_INVALID_COLOR,
         ThemeRepository.VALIDATION_INVALID_FLAG,
         ThemeRepository.VALIDATION_UNKNOWN_TOKEN,
+        ThemeRepository.VALIDATION_INVALID_DRAWABLES,
+        ThemeRepository.VALIDATION_INVALID_DRAWABLE,
+        ThemeRepository.VALIDATION_MISSING_DRAWABLE,
         ThemeRepository.VALIDATION_UNREADABLE_THEME_DATA,
         ThemeRepository.VALIDATION_INVALID_THEME_DATA,
         ThemeRepository.VALIDATION_NOT_DIRECTORY -> R.string.theme_invalid_theme_data

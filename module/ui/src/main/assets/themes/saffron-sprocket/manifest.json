@@ -1,0 +1,11 @@
+{
+  "format_version": 2,
+  "id": "saffron-sprocket",
+  "name": "Saffron Sprocket",
+  "version": "1.0.0",
+  "author": "Codex",
+  "description": "A bright editorial showcase theme with warm saffron chrome, inked accents, and file-backed assets.",
+  "base": "light",
+  "preview": "preview.png",
+  "builtin": true
+}

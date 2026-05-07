@@ -76,6 +76,16 @@ class TabBar(context: Context, controller: ActionController, iconManager: Action
 
     override fun applyTheme(themeData: ThemeData?) {
         super.applyTheme(themeData)
+        val data = themeData
+        if (data != null) {
+            when {
+                data.statusBarColor != 0 -> binding.linearLayout.setBackgroundColor(data.statusBarColor)
+                data.toolbarBackgroundColor != 0 -> binding.linearLayout.setBackgroundColor(data.toolbarBackgroundColor)
+                else -> binding.linearLayout.setBackgroundResource(R.color.toolbar_tab_bg)
+            }
+        } else {
+            binding.linearLayout.setBackgroundResource(R.color.toolbar_tab_bg)
+        }
         applyTheme(mLeftButtonController)
         applyTheme(mRightButtonController)
         mTabLayout.applyTheme(themeData)
