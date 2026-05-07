@@ -33,6 +33,7 @@ public class ThemeData {
     public int toolbarBackgroundColor;
     public int toolbarTextColor, toolbarImageColor;
     public int urlBarBackgroundColor, urlBarBorderColor;
+    public Drawable urlBarBackgroundDrawable;
     public Drawable toolbarButtonBackgroundPressDrawable, toolbarTextButtonBackgroundPressDrawable;
     public ShapeDrawable toolbarButtonBackgroundPress, toolbarTextButtonBackgroundPress;
     public int qcItemBackgroundColorNormal, qcItemBackgroundColorSelect, qcItemColor;
@@ -69,6 +70,7 @@ public class ThemeData {
         toolbarImageColor = theme.color("toolbarIcon");
         urlBarBackgroundColor = theme.color("urlBarBackground");
         urlBarBorderColor = theme.color("urlBarBorder");
+        urlBarBackgroundDrawable = theme.drawable("urlBarBackgroundDrawable");
 
         Drawable toolbarButtonPressDrawable = theme.drawable("toolbarButtonPress");
         if (toolbarButtonPressDrawable != null) {

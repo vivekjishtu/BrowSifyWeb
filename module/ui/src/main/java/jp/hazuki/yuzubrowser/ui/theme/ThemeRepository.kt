@@ -111,7 +111,8 @@ object ThemeRepository {
         "tabBackgroundNormal",
         "tabBackgroundSelect",
         "tabBackgroundSelected",
-        "toolbarButtonPress"
+        "toolbarButtonPress",
+        "urlBarBackgroundDrawable"
     )
 
     @JvmStatic

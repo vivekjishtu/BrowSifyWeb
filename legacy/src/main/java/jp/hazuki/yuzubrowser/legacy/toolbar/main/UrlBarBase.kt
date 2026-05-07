@@ -196,6 +196,12 @@ abstract class UrlBarBase(context: Context, controller: ActionController, iconMa
     private fun applyUrlBoxTheme(themeData: ThemeData?) {
         if (!AppPrefs.toolbar_url_box.get()) return
 
+        val themedDrawable = themeData?.urlBarBackgroundDrawable
+        if (themedDrawable != null) {
+            centerUrlButton.background = themedDrawable
+            return
+        }
+
         val background = centerUrlButton.background?.mutate() ?: return
         val fillColor = themeData?.urlBarBackgroundColor ?: 0
         val borderColor = themeData?.urlBarBorderColor ?: 0

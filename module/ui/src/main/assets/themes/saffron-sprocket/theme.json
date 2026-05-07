@@ -28,6 +28,7 @@
   "drawables": {
     "tabBackgroundNormal": "tab_bg_normal.png",
     "tabBackgroundSelected": "tab_bg_selected.png",
-    "toolbarButtonPress": "toolbar_button_press.png"
+    "toolbarButtonPress": "toolbar_button_press.png",
+    "urlBarBackgroundDrawable": "url_bar_box.png"
   }
 }
