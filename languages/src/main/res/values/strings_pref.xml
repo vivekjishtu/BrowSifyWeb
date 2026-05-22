@@ -140,6 +140,9 @@
     <string name="pref_pause_web_tab_change_disable_summary">Disabled due to a bug in WebView</string>
     <string name="pref_btn_custom">Custom bar button</string>
     <string name="pref_custom_bar">Custom bar</string>
+    <string name="pref_custom_bar_placement">Show custom bar in</string>
+    <string name="pref_custom_bar_placement_main_menu">Main menu</string>
+    <string name="pref_custom_bar_placement_browser_ui">Browser UI</string>
     <string name="pref_save_formdata">Save data of web forms</string>
     <string name="pref_web_app_cache">Enable application cache</string>
     <string name="pref_web_geolocation">Enable geolocation</string>

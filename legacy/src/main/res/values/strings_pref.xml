@@ -122,6 +122,16 @@
         <item>4</item>
     </integer-array>
 
+    <string-array name="pref_custom_toolbar_placement_list">
+        <item>@string/pref_custom_bar_placement_main_menu</item>
+        <item>@string/pref_custom_bar_placement_browser_ui</item>
+    </string-array>
+
+    <integer-array name="pref_custom_toolbar_placement_values">
+        <item>0</item>
+        <item>1</item>
+    </integer-array>
+
     <string-array name="pref_toolbar_location_landscape_priority_list" translatable="false">
         <item>@string/pref_toolbar_location_undefine</item>
         <item>"1"</item>

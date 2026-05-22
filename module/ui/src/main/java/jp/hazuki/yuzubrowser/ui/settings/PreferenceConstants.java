@@ -30,4 +30,7 @@ public class PreferenceConstants {
 
     public static final int TOOLBAR_LOCATION_UNDEFINED = -1;
     public static final int TOOLBAR_LOCATION_TOP = 0;
+
+    public static final int CUSTOM_TOOLBAR_PLACEMENT_MAIN_MENU = 0;
+    public static final int CUSTOM_TOOLBAR_PLACEMENT_BROWSER_UI = 1;
 }

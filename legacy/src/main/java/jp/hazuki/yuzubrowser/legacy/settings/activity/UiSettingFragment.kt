@@ -62,6 +62,12 @@ class UiSettingFragment : YuzuPreferenceFragment() {
         bindIntSummary("toolbar_size_url", AppPrefs.toolbar_url.size.get(), "dp")
         bindIntSummary("toolbar_size_progress", AppPrefs.toolbar_progress.size.get(), "dp")
         bindIntSummary("toolbar_size_custom1", AppPrefs.toolbar_custom1.size.get(), "dp")
+        bindListSummary(
+            "toolbar_placement_custom1",
+            AppPrefs.toolbar_custom1_placement.get(),
+            R.array.pref_custom_toolbar_placement_list,
+            R.array.pref_custom_toolbar_placement_values
+        )
         bindIntSummary("toolbar_text_size_url", AppPrefs.toolbar_text_size_url.get(), "sp")
         bindIntSummary("tab_size_x", AppPrefs.tab_size_x.get(), "dp")
         bindIntSummary("tab_font_size", AppPrefs.tab_font_size.get(), "sp")
@@ -69,7 +75,7 @@ class UiSettingFragment : YuzuPreferenceFragment() {
         bindToolbarCardSummary("ps_toolbar_tab", "toolbar_size_tab")
         bindToolbarCardSummary("ps_toolbar_url", "toolbar_size_url")
         bindToolbarCardSummary("ps_toolbar_progress", "toolbar_size_progress")
-        bindToolbarCardSummary("ps_toolbar_custom", "toolbar_size_custom1")
+        bindToolbarCardSummary("ps_toolbar_custom", "toolbar_size_custom1", "toolbar_placement_custom1")
 
         setFragmentResultListener(ThemeManagementFragment.REQUEST_THEME_LIST_UPDATE) { _, bundle ->
             if (bundle.getBoolean(ThemeManagementFragment.REQUEST_THEME_LIST_UPDATE)) {
@@ -78,15 +84,23 @@ class UiSettingFragment : YuzuPreferenceFragment() {
         }
     }
 
-    private fun bindToolbarCardSummary(toolbarKey: String, sizeKey: String) {
+    private fun bindToolbarCardSummary(toolbarKey: String, sizeKey: String, placementKey: String? = null) {
         val toolbarPreference = findPreference<PreferenceScreen>(toolbarKey) ?: return
         val sizePreference = findPreference<Preference>(sizeKey) ?: return
+        val placementPreference = placementKey?.let { findPreference<Preference>(it) }
 
         toolbarPreference.summaryProvider = Preference.SummaryProvider<PreferenceScreen> {
             val sizeSummary = sizePreference.summaryProvider?.provideSummary(sizePreference)
                 ?: sizePreference.summary
                 ?: ""
-            "${getString(R.string.pref_toolbar_size)}: $sizeSummary"
+            val placementSummary = placementPreference?.summaryProvider?.provideSummary(placementPreference)
+                ?: placementPreference?.summary
+
+            if (placementSummary != null) {
+                "${getString(R.string.pref_custom_bar_placement)}: $placementSummary\n${getString(R.string.pref_toolbar_size)}: $sizeSummary"
+            } else {
+                "${getString(R.string.pref_toolbar_size)}: $sizeSummary"
+            }
         }
     }
 
@@ -95,6 +109,17 @@ class UiSettingFragment : YuzuPreferenceFragment() {
         preference.summaryProvider = Preference.SummaryProvider<Preference> { pref ->
             val value = pref.preferenceManager.sharedPreferences?.getInt(key, defaultValue) ?: defaultValue
             if (suffix.isEmpty()) value.toString() else "$value $suffix"
+        }
+    }
+
+    private fun bindListSummary(key: String, defaultValue: Int, entriesId: Int, valuesId: Int) {
+        val preference = findPreference<Preference>(key) ?: return
+        val entries = resources.getStringArray(entriesId)
+        val values = resources.getIntArray(valuesId)
+        preference.summaryProvider = Preference.SummaryProvider<Preference> { pref ->
+            val value = pref.preferenceManager.sharedPreferences?.getInt(key, defaultValue) ?: defaultValue
+            val index = values.indexOf(value)
+            if (index >= 0 && index < entries.size) entries[index] else ""
         }
     }
 }

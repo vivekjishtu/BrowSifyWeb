@@ -59,6 +59,7 @@ public class AppPrefs {
     public static final BooleanContainer toolbar_url_box = new BooleanContainer("toolbar_url_box", true);
     public static final ToolbarContainer toolbar_progress = new ToolbarContainer("progress", 1);
     public static final ToolbarContainer toolbar_custom1 = new ToolbarContainer("custom1", 1);
+    public static final IntContainer toolbar_custom1_placement = new IntContainer("toolbar_placement_custom1", PreferenceConstants.CUSTOM_TOOLBAR_PLACEMENT_MAIN_MENU);
     public static final BooleanContainer toolbar_always_show_url = new BooleanContainer("toolbar_always_show_url", true);
     public static final BooleanContainer toolbar_show_favicon = new BooleanContainer("toolbar_show_favicon", true);
     public static final BooleanContainer toolbar_auto_open = new BooleanContainer("toolbar_auto_open", true);
