@@ -91,7 +91,7 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
             customToolbarContainer.addView(
                 toolbar,
                 LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
                     context.convertDpToPx(AppPrefs.toolbar_custom1.size.get())
                 )
             )
