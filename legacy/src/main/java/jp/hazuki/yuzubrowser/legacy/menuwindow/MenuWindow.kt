@@ -17,7 +17,11 @@
 package jp.hazuki.yuzubrowser.legacy.menuwindow
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -45,6 +49,7 @@ typealias OnMenuCloseListener = () -> Unit
 class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: ActionController, private val iconManager: ActionIconManager) : PopupWindow.OnDismissListener {
 
     private val windowMargin = context.convertDpToPx(4)
+    private val cornerRadius = context.convertDpToPx(8).toFloat()
     private val window = PopupWindow(context)
     private val handler = Handler(Looper.getMainLooper())
     private val visibleFrame = Rect()
@@ -52,6 +57,13 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
     private var locking = false
     private var mListener: OnMenuCloseListener? = null
     private var menuCustomToolbar: MenuCustomToolbar? = null
+    private val themeData = ThemeData.getInstance()
+    private val menuBackgroundColor = themeData?.menuBackgroundColor.orFallback(themeData?.toolbarBackgroundColor ?: 0xFF303134.toInt())
+    private val menuBorderColor = themeData?.menuBorderColor.orFallback(themeData?.menuDividerColor ?: adjustColor(menuBackgroundColor, if (themeData?.lightTheme == true) 0.78f else 1.22f))
+    private val menuTextColor = themeData?.menuTextColor.orFallback(themeData?.toolbarTextColor ?: 0xFFE8EAED.toInt())
+    private val menuIconColor = themeData?.menuIconColor.orFallback(themeData?.toolbarImageColor ?: menuTextColor)
+    private val menuDividerColor = themeData?.menuDividerColor.orFallback(adjustColor(menuBackgroundColor, if (themeData?.lightTheme == true) 0.82f else 1.18f))
+    private val menuItemPressedColor = themeData?.menuItemPressedColor.orFallback(adjustColor(menuBackgroundColor, if (themeData?.lightTheme == true) 0.94f else 1.10f))
 
     init {
         val inflater = LayoutInflater.from(context)
@@ -65,7 +77,7 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
         window.isOutsideTouchable = true
         window.height = LinearLayout.LayoutParams.WRAP_CONTENT
         window.width = LinearLayout.LayoutParams.WRAP_CONTENT
-        window.setBackgroundDrawable(context.getDrawable(R.drawable.menu_drop_down_background))
+        window.setBackgroundDrawable(createMenuBackground())
         window.elevation = context.convertDpToFloatPx(10)
         window.setOnDismissListener(this)
         window.contentView.isFocusableInTouchMode = true
@@ -88,6 +100,7 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
             menuCustomToolbar = toolbar
             customToolbarContainer.visibility = View.VISIBLE
             customToolbarDivider.visibility = View.VISIBLE
+            customToolbarDivider.background = createDividerDrawable()
             customToolbarContainer.addView(
                 toolbar,
                 LinearLayout.LayoutParams(
@@ -107,15 +120,18 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
             val child = inflater.inflate(R.layout.menu_list_item, v, false)
             val icon = child.findViewById<ImageView>(R.id.iconImageView)
             val name = child.findViewById<TextView>(R.id.actionNameTextView)
+            child.background = createMenuItemBackground()
             if (fontSize >= 0) {
                 name.textSize = fontSize.toFloat()
             }
+            name.setTextColor(menuTextColor)
             child.setOnClickListener {
                 controller.run(action)
                 window.dismiss()
             }
             if (AppPrefs.menu_icon.get()) {
                 icon.setImageDrawable(iconManager[action])
+                icon.imageTintList = ColorStateList.valueOf(menuIconColor)
             } else {
                 icon.visibility = View.GONE
             }
@@ -257,7 +273,7 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
 
     private fun createDivider(context: Context): View {
         return View(context).apply {
-            background = context.getDrawable(R.drawable.menu_divider)
+            background = createDividerDrawable()
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 context.convertDpToPx(1)
@@ -298,4 +314,47 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
     }
 
     private val lock = { locking = false }
+
+    private fun createMenuBackground(): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = this@MenuWindow.cornerRadius
+            setColor(menuBackgroundColor)
+            setStroke(1, menuBorderColor)
+        }
+    }
+
+    private fun createMenuItemBackground(): StateListDrawable {
+        return StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), createMenuItemShape(menuItemPressedColor))
+            addState(intArrayOf(android.R.attr.state_focused), createMenuItemShape(menuItemPressedColor))
+            addState(intArrayOf(), createMenuItemShape(Color.TRANSPARENT))
+        }
+    }
+
+    private fun createMenuItemShape(color: Int): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(color)
+        }
+    }
+
+    private fun createDividerDrawable(): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(menuDividerColor)
+        }
+    }
+
+    private fun Int?.orFallback(fallback: Int): Int {
+        return if (this != null && this != 0) this else fallback
+    }
+
+    private fun adjustColor(color: Int, factor: Float): Int {
+        val alpha = android.graphics.Color.alpha(color)
+        val red = (android.graphics.Color.red(color) * factor).toInt().coerceIn(0, 255)
+        val green = (android.graphics.Color.green(color) * factor).toInt().coerceIn(0, 255)
+        val blue = (android.graphics.Color.blue(color) * factor).toInt().coerceIn(0, 255)
+        return android.graphics.Color.argb(alpha, red, green, blue)
+    }
 }

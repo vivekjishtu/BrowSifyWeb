@@ -37,6 +37,8 @@ public class ThemeData {
     public Drawable urlBarBackgroundDrawable;
     public Drawable toolbarButtonBackgroundPressDrawable, toolbarTextButtonBackgroundPressDrawable;
     public ShapeDrawable toolbarButtonBackgroundPress, toolbarTextButtonBackgroundPress;
+    public int menuBackgroundColor, menuBorderColor, menuTextColor, menuIconColor, menuDividerColor, menuItemPressedColor;
+    public int menuToolbarButtonColor, menuToolbarButtonPressedColor;
     public int qcItemBackgroundColorNormal, qcItemBackgroundColorSelect, qcItemColor;
     public int statusBarColor;
     private boolean statusBarDarkIcon;
@@ -73,6 +75,14 @@ public class ThemeData {
         urlBarBackgroundColor = theme.color("urlBarBackground");
         urlBarBorderColor = theme.color("urlBarBorder");
         urlBarBackgroundDrawable = theme.drawable("urlBarBackgroundDrawable");
+        menuBackgroundColor = theme.color("menuBackground");
+        menuBorderColor = theme.color("menuBorder");
+        menuTextColor = theme.color("menuText");
+        menuIconColor = theme.color("menuIcon");
+        menuDividerColor = theme.color("menuDivider");
+        menuItemPressedColor = theme.color("menuItemPressed");
+        menuToolbarButtonColor = theme.color("menuToolbarButton");
+        menuToolbarButtonPressedColor = theme.color("menuToolbarButtonPressed");
 
         Drawable toolbarButtonPressDrawable = theme.drawable("toolbarButtonPress");
         if (toolbarButtonPressDrawable != null) {

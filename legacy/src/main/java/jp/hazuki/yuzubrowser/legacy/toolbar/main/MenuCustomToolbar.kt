@@ -20,8 +20,9 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
 import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import jp.hazuki.yuzubrowser.core.utility.extensions.convertDpToPx
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionController
@@ -49,8 +50,38 @@ class MenuCustomToolbar(
     }
 
     override fun applyTheme(themeData: ThemeData?) {
-        mButtonController.setColorFilter(PorterDuffColorFilter(0xFFE8EAED.toInt(), PorterDuff.Mode.SRC_ATOP))
-        mButtonController.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.menu_toolbar_button_background))
+        val iconColor = themeData?.menuIconColor.orFallback(themeData?.toolbarImageColor)?.orFallback(0xFFE8EAED.toInt()) ?: 0xFFE8EAED.toInt()
+        val normalColor = themeData?.menuToolbarButtonColor
+            .orFallback(themeData?.menuItemPressedColor)
+            .orFallback(themeData?.toolbarButtonBackgroundPress?.paint?.color)
+            .orFallback(0xFF3C4043.toInt()) ?: 0xFF3C4043.toInt()
+        val pressedColor = themeData?.menuToolbarButtonPressedColor
+            .orFallback(themeData?.menuBorderColor)
+            .orFallback(themeData?.menuDividerColor)
+            .orFallback(themeData?.toolbarButtonBackgroundPress?.paint?.color)
+            .orFallback(0xFF4B4C50.toInt()) ?: 0xFF4B4C50.toInt()
+
+        mButtonController.setColorFilter(PorterDuffColorFilter(iconColor, PorterDuff.Mode.SRC_ATOP))
+        mButtonController.setBackgroundDrawable(createButtonBackground(normalColor, pressedColor))
+    }
+
+    private fun createButtonBackground(normalColor: Int, pressedColor: Int): StateListDrawable {
+        return StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), createButtonShape(pressedColor))
+            addState(intArrayOf(android.R.attr.state_focused), createButtonShape(pressedColor))
+            addState(intArrayOf(), createButtonShape(normalColor))
+        }
+    }
+
+    private fun createButtonShape(color: Int): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(color)
+        }
+    }
+
+    private fun Int?.orFallback(fallback: Int?): Int? {
+        return if (this != null && this != 0) this else fallback
     }
 
     private object AlwaysVisibleRequestCallback : RequestCallback {
