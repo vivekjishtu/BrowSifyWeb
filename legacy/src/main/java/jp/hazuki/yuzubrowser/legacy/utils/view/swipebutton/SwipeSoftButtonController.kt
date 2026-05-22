@@ -18,6 +18,7 @@ package jp.hazuki.yuzubrowser.legacy.utils.view.swipebutton
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.view.View
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionController
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionIconManager
 import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionFile
@@ -30,6 +31,7 @@ class SwipeSoftButtonController
     private var mActionList: SoftButtonActionFile? = null
     private var controller: ActionController? = null
     private var iconManager: ActionIconManager? = null
+    private var anchorView: View? = null
 
     val icon: Drawable?
         get() = getIcon(currentWhatNo)
@@ -42,11 +44,12 @@ class SwipeSoftButtonController
             return iconManager[actionList.press]
         }
 
-    fun setActionData(actionlist: SoftButtonActionFile, controller: ActionController, iconManager: ActionIconManager) {
+    fun setActionData(actionlist: SoftButtonActionFile, controller: ActionController, iconManager: ActionIconManager, anchorView: View? = null) {
         mActionList = actionlist
 
         this.controller = controller
         this.iconManager = iconManager
+        this.anchorView = anchorView
     }
 
     fun getIcon(whatNo: Int): Drawable? {
@@ -68,14 +71,15 @@ class SwipeSoftButtonController
         //mBackgroundDrawable.setState(STATE_NOTHING);
         val actionList = mActionList ?: return
         val controller = controller ?: return
+        val anchorView = anchorView
 
         when (whatNo) {
-            SWIPE_PRESS -> controller.run(actionList.press)
+            SWIPE_PRESS -> controller.run(actionList.press, null, anchorView)
         //SwipeController.SWIPE_LPRESS -> Nothing
-            SWIPE_UP -> controller.run(actionList.up)
-            SWIPE_DOWN -> controller.run(actionList.down)
-            SWIPE_LEFT -> controller.run(actionList.left)
-            SWIPE_RIGHT -> controller.run(actionList.right)
+            SWIPE_UP -> controller.run(actionList.up, null, anchorView)
+            SWIPE_DOWN -> controller.run(actionList.down, null, anchorView)
+            SWIPE_LEFT -> controller.run(actionList.left, null, anchorView)
+            SWIPE_RIGHT -> controller.run(actionList.right, null, anchorView)
         }
     }
 
@@ -93,7 +97,7 @@ class SwipeSoftButtonController
 
     override fun onEventLongPress() {
         if (mActionList != null && controller != null) {
-            controller!!.run(mActionList!!.lpress)
+            controller!!.run(mActionList!!.lpress, null, anchorView)
         }
     }
 

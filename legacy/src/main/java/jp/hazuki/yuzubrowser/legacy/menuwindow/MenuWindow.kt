@@ -19,6 +19,7 @@ package jp.hazuki.yuzubrowser.legacy.menuwindow
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.graphics.Rect
 import android.view.*
 import android.widget.*
 import jp.hazuki.yuzubrowser.core.utility.extensions.convertDpToFloatPx
@@ -39,6 +40,8 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
     private val windowMargin = context.convertDpToPx(4)
     private val window = PopupWindow(context)
     private val handler = Handler(Looper.getMainLooper())
+    private val visibleFrame = Rect()
+    private val anchorLocation = IntArray(2)
     private var locking = false
     private var mListener: OnMenuCloseListener? = null
 
@@ -117,11 +120,73 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
             //This is a magic!
             window.isFocusable = false
 
-            window.showAsDropDown(anchor)
+            showAnchored(anchor)
 
             //Reset focusable
             window.isFocusable = true
         }
+    }
+
+    private fun showAnchored(anchor: View) {
+        val popupWidth = measurePopupWidth(anchor)
+        val popupHeight = measurePopupHeight(anchor)
+
+        anchor.getWindowVisibleDisplayFrame(visibleFrame)
+        anchor.getLocationOnScreen(anchorLocation)
+
+        val anchorLeft = anchorLocation[0]
+        val anchorTop = anchorLocation[1]
+        val anchorRight = anchorLeft + anchor.width
+        val anchorBottom = anchorTop + anchor.height
+
+        val spaceAbove = anchorTop - visibleFrame.top
+        val spaceBelow = visibleFrame.bottom - anchorBottom
+        val showBelow = spaceBelow >= popupHeight || spaceBelow >= spaceAbove
+
+        val minX = visibleFrame.left + windowMargin
+        val maxX = (visibleFrame.right - popupWidth - windowMargin).coerceAtLeast(minX)
+        val anchorAlignedX = if (anchor.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+            anchorLeft
+        } else {
+            anchorRight - popupWidth
+        }
+        val popupX = anchorAlignedX.coerceIn(minX, maxX)
+
+        val desiredY = if (showBelow) {
+            anchorBottom
+        } else {
+            anchorTop - popupHeight
+        }
+        val minY = visibleFrame.top + windowMargin
+        val maxY = (visibleFrame.bottom - popupHeight - windowMargin).coerceAtLeast(minY)
+        val popupY = desiredY.coerceIn(minY, maxY)
+
+        window.animationStyle = if (showBelow) {
+            R.style.AnimationMenuWindowAnchoredBelow
+        } else {
+            R.style.AnimationMenuWindowAnchoredAbove
+        }
+        window.showAtLocation(anchor, Gravity.NO_GRAVITY, popupX, popupY)
+    }
+
+    private fun measurePopupWidth(anchor: View): Int {
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(
+            (anchor.resources.displayMetrics.widthPixels - windowMargin * 2).coerceAtLeast(0),
+            View.MeasureSpec.AT_MOST
+        )
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        window.contentView.measure(widthSpec, heightSpec)
+        return window.contentView.measuredWidth
+    }
+
+    private fun measurePopupHeight(anchor: View): Int {
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(
+            (anchor.resources.displayMetrics.widthPixels - windowMargin * 2).coerceAtLeast(0),
+            View.MeasureSpec.AT_MOST
+        )
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        window.contentView.measure(widthSpec, heightSpec)
+        return window.contentView.measuredHeight
     }
 
     fun setSystemUiVisibility(flags: Int) {

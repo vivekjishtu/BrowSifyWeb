@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AnimationMenuWindowAnchoredBelow">
+        <item name="android:windowEnterAnimation">@anim/menu_window_enter_below</item>
+        <item name="android:windowExitAnimation">@anim/menu_window_exit_below</item>
+    </style>
+
+    <style name="AnimationMenuWindowAnchoredAbove">
+        <item name="android:windowEnterAnimation">@anim/menu_window_enter_above</item>
+        <item name="android:windowExitAnimation">@anim/menu_window_exit_above</item>
+    </style>
+</resources>

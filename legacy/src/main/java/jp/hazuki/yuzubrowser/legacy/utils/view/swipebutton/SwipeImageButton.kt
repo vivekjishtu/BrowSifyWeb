@@ -39,7 +39,7 @@ class SwipeImageButton @JvmOverloads constructor(context: Context, attrs: Attrib
     }
 
     fun setActionData(action_list: SoftButtonActionFile, controller: ActionController, iconManager: ActionIconManager) {
-        mController.setActionData(action_list, controller, iconManager)
+        mController.setActionData(action_list, controller, iconManager, this)
         mController.setOnChangeListener(this)
         setImageDrawable(mController.defaultIcon)
         setOverlayIcon(AppPrefs.toolbar_small_icon.get())

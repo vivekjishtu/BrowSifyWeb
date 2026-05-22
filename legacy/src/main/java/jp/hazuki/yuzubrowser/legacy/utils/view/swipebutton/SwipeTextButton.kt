@@ -38,7 +38,7 @@ open class SwipeTextButton @JvmOverloads constructor(context: Context, attrs: At
     private var typeUrl: Boolean = false
 
     fun setActionData(action_list: SoftButtonActionFile, controller: ActionController, iconManager: ActionIconManager) {
-        mController.setActionData(action_list, controller, iconManager)
+        mController.setActionData(action_list, controller, iconManager, this)
         mController.setOnChangeListener(this)
 
         onSetNormalBackground()
