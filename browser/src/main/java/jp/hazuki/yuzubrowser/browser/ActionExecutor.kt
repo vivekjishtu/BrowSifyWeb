@@ -949,21 +949,18 @@ class ActionExecutor(
                 val tab = controller.getTab(actionTarget)
                 val actionList = (action as CustomMenuSingleAction).actionList
 
-                val builder = AlertDialog.Builder(controller.activity)
                 if (target is ActionController.HitTestResultTargetInfo) {
-                    builder.setCustomTitle(
-                            ContextMenuTitleView(controller.activity, target.result.extra ?: ""))
-                            .setAdapter(
-                                    ActionListViewAdapter(controller.activity, actionList, target.actionNameArray)
-                            ) { _, which -> checkAndRun(actionList[which], target) }
+                    HitTestContextMenuDialog(controller, target, actionList) {
+                        checkAndRun(it, target)
+                    }.show()
                 } else {
+                    val builder = AlertDialog.Builder(controller.activity)
                     builder.setCustomTitle(ContextMenuTitleView(controller.activity, tab.url ?: ""))
                             .setAdapter(
                                     ActionListViewAdapter(controller.activity, actionList, null)
                             ) { _, which -> checkAndRun(actionList[which], target) }
+                    builder.show()
                 }
-
-                builder.show()
             }
             SingleAction.FINISH -> {
                 val finishAction = action as FinishSingleAction

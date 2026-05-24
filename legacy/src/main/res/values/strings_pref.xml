@@ -296,6 +296,34 @@
         <item>-163</item>
     </integer-array>
 
+    <string name="context_menu_kind_link">Link</string>
+    <string name="context_menu_kind_image">Image</string>
+    <string name="context_menu_kind_linked_image">Linked image</string>
+    <string name="context_menu_advanced_actions">Advanced tools</string>
+    <string name="context_menu_open_here">Open</string>
+    <string name="context_menu_open_new_tab">Open in new tab</string>
+    <string name="context_menu_open_background">Open in background</string>
+    <string name="context_menu_open_new_tab_right">Open in new tab on right</string>
+    <string name="context_menu_open_background_right">Open in background on right</string>
+    <string name="context_menu_share_link">Share link</string>
+    <string name="context_menu_open_other_app">Open externally</string>
+    <string name="context_menu_copy_link">Copy link</string>
+    <string name="context_menu_copy_text">Copy text</string>
+    <string name="context_menu_download_link">Download link</string>
+    <string name="context_menu_download_link_as">Download link as...</string>
+    <string name="context_menu_open_image">Open image</string>
+    <string name="context_menu_open_image_new_tab">Open image in new tab</string>
+    <string name="context_menu_open_image_background">Open image in background</string>
+    <string name="context_menu_open_image_new_tab_right">Open image in new tab on right</string>
+    <string name="context_menu_open_image_background_right">Open image in background on right</string>
+    <string name="context_menu_share_image">Share image</string>
+    <string name="context_menu_share_image_link">Share image link</string>
+    <string name="context_menu_open_image_other_app">Open image externally</string>
+    <string name="context_menu_copy_image_link">Copy image link</string>
+    <string name="context_menu_download_image">Download image</string>
+    <string name="context_menu_download_image_as">Download image as...</string>
+    <string name="context_menu_search_image">Search image</string>
+
     <integer-array name="pref_web_cache_values">
         <item>-1</item>
         <item>2</item>
