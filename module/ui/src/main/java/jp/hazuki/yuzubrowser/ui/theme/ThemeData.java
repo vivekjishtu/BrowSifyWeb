@@ -27,6 +27,9 @@ public class ThemeData {
 
     public Drawable tabBackgroundNormal, tabBackgroundSelect;
     public Drawable tabStripBackgroundDrawable;
+    public int tabListBackgroundColor;
+    public int tabListDividerColor;
+    public int tabListItemBackgroundNormalColor, tabListItemBackgroundSelectedColor;
     public int tabTextColorNormal, tabTextColorLock, tabTextColorPin, tabTextColorSelect, tabAccentColor, tabDividerColor;
     public int scrollbarAccentColor;
     public boolean showTabDivider;
@@ -60,6 +63,10 @@ public class ThemeData {
         scrollbarAccentColor = theme.color("scrollbarAccent");
         showTabDivider = theme.flag("showTabDivider");
         tabStripBackgroundDrawable = theme.drawable("tabStripBackgroundDrawable");
+        tabListBackgroundColor = theme.color("tabListBackground");
+        tabListDividerColor = theme.color("tabListDivider");
+        tabListItemBackgroundNormalColor = theme.color("tabItemBackgroundNormal");
+        tabListItemBackgroundSelectedColor = theme.color("tabItemBackgroundSelected");
         tabBackgroundNormal = theme.drawable("tabBackgroundNormal");
         tabBackgroundSelect = theme.drawable("tabBackgroundSelected");
         if (tabBackgroundSelect == null) {

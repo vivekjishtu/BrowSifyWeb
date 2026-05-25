@@ -25,10 +25,13 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.ImageButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import jp.hazuki.yuzubrowser.legacy.R
@@ -39,6 +42,7 @@ import jp.hazuki.yuzubrowser.legacy.tab.manager.MainTabData
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabManager
 import jp.hazuki.yuzubrowser.legacy.utils.view.templatepreserving.TemplatePreservingSnackBar
 import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 
 class TabListLayout @SuppressLint("RtlHardcoded")
 constructor(context: Context, attrs: AttributeSet?, mode: Int, left: Boolean, val lastTabMode: Int) : LinearLayout(context, attrs) {
@@ -72,6 +76,8 @@ constructor(context: Context, attrs: AttributeSet?, mode: Int, left: Boolean, va
         if (left) {
             bottomBar.gravity = Gravity.LEFT
         }
+
+        applyTheme()
 
         ViewCompat.setOnApplyWindowInsetsListener(this) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -150,6 +156,44 @@ constructor(context: Context, attrs: AttributeSet?, mode: Int, left: Boolean, va
         findViewById<View>(R.id.newTabButton).setOnClickListener {
             callback.requestAddTab()
             close()
+        }
+    }
+
+    private fun applyTheme() {
+        val themeData = ThemeData.getInstance()
+        val backgroundColor = when {
+            themeData != null && themeData.tabListBackgroundColor != 0 -> themeData.tabListBackgroundColor
+            themeData != null && themeData.toolbarBackgroundColor != 0 -> themeData.toolbarBackgroundColor
+            themeData != null && themeData.menuBackgroundColor != 0 -> themeData.menuBackgroundColor
+            else -> 0xFF222222.toInt()
+        }
+        val dividerColor = themeData?.tabListDividerColor?.takeIf { it != 0 } ?: themeData?.tabDividerColor ?: themeData?.menuDividerColor ?: 0x1FFFFFFF
+        val buttonColor = themeData?.menuToolbarButtonColor ?: themeData?.tabAccentColor ?: themeData?.toolbarImageColor ?: 0xFFFFFFFF.toInt()
+        val buttonIconColor = themeData?.toolbarTextColor ?: themeData?.toolbarImageColor ?: themeData?.menuTextColor ?: 0xFFFFFFFF.toInt()
+        val buttonPressed = themeData?.menuToolbarButtonPressedColor ?: themeData?.menuItemPressedColor ?: 0x33FFFFFF
+
+        setBackgroundColor(backgroundColor)
+        bottomBar.setBackgroundColor(backgroundColor)
+
+        findViewById<View>(R.id.divider)?.setBackgroundColor(dividerColor)
+
+        findViewById<RecyclerView>(R.id.recyclerView).setBackgroundColor(backgroundColor)
+
+        val newTabButton = findViewById<ImageButton>(R.id.newTabButton)
+        newTabButton.background = createButtonBackground(buttonColor, buttonPressed)
+        ImageViewCompat.setImageTintList(newTabButton, android.content.res.ColorStateList.valueOf(buttonIconColor))
+    }
+
+    private fun createButtonBackground(normalColor: Int, pressedColor: Int): android.graphics.drawable.Drawable {
+        return android.graphics.drawable.StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), android.graphics.drawable.GradientDrawable().apply {
+                shape = android.graphics.drawable.GradientDrawable.OVAL
+                setColor(pressedColor)
+            })
+            addState(intArrayOf(), android.graphics.drawable.GradientDrawable().apply {
+                shape = android.graphics.drawable.GradientDrawable.OVAL
+                setColor(normalColor)
+            })
         }
     }
 

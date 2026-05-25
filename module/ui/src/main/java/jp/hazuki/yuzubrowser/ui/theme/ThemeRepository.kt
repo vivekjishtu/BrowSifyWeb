@@ -109,6 +109,10 @@ object ThemeRepository {
     private val allowedExtensions = setOf("json", "png", "jpg", "jpeg", "webp")
     private val drawableFields = setOf(
         "tabStripBackgroundDrawable",
+        "tabListBackground",
+        "tabListDivider",
+        "tabItemBackgroundNormal",
+        "tabItemBackgroundSelected",
         "tabBackgroundNormal",
         "tabBackgroundSelect",
         "tabBackgroundSelected",
@@ -751,6 +755,10 @@ object ThemeRepository {
                 "toolbarButtonPress",
                 "urlBarBackground",
                 "urlBarBorder",
+                "tabListBackground",
+                "tabListDivider",
+                "tabItemBackgroundNormal",
+                "tabItemBackgroundSelected",
                 "menuBackground",
                 "menuBorder",
                 "menuText",

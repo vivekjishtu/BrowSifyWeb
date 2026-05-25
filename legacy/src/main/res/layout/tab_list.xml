@@ -15,16 +15,20 @@
         android:layout_gravity="bottom"
         android:clickable="true"
         android:gravity="end"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
         android:paddingEnd="8dp"
         tools:ignore="KeyboardInaccessibleWidget,RtlHardcoded">
 
         <ImageButton
             android:src="@drawable/ic_add_white_24dp"
             android:contentDescription="@string/new_tab"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:id="@+id/newTabButton"
-            android:padding="10dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:padding="8dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:tint="@android:color/white" />
     </LinearLayout>

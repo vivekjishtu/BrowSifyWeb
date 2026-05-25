@@ -38,10 +38,6 @@ class VerticalTabListAdapter extends TabListRecyclerBaseAdapter {
     @Override
     void onBindViewHolder(ViewHolder holder, TabIndexData indexData) {
         holder.url.setText(UrlExtensionsKt.decodePunyCodeUrl(indexData.getUrl()));
-
-        if (holder.getBindingAdapterPosition() == getTabManager().getCurrentTabNo())
-            holder.itemView.setBackgroundResource(R.drawable.tab_list_item_background_selected);
-        else
-            holder.itemView.setBackgroundResource(R.drawable.tab_list_item_background_normal);
+        applyTheme(holder, holder.getBindingAdapterPosition() == getTabManager().getCurrentTabNo());
     }
 }

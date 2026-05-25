@@ -17,10 +17,14 @@
 package jp.hazuki.yuzubrowser.legacy.tab.adapter;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -31,10 +35,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.widget.ImageViewCompat;
 import jp.hazuki.yuzubrowser.legacy.R;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabIndexData;
 import jp.hazuki.yuzubrowser.legacy.tab.manager.TabManager;
 import jp.hazuki.yuzubrowser.legacy.webkit.TabType;
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData;
 
 public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<TabListRecyclerBaseAdapter.ViewHolder> {
     private static final PorterDuffColorFilter IMAGE_FILTER = new PorterDuffColorFilter(0x64FFFFFF, PorterDuff.Mode.SRC_ATOP);
@@ -42,6 +48,7 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
     private final Drawable closeIcon;
     private final Drawable pinIcon;
     private final Context context;
+    private final ThemeData themeData;
 
     private LayoutInflater mInflater;
     private TabManager tabManager;
@@ -49,6 +56,7 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
 
     TabListRecyclerBaseAdapter(Context context, TabManager list, OnRecyclerListener listener) {
         this.context = context;
+        this.themeData = ThemeData.getInstance();
         mInflater = LayoutInflater.from(context);
         tabManager = list;
         mListener = listener;
@@ -98,6 +106,7 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
                 holder.closeButton.setImageDrawable(closeIcon);
                 holder.closeButton.setEnabled(true);
             }
+            applyTheme(holder, holder.getBindingAdapterPosition() == getTabManager().getCurrentTabNo());
         }
 
         onBindViewHolder(holder, indexData);
@@ -147,6 +156,72 @@ public abstract class TabListRecyclerBaseAdapter extends RecyclerView.Adapter<Ta
 
     protected TabManager getTabManager() {
         return tabManager;
+    }
+
+    protected void applyTheme(ViewHolder holder, boolean selected) {
+        int normalText = themeData != null && themeData.tabTextColorNormal != 0
+                ? themeData.tabTextColorNormal
+                : (themeData != null && themeData.lightTheme ? Color.BLACK : Color.WHITE);
+        int selectedText = themeData != null && themeData.tabTextColorSelect != 0
+                ? themeData.tabTextColorSelect
+                : normalText;
+        int privateText = themeData != null && themeData.tabTextColorPin != 0
+                ? themeData.tabTextColorPin
+                : selectedText;
+        int accent = themeData != null && themeData.tabAccentColor != 0
+                ? themeData.tabAccentColor
+                : (themeData != null && themeData.lightTheme ? 0xFF4A4A4A : 0xFFEAEAEA);
+
+        holder.itemView.setBackground(getTabBackground(selected));
+        holder.title.setTextColor(selected ? selectedText : normalText);
+        holder.url.setTextColor(applyAlpha(selected ? selectedText : normalText, 0.78f));
+        if (holder.privateLabel != null && holder.privateLabel.getVisibility() == View.VISIBLE) {
+            holder.privateLabel.setTextColor(applyAlpha(privateText, 0.95f));
+        }
+        holder.closeButton.setImageTintList(ColorStateList.valueOf(selectedText));
+        if (holder.historyButton instanceof ImageButton) {
+            ImageViewCompat.setImageTintList((ImageButton) holder.historyButton, ColorStateList.valueOf(selectedText));
+        }
+        if (holder.disable != null) {
+            holder.disable.setBackgroundColor(applyAlpha(accent, selected ? 0.18f : 0.10f));
+        }
+    }
+
+    protected Drawable getTabBackground(boolean selected) {
+        if (themeData != null) {
+            int normalColor = themeData.tabListItemBackgroundNormalColor;
+            int selectedColor = themeData.tabListItemBackgroundSelectedColor;
+            if (normalColor != 0 || selectedColor != 0) {
+                int base = selected ? (selectedColor != 0 ? selectedColor : normalColor) : normalColor;
+                if (base != 0) {
+                    GradientDrawable drawable = new GradientDrawable();
+                    drawable.setShape(GradientDrawable.RECTANGLE);
+                    drawable.setCornerRadius(context.getResources().getDisplayMetrics().density * 4f);
+                    drawable.setColor(base);
+                    drawable.setStroke(1, applyAlpha(themeData.tabDividerColor != 0 ? themeData.tabDividerColor : themeData.menuDividerColor, selected ? 0.36f : 0.22f));
+                    return drawable;
+                }
+            }
+            Drawable themed = selected ? themeData.tabBackgroundSelect : themeData.tabBackgroundNormal;
+            if (themed != null) {
+                return themed.getConstantState() != null
+                        ? themed.getConstantState().newDrawable().mutate()
+                        : themed.mutate();
+            }
+        }
+
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setCornerRadius(context.getResources().getDisplayMetrics().density * 4f);
+        drawable.setColor(selected
+                ? applyAlpha(themeData != null && themeData.tabAccentColor != 0 ? themeData.tabAccentColor : Color.WHITE, themeData != null && themeData.lightTheme ? 0.22f : 0.16f)
+                : applyAlpha(themeData != null && themeData.toolbarBackgroundColor != 0 ? themeData.toolbarBackgroundColor : Color.TRANSPARENT, themeData != null && themeData.lightTheme ? 0.86f : 1.0f));
+        drawable.setStroke(1, applyAlpha(themeData != null && themeData.tabDividerColor != 0 ? themeData.tabDividerColor : Color.TRANSPARENT, 0.30f));
+        return drawable;
+    }
+
+    protected int applyAlpha(int color, float alphaFactor) {
+        int alpha = Math.min(255, Math.max(0, Math.round(Color.alpha(color) * alphaFactor)));
+        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
     }
 
     public interface OnRecyclerListener {

@@ -47,5 +47,7 @@ class HorizontalTabListAdapter extends TabListRecyclerBaseAdapter {
             holder.disable.setVisibility(View.GONE);
         else
             holder.disable.setVisibility(View.VISIBLE);
+
+        applyTheme(holder, holder.getBindingAdapterPosition() == getTabManager().getCurrentTabNo());
     }
 }
