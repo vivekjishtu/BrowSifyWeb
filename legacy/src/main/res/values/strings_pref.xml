@@ -323,6 +323,10 @@
     <string name="context_menu_download_image">Download image</string>
     <string name="context_menu_download_image_as">Download image as...</string>
     <string name="context_menu_search_image">Search image</string>
+    <string name="context_menu_section_open_more">Open more</string>
+    <string name="context_menu_section_share_copy">Share and copy</string>
+    <string name="context_menu_section_download">Download</string>
+    <string name="context_menu_section_safety">Safety tools</string>
 
     <integer-array name="pref_web_cache_values">
         <item>-1</item>

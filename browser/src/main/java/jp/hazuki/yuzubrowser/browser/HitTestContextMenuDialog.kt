@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -26,6 +27,7 @@ internal class HitTestContextMenuDialog(
     private val actionList: ActionList,
     private val onActionClick: (Action) -> Unit
 ) {
+    private val menuVariant = resolveMenuVariant()
     private val activity = controller.activity
     private val themeData = ThemeData.getInstance()
     private val menuBackgroundColor = themeData?.menuBackgroundColor.orFallback(themeData?.toolbarBackgroundColor ?: 0xFF303134.toInt())
@@ -37,7 +39,7 @@ internal class HitTestContextMenuDialog(
     private val cornerRadius = activity.resources.displayMetrics.density * 18f
 
     fun show() {
-        val sections = splitActions(actionList)
+        val sections = splitActions(actionList, menuVariant)
         if (sections.primary.isEmpty() && sections.advanced.isNotEmpty()) {
             showDialog(sections.advanced, emptyList(), true)
         } else {
@@ -73,23 +75,30 @@ internal class HitTestContextMenuDialog(
         styleHeader(titleView, subtitleView)
 
         var dialog: AlertDialog? = null
-        val allRows = primaryActions.toMutableList()
+        val allRows = sortActions(primaryActions, advancedMode)
         val hasAdvancedShortcut = !advancedMode && advancedActions.isNotEmpty()
 
-        allRows.forEachIndexed { index, action ->
-            val previous = allRows.getOrNull(index - 1)
-            val showDivider = previous != null && groupForAction(previous) != groupForAction(action)
-            itemsContainer.addView(createActionRow(action, showDivider) {
+        if (advancedMode) {
+            addAdvancedSections(itemsContainer, allRows) { action ->
                 dialog?.dismiss()
                 onActionClick(action)
-            })
-        }
+            }
+        } else {
+            allRows.forEachIndexed { index, action ->
+                val previous = allRows.getOrNull(index - 1)
+                val showDivider = previous != null && groupForAction(previous) != groupForAction(action)
+                itemsContainer.addView(createActionRow(action, showDivider) {
+                    dialog?.dismiss()
+                    onActionClick(action)
+                })
+            }
 
-        if (hasAdvancedShortcut) {
-            itemsContainer.addView(createAdvancedRow(advancedActions, allRows.isNotEmpty()) {
-                dialog?.dismiss()
-                showDialog(advancedActions, emptyList(), true)
-            })
+            if (hasAdvancedShortcut) {
+                itemsContainer.addView(createAdvancedRow(sortActions(advancedActions, true), allRows.isNotEmpty()) {
+                    dialog?.dismiss()
+                    showDialog(advancedActions, emptyList(), true)
+                })
+            }
         }
 
         dialog = AlertDialog.Builder(activity)
@@ -170,6 +179,70 @@ internal class HitTestContextMenuDialog(
         return row
     }
 
+    private fun addAdvancedSections(
+        container: LinearLayout,
+        actions: List<Action>,
+        onActionClick: (Action) -> Unit
+    ) {
+        val buckets = linkedMapOf(
+            AdvancedSection.OPEN_MORE to ArrayList<Action>(),
+            AdvancedSection.SHARE_COPY to ArrayList<Action>(),
+            AdvancedSection.DOWNLOAD to ArrayList<Action>(),
+            AdvancedSection.SAFETY to ArrayList<Action>()
+        )
+        for (action in actions) {
+            buckets[advancedSectionForAction(action)]?.add(action)
+        }
+
+        var firstSection = true
+        buckets.forEach { (section, bucketActions) ->
+            if (bucketActions.isEmpty()) return@forEach
+            if (!firstSection) {
+                addSectionSpacer(container)
+            }
+            firstSection = false
+            container.addView(createSectionHeader(activity.getString(section.title)))
+            bucketActions.forEachIndexed { index, action ->
+                val previous = bucketActions.getOrNull(index - 1)
+                val showDivider = previous != null && groupForAction(previous) != groupForAction(action)
+                container.addView(createActionRow(action, showDivider) {
+                    onActionClick(action)
+                })
+            }
+        }
+    }
+
+    private fun addSectionSpacer(container: LinearLayout) {
+        val spacer = View(activity)
+        spacer.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            (activity.resources.displayMetrics.density * 6f).toInt()
+        )
+        container.addView(spacer)
+    }
+
+    private fun createSectionHeader(title: String): View {
+        return TextView(activity).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topMargin = (activity.resources.displayMetrics.density * 6f).toInt()
+                bottomMargin = (activity.resources.displayMetrics.density * 4f).toInt()
+            }
+            text = title.uppercase()
+            setTextColor(adjustAlpha(menuTextColor, 0.58f))
+            textSize = 11f
+            letterSpacing = 0.08f
+            setPadding(
+                (activity.resources.displayMetrics.density * 10f).toInt(),
+                (activity.resources.displayMetrics.density * 2f).toInt(),
+                (activity.resources.displayMetrics.density * 10f).toInt(),
+                (activity.resources.displayMetrics.density * 2f).toInt()
+            )
+        }
+    }
+
     private fun styleHeader(titleView: TextView, subtitleView: TextView) {
         titleView.setTextColor(adjustAlpha(menuTextColor, 0.92f))
         subtitleView.setTextColor(adjustAlpha(menuTextColor, 0.68f))
@@ -189,11 +262,11 @@ internal class HitTestContextMenuDialog(
         }
     }
 
-    private fun splitActions(actions: ActionList): MenuSections {
+    private fun splitActions(actions: ActionList, variant: HitTestMenuVariant): MenuSections {
         val primary = ArrayList<Action>()
         val advanced = ArrayList<Action>()
         for (action in actions) {
-            if (isAdvancedAction(action)) {
+            if (isAdvancedAction(action, variant)) {
                 advanced.add(action)
             } else {
                 primary.add(action)
@@ -202,9 +275,14 @@ internal class HitTestContextMenuDialog(
         return MenuSections(primary, advanced)
     }
 
-    private fun isAdvancedAction(action: Action): Boolean {
+    private fun isAdvancedAction(action: Action, variant: HitTestMenuVariant): Boolean {
         if (action.isEmpty()) return false
-        return action[0].id in advancedActionIds
+        return action[0].id in advancedActionIds(variant)
+    }
+
+    private fun sortActions(actions: List<Action>, advancedMode: Boolean): List<Action> {
+        val indexed = actions.withIndex().sortedWith(compareBy({ actionPriority(advancedMode, it.value) }, { it.index }))
+        return indexed.map { it.value }
     }
 
     private fun iconResForAction(action: Action): Int? {
@@ -275,34 +353,52 @@ internal class HitTestContextMenuDialog(
 
     private fun groupForAction(action: Action): Int {
         if (action.isEmpty()) return 99
-        return when (action[0].id) {
-            SingleAction.LPRESS_OPEN,
-            SingleAction.LPRESS_OPEN_NEW,
-            SingleAction.LPRESS_OPEN_BG,
-            SingleAction.LPRESS_OPEN_OTHERS,
-            SingleAction.LPRESS_OPEN_NEW_RIGHT,
-            SingleAction.LPRESS_OPEN_BG_RIGHT,
-            SingleAction.LPRESS_OPEN_IMAGE,
-            SingleAction.LPRESS_OPEN_IMAGE_NEW,
-            SingleAction.LPRESS_OPEN_IMAGE_BG,
-            SingleAction.LPRESS_OPEN_IMAGE_OTHERS,
-            SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT,
-            SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT -> 0
+        return when (menuVariant) {
+            HitTestMenuVariant.LINK -> when (action[0].id) {
+                SingleAction.LPRESS_OPEN,
+                SingleAction.LPRESS_OPEN_NEW -> 0
 
-            SingleAction.LPRESS_SHARE,
-            SingleAction.LPRESS_SHARE_IMAGE,
-            SingleAction.LPRESS_SHARE_IMAGE_URL,
-            SingleAction.LPRESS_COPY_URL,
-            SingleAction.LPRESS_COPY_LINK_TEXT,
-            SingleAction.LPRESS_COPY_IMAGE_URL -> 1
+                SingleAction.LPRESS_COPY_URL,
+                SingleAction.LPRESS_COPY_LINK_TEXT,
+                SingleAction.LPRESS_SHARE -> 1
 
-            SingleAction.LPRESS_SAVE_PAGE,
-            SingleAction.LPRESS_SAVE_PAGE_AS,
-            SingleAction.LPRESS_SAVE_IMAGE,
-            SingleAction.LPRESS_SAVE_IMAGE_AS,
-            SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 2
+                SingleAction.LPRESS_SAVE_PAGE -> 2
 
-            else -> 3
+                else -> 3
+            }
+
+            HitTestMenuVariant.IMAGE -> when (action[0].id) {
+                SingleAction.LPRESS_OPEN_IMAGE,
+                SingleAction.LPRESS_OPEN_IMAGE_NEW -> 0
+
+                SingleAction.LPRESS_COPY_IMAGE_URL,
+                SingleAction.LPRESS_SHARE_IMAGE -> 1
+
+                SingleAction.LPRESS_SAVE_IMAGE,
+                SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 2
+
+                else -> 3
+            }
+
+            HitTestMenuVariant.LINKED_IMAGE -> when (action[0].id) {
+                SingleAction.LPRESS_OPEN,
+                SingleAction.LPRESS_OPEN_NEW -> 0
+
+                SingleAction.LPRESS_OPEN_IMAGE,
+                SingleAction.LPRESS_OPEN_IMAGE_NEW -> 1
+
+                SingleAction.LPRESS_COPY_IMAGE_URL,
+                SingleAction.LPRESS_COPY_URL,
+                SingleAction.LPRESS_COPY_LINK_TEXT,
+                SingleAction.LPRESS_SHARE_IMAGE,
+                SingleAction.LPRESS_SHARE -> 2
+
+                SingleAction.LPRESS_SAVE_IMAGE,
+                SingleAction.LPRESS_SAVE_PAGE,
+                SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 3
+
+                else -> 3
+            }
         }
     }
 
@@ -364,18 +460,161 @@ internal class HitTestContextMenuDialog(
         val subtitle: String?
     )
 
-    companion object {
-        private val advancedActionIds = setOf(
+    private fun actionPriority(advancedMode: Boolean, action: Action): Int {
+        if (action.isEmpty()) return Int.MAX_VALUE
+        return when (menuVariant) {
+            HitTestMenuVariant.LINK -> when (action[0].id) {
+                SingleAction.LPRESS_OPEN -> 0
+                SingleAction.LPRESS_OPEN_NEW -> 1
+                SingleAction.LPRESS_COPY_URL -> 2
+                SingleAction.LPRESS_COPY_LINK_TEXT -> 3
+                SingleAction.LPRESS_SHARE -> 4
+                SingleAction.LPRESS_SAVE_PAGE -> 5
+                SingleAction.LPRESS_OPEN_BG,
+                SingleAction.LPRESS_OPEN_OTHERS,
+                SingleAction.LPRESS_OPEN_NEW_RIGHT,
+                SingleAction.LPRESS_OPEN_BG_RIGHT,
+                SingleAction.LPRESS_SAVE_PAGE_AS,
+                SingleAction.LPRESS_PATTERN_MATCH,
+                SingleAction.LPRESS_ADD_BLACK_LIST,
+                SingleAction.LPRESS_ADD_WHITE_LIST -> if (advancedMode) 0 else 100 + action[0].id
+                else -> 200 + action[0].id
+            }
+
+            HitTestMenuVariant.IMAGE -> when (action[0].id) {
+                SingleAction.LPRESS_OPEN_IMAGE -> 0
+                SingleAction.LPRESS_OPEN_IMAGE_NEW -> 1
+                SingleAction.LPRESS_COPY_IMAGE_URL -> 2
+                SingleAction.LPRESS_SHARE_IMAGE -> 3
+                SingleAction.LPRESS_SAVE_IMAGE -> 4
+                SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 5
+                SingleAction.LPRESS_OPEN_IMAGE_BG,
+                SingleAction.LPRESS_OPEN_IMAGE_OTHERS,
+                SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT,
+                SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT,
+                SingleAction.LPRESS_SHARE_IMAGE_URL,
+                SingleAction.LPRESS_SAVE_IMAGE_AS,
+                SingleAction.LPRESS_PATTERN_MATCH,
+                SingleAction.LPRESS_ADD_IMAGE_BLACK_LIST,
+                SingleAction.LPRESS_ADD_IMAGE_WHITE_LIST,
+                SingleAction.LPRESS_IMAGE_RES_BLOCK -> if (advancedMode) 0 else 100 + action[0].id
+                else -> 200 + action[0].id
+            }
+
+            HitTestMenuVariant.LINKED_IMAGE -> when (action[0].id) {
+                SingleAction.LPRESS_OPEN -> 0
+                SingleAction.LPRESS_OPEN_NEW -> 1
+                SingleAction.LPRESS_OPEN_IMAGE -> 2
+                SingleAction.LPRESS_OPEN_IMAGE_NEW -> 3
+                SingleAction.LPRESS_COPY_URL -> 4
+                SingleAction.LPRESS_COPY_LINK_TEXT -> 5
+                SingleAction.LPRESS_COPY_IMAGE_URL -> 6
+                SingleAction.LPRESS_SHARE -> 7
+                SingleAction.LPRESS_SHARE_IMAGE -> 8
+                SingleAction.LPRESS_SAVE_PAGE -> 9
+                SingleAction.LPRESS_SAVE_IMAGE -> 10
+                SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 11
+                SingleAction.LPRESS_OPEN_BG,
+                SingleAction.LPRESS_OPEN_OTHERS,
+                SingleAction.LPRESS_OPEN_NEW_RIGHT,
+                SingleAction.LPRESS_OPEN_BG_RIGHT,
+                SingleAction.LPRESS_OPEN_IMAGE_BG,
+                SingleAction.LPRESS_OPEN_IMAGE_OTHERS,
+                SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT,
+                SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT,
+                SingleAction.LPRESS_SHARE_IMAGE_URL,
+                SingleAction.LPRESS_SAVE_PAGE_AS,
+                SingleAction.LPRESS_SAVE_IMAGE_AS,
+                SingleAction.LPRESS_PATTERN_MATCH,
+                SingleAction.LPRESS_ADD_BLACK_LIST,
+                SingleAction.LPRESS_ADD_WHITE_LIST,
+                SingleAction.LPRESS_ADD_IMAGE_BLACK_LIST,
+                SingleAction.LPRESS_ADD_IMAGE_WHITE_LIST,
+                SingleAction.LPRESS_IMAGE_RES_BLOCK -> if (advancedMode) 0 else 100 + action[0].id
+                else -> 200 + action[0].id
+            }
+        }
+    }
+
+    private fun advancedActionIds(variant: HitTestMenuVariant): Set<Int> {
+        return when (variant) {
+            HitTestMenuVariant.LINK -> linkAdvancedActionIds
+            HitTestMenuVariant.IMAGE -> imageAdvancedActionIds
+            HitTestMenuVariant.LINKED_IMAGE -> linkedImageAdvancedActionIds
+        }
+    }
+
+    private fun advancedSectionForAction(action: Action): AdvancedSection {
+        if (action.isEmpty()) return AdvancedSection.OPEN_MORE
+        return when (action[0].id) {
             SingleAction.LPRESS_OPEN_BG,
-            SingleAction.LPRESS_OPEN_BG_RIGHT,
             SingleAction.LPRESS_OPEN_OTHERS,
             SingleAction.LPRESS_OPEN_NEW_RIGHT,
-            SingleAction.LPRESS_SAVE_PAGE_AS,
+            SingleAction.LPRESS_OPEN_BG_RIGHT,
             SingleAction.LPRESS_OPEN_IMAGE_BG,
-            SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT,
             SingleAction.LPRESS_OPEN_IMAGE_OTHERS,
             SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT,
+            SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT -> AdvancedSection.OPEN_MORE
+
             SingleAction.LPRESS_SHARE_IMAGE_URL,
+            SingleAction.LPRESS_COPY_URL,
+            SingleAction.LPRESS_COPY_LINK_TEXT,
+            SingleAction.LPRESS_COPY_IMAGE_URL -> AdvancedSection.SHARE_COPY
+
+            SingleAction.LPRESS_SAVE_PAGE_AS,
+            SingleAction.LPRESS_SAVE_IMAGE_AS,
+            SingleAction.LPRESS_SAVE_PAGE,
+            SingleAction.LPRESS_SAVE_IMAGE,
+            SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> AdvancedSection.DOWNLOAD
+
+            else -> AdvancedSection.SAFETY
+        }
+    }
+
+    private fun resolveMenuVariant(): HitTestMenuVariant {
+        return when (target.result.type) {
+            android.webkit.WebView.HitTestResult.SRC_ANCHOR_TYPE -> HitTestMenuVariant.LINK
+            android.webkit.WebView.HitTestResult.IMAGE_TYPE -> HitTestMenuVariant.IMAGE
+            else -> HitTestMenuVariant.LINKED_IMAGE
+        }
+    }
+
+    companion object {
+        private val linkAdvancedActionIds = setOf(
+            SingleAction.LPRESS_OPEN_BG,
+            SingleAction.LPRESS_OPEN_OTHERS,
+            SingleAction.LPRESS_OPEN_NEW_RIGHT,
+            SingleAction.LPRESS_OPEN_BG_RIGHT,
+            SingleAction.LPRESS_SAVE_PAGE_AS,
+            SingleAction.LPRESS_PATTERN_MATCH,
+            SingleAction.LPRESS_ADD_BLACK_LIST,
+            SingleAction.LPRESS_ADD_WHITE_LIST
+        )
+
+        private val imageAdvancedActionIds = setOf(
+            SingleAction.LPRESS_OPEN_IMAGE_BG,
+            SingleAction.LPRESS_OPEN_IMAGE_OTHERS,
+            SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT,
+            SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT,
+            SingleAction.LPRESS_SHARE_IMAGE_URL,
+            SingleAction.LPRESS_SAVE_IMAGE_AS,
+            SingleAction.LPRESS_PATTERN_MATCH,
+            SingleAction.LPRESS_ADD_IMAGE_BLACK_LIST,
+            SingleAction.LPRESS_ADD_IMAGE_WHITE_LIST,
+            SingleAction.LPRESS_IMAGE_RES_BLOCK
+        )
+
+        private val linkedImageAdvancedActionIds = setOf(
+            SingleAction.LPRESS_OPEN_BG,
+            SingleAction.LPRESS_OPEN_OTHERS,
+            SingleAction.LPRESS_OPEN_NEW_RIGHT,
+            SingleAction.LPRESS_OPEN_BG_RIGHT,
+            SingleAction.LPRESS_OPEN_IMAGE_BG,
+            SingleAction.LPRESS_OPEN_IMAGE_OTHERS,
+            SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT,
+            SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT,
+            SingleAction.LPRESS_SHARE_IMAGE_URL,
+            SingleAction.LPRESS_SAVE_PAGE_AS,
             SingleAction.LPRESS_SAVE_IMAGE_AS,
             SingleAction.LPRESS_PATTERN_MATCH,
             SingleAction.LPRESS_ADD_BLACK_LIST,
@@ -384,5 +623,18 @@ internal class HitTestContextMenuDialog(
             SingleAction.LPRESS_ADD_IMAGE_WHITE_LIST,
             SingleAction.LPRESS_IMAGE_RES_BLOCK
         )
+    }
+
+    private enum class HitTestMenuVariant {
+        LINK,
+        IMAGE,
+        LINKED_IMAGE
+    }
+
+    private enum class AdvancedSection(val title: Int) {
+        OPEN_MORE(R.string.context_menu_section_open_more),
+        SHARE_COPY(R.string.context_menu_section_share_copy),
+        DOWNLOAD(R.string.context_menu_section_download),
+        SAFETY(R.string.context_menu_section_safety)
     }
 }
