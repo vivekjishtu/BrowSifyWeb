@@ -29,12 +29,14 @@ import jp.hazuki.yuzubrowser.ui.INTENT_EXTRA_MODE_FULLSCREEN
 import jp.hazuki.yuzubrowser.ui.INTENT_EXTRA_MODE_ORIENTATION
 import jp.hazuki.yuzubrowser.ui.app.LongPressFixActivity
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.theme.ThemeDataResolver
 
 @AndroidEntryPoint
 class BookmarkActivity : LongPressFixActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeDataResolver.resolve(applicationContext)
         setContentView(R.layout.fragment_base)
 
         val intent = intent

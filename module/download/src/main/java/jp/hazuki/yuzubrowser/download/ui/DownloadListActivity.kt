@@ -16,10 +16,16 @@
 
 package jp.hazuki.yuzubrowser.download.ui
 
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.WindowInsets
 import android.view.WindowManager
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.DrawableCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hazuki.yuzubrowser.download.R
 import jp.hazuki.yuzubrowser.download.core.data.DownloadFileInfo
@@ -30,6 +36,7 @@ import jp.hazuki.yuzubrowser.ui.INTENT_EXTRA_MODE_FULLSCREEN
 import jp.hazuki.yuzubrowser.ui.INTENT_EXTRA_MODE_ORIENTATION
 import jp.hazuki.yuzubrowser.ui.app.ThemeActivity
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 
 @AndroidEntryPoint
 class DownloadListActivity : ThemeActivity(), ActivityClient.ActivityClientListener, DownloadCommandController {
@@ -40,6 +47,7 @@ class DownloadListActivity : ThemeActivity(), ActivityClient.ActivityClientListe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_base)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        applyThemedActionBar(title)
 
         var fullscreen = AppPrefs.fullscreen.get()
         var orientation = AppPrefs.oritentation.get()
@@ -63,6 +71,38 @@ class DownloadListActivity : ThemeActivity(), ActivityClient.ActivityClientListe
             supportFragmentManager.beginTransaction()
                     .replace(R.id.container, DownloadListFragment(), TAG)
                     .commit()
+        }
+    }
+
+    override fun onTitleChanged(title: CharSequence?, color: Int) {
+        super.onTitleChanged(title, color)
+        applyThemedActionBar(title)
+    }
+
+    private fun applyThemedActionBar(titleText: CharSequence?) {
+        val theme = ThemeData.getInstance() ?: return
+        supportActionBar?.run {
+            setBackgroundDrawable(ColorDrawable(theme.toolbarBackgroundColor))
+            setDisplayHomeAsUpEnabled(true)
+            AppCompatResources.getDrawable(
+                this@DownloadListActivity,
+                androidx.appcompat.R.drawable.abc_ic_ab_back_material
+            )?.let { drawable ->
+                val wrapped = DrawableCompat.wrap(drawable).mutate()
+                DrawableCompat.setTint(wrapped, theme.toolbarTextColor)
+                setHomeAsUpIndicator(wrapped)
+            }
+            if (!titleText.isNullOrEmpty()) {
+                val styledTitle = SpannableString(titleText).apply {
+                    setSpan(
+                        ForegroundColorSpan(theme.toolbarTextColor),
+                        0,
+                        length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+                title = styledTitle
+            }
         }
     }
 

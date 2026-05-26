@@ -45,6 +45,8 @@ import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.extensions.setClipboardWithToast
 import jp.hazuki.yuzubrowser.ui.extensions.share
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.theme.ThemeDataResolver
+import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
 import jp.hazuki.yuzubrowser.ui.widget.recycler.LoadMoreListener
 import jp.hazuki.yuzubrowser.ui.widget.recycler.RecyclerTouchLocationDetector
 import java.util.*
@@ -77,6 +79,7 @@ class BrowserHistoryFragment : Fragment(), BrowserHistoryAdapter.OnHistoryRecycl
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val touchScrollBar = view.findViewById<TouchScrollBar>(R.id.touchScrollBar)
+        val themeData = ThemeDataResolver.resolve(requireContext())
 
         pickMode = arguments.getBoolean(PICK_MODE)
 
@@ -95,6 +98,11 @@ class BrowserHistoryFragment : Fragment(), BrowserHistoryAdapter.OnHistoryRecycl
         adapter = BrowserHistoryAdapter(activity, manager, faviconManager, pickMode, this)
         val decoration = StickyHeaderDecoration(adapter)
         adapter.setDecoration(decoration)
+        themeData?.let {
+            view.setBackgroundColor(it.contentBackgroundColor)
+            recyclerView.setBackgroundColor(it.contentBackgroundColor)
+            recyclerView.addItemDecoration(DividerItemDecoration(activity, it.contentDividerColor))
+        }
         recyclerView.addItemDecoration(decoration)
         recyclerView.adapter = adapter
 

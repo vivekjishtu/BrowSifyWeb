@@ -48,6 +48,8 @@ import jp.hazuki.yuzubrowser.ui.extensions.addCallback
 import jp.hazuki.yuzubrowser.ui.extensions.applyIconColor
 import jp.hazuki.yuzubrowser.ui.extensions.setClipboardWithToast
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.theme.ThemeDataResolver
+import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
 import jp.hazuki.yuzubrowser.ui.utils.PackageUtils.createShortcut
 import jp.hazuki.yuzubrowser.ui.utils.shareWeb
 import jp.hazuki.yuzubrowser.ui.widget.breadcrumbs.BreadcrumbsView
@@ -103,6 +105,7 @@ class BookmarkFragment : Fragment(), BookmarkItemAdapter.OnBookmarkRecyclerListe
                 setDisplayHomeAsUpEnabled(true)
             }
         }
+        val themeData = ThemeDataResolver.resolve(requireContext())
 
         val recyclerView = binding.recyclerView
         val breadCrumbsView = binding.breadCrumbsView
@@ -119,6 +122,23 @@ class BookmarkFragment : Fragment(), BookmarkItemAdapter.OnBookmarkRecyclerListe
         locationDetector = RecyclerTouchLocationDetector()
 
         recyclerView.addOnItemTouchListener(locationDetector)
+        themeData?.let {
+            binding.root.setBackgroundColor(it.contentBackgroundColor)
+            binding.coordinator.setBackgroundColor(it.contentBackgroundColor)
+            binding.recyclerView.setBackgroundColor(it.contentBackgroundColor)
+            binding.toolbarAppbar.setBackgroundColor(it.toolbarBackgroundColor)
+            binding.toolBar.setBackgroundColor(it.toolbarBackgroundColor)
+            binding.subBar.setBackgroundColor(it.toolbarBackgroundColor)
+            binding.breadCrumbsView.setBackgroundColor(it.toolbarBackgroundColor)
+            binding.toolBar.setTitleTextColor(it.toolbarTextColor)
+            binding.toolBar.navigationIcon?.setTint(it.toolbarTextColor)
+            binding.breadCrumbsView.setColors(it.toolbarTextColor, it.toolbarImageColor, it.toolbarImageColor)
+            binding.fastScroller.scrollBarColor = it.contentDividerColor
+            binding.fastScroller.handleNormalColor = it.contentIconColor
+            binding.fastScroller.handlePressedColor = it.toolbarImageColor
+            recyclerView.setBackgroundColor(it.contentBackgroundColor)
+            recyclerView.addItemDecoration(DividerItemDecoration(activity, it.contentDividerColor))
+        }
 
         breadcrumbAdapter = BreadcrumbsViewAdapter(activity, breadCrumbsView)
         breadCrumbsView.adapter = breadcrumbAdapter

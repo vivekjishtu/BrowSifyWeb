@@ -17,6 +17,7 @@
 package jp.hazuki.yuzubrowser.bookmark.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.ColorDrawable
@@ -24,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import jp.hazuki.bookmark.R
 import jp.hazuki.yuzubrowser.bookmark.item.BookmarkFolder
@@ -32,7 +34,9 @@ import jp.hazuki.yuzubrowser.bookmark.item.BookmarkSite
 import jp.hazuki.yuzubrowser.core.utility.extensions.getResColor
 import jp.hazuki.yuzubrowser.core.utility.utils.FontUtils
 import jp.hazuki.yuzubrowser.favicon.FaviconManager
+import jp.hazuki.yuzubrowser.ui.R as UiR
 import jp.hazuki.yuzubrowser.ui.extensions.getColorFromThemeRes
+import jp.hazuki.yuzubrowser.ui.theme.ThemeDataResolver
 import jp.hazuki.yuzubrowser.ui.widget.recycler.ArrayRecyclerAdapter
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
 
@@ -46,8 +50,12 @@ open class BookmarkItemAdapter(
     private val bookmarkItemListener: OnBookmarkRecyclerListener
 ) : ArrayRecyclerAdapter<BookmarkItem, BookmarkItemAdapter.BookmarkFolderHolder>(context, list, null) {
 
+    private val themeData = ThemeDataResolver.resolve(context)
+    private val primaryTextColor = themeData?.contentTextColor ?: context.getColorFromThemeRes(android.R.attr.textColorPrimary)
+    private val secondaryTextColor = themeData?.contentSummaryColor ?: context.getColorFromThemeRes(android.R.attr.textColorSecondary)
+    private val iconColor = themeData?.contentIconColor ?: resolveIconColor(context)
     private val defaultColorFilter: PorterDuffColorFilter =
-        PorterDuffColorFilter(context.getColorFromThemeRes(R.attr.iconColor), PorterDuff.Mode.SRC_ATOP)
+        PorterDuffColorFilter(iconColor, PorterDuff.Mode.SRC_ATOP)
 
     private val foregroundOverlay =
         ColorDrawable(context.getResColor(R.color.selected_overlay))
@@ -70,24 +78,31 @@ open class BookmarkItemAdapter(
 
     override fun onBindViewHolder(holder: BookmarkFolderHolder, item: BookmarkItem, position: Int) {
         if (item is BookmarkSite) {
-            holder as SimpleBookmarkSiteHolder
+            val siteHolder = holder as SimpleBookmarkSiteHolder
             if (!openNewTab || pickMode || isMultiSelectMode) {
-                holder.imageButton.isEnabled = false
-                holder.imageButton.isClickable = false
+                siteHolder.imageButton.isEnabled = false
+                siteHolder.imageButton.isClickable = false
             } else {
-                holder.imageButton.isEnabled = true
-                holder.imageButton.isClickable = true
+                siteHolder.imageButton.isEnabled = true
+                siteHolder.imageButton.isClickable = true
             }
 
             val bitmap = faviconManager[item.url]
             if (bitmap != null) {
-                holder.imageButton.setImageBitmap(bitmap)
-                holder.imageButton.clearColorFilter()
+                siteHolder.imageButton.setImageBitmap(bitmap)
+                siteHolder.imageButton.clearColorFilter()
+                siteHolder.imageButton.imageTintList = null
             } else {
-                holder.imageButton.setImageResource(R.drawable.ic_bookmark_white_24dp)
-                holder.imageButton.colorFilter = defaultColorFilter
+                siteHolder.imageButton.setImageResource(R.drawable.ic_bookmark_white_24dp)
+                siteHolder.imageButton.colorFilter = defaultColorFilter
+                siteHolder.imageButton.imageTintList = ColorStateList.valueOf(iconColor)
             }
         }
+
+        holder.title.setTextColor(primaryTextColor)
+        holder.urlTextView?.setTextColor(secondaryTextColor)
+        holder.iconImageView?.imageTintList = ColorStateList.valueOf(iconColor)
+        holder.more.imageTintList = ColorStateList.valueOf(iconColor)
 
         if (isMultiSelectMode && isSelected(position)) {
             holder.foreground.background = foregroundOverlay
@@ -142,6 +157,8 @@ open class BookmarkItemAdapter(
         val title: TextView = itemView.findViewById(R.id.titleTextView)
         val more: ImageButton = itemView.findViewById(R.id.overflowButton)
         val foreground: View = itemView.findViewById(R.id.foreground)
+        val iconImageView: ImageView? = itemView.findViewById(R.id.iconImageView)
+        val urlTextView: TextView? = itemView.findViewById(R.id.urlTextView)
 
 
         init {
@@ -192,5 +209,9 @@ open class BookmarkItemAdapter(
     companion object {
         const val TYPE_SITE = 1
         const val TYPE_FOLDER = 2
+
+        private fun resolveIconColor(context: Context): Int {
+            return context.getColorFromThemeRes(UiR.attr.iconColor)
+        }
     }
 }

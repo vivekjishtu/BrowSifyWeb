@@ -46,6 +46,7 @@ import jp.hazuki.yuzubrowser.ui.ACTIVITY_MAIN_BROWSER
 import jp.hazuki.yuzubrowser.ui.BrowserApplication
 import jp.hazuki.yuzubrowser.ui.extensions.addCallback
 import jp.hazuki.yuzubrowser.ui.extensions.intentFor
+import jp.hazuki.yuzubrowser.ui.theme.ThemeDataResolver
 import jp.hazuki.yuzubrowser.ui.widget.longToast
 import jp.hazuki.yuzubrowser.ui.widget.recycler.DividerItemDecoration
 import jp.hazuki.yuzubrowser.ui.widget.recycler.LoadMoreListener
@@ -71,6 +72,7 @@ class DownloadListFragment : Fragment(), ActivityClient.ActivityClientListener, 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val activity = activity ?: return
+        val themeData = ThemeDataResolver.resolve(requireContext())
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val layoutManager = LinearLayoutManager(activity)
@@ -79,7 +81,11 @@ class DownloadListFragment : Fragment(), ActivityClient.ActivityClientListener, 
                 adapter.loadMore()
             }
         })
-        recyclerView.addItemDecoration(DividerItemDecoration(activity))
+        themeData?.let {
+            view.setBackgroundColor(it.contentBackgroundColor)
+            recyclerView.setBackgroundColor(it.contentBackgroundColor)
+            recyclerView.addItemDecoration(DividerItemDecoration(activity, it.contentDividerColor))
+        } ?: recyclerView.addItemDecoration(DividerItemDecoration(activity))
         recyclerView.layoutManager = layoutManager
 
         adapter = DownloadListAdapter(activity, viewLifecycleOwner, downloadsDao, this)

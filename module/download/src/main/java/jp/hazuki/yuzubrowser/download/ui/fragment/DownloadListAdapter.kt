@@ -17,6 +17,7 @@
 package jp.hazuki.yuzubrowser.download.ui.fragment
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.text.format.DateFormat
@@ -34,11 +35,14 @@ import ca.barrenechea.widget.recyclerview.decoration.StickyHeaderAdapter
 import ca.barrenechea.widget.recyclerview.decoration.StickyHeaderDecoration
 import jp.hazuki.yuzubrowser.core.utility.extensions.binarySearchLong
 import jp.hazuki.yuzubrowser.core.utility.extensions.getResColor
-import jp.hazuki.yuzubrowser.download.R
+import jp.hazuki.yuzubrowser.download.R as DownloadR
 import jp.hazuki.yuzubrowser.download.core.data.DownloadFileInfo
 import jp.hazuki.yuzubrowser.download.core.utils.getNotificationString
 import jp.hazuki.yuzubrowser.download.databinding.FragmentDownloadListItemBinding
 import jp.hazuki.yuzubrowser.download.repository.DownloadsDao
+import jp.hazuki.yuzubrowser.ui.R as UiR
+import jp.hazuki.yuzubrowser.ui.extensions.getColorFromThemeRes
+import jp.hazuki.yuzubrowser.ui.theme.ThemeDataResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -57,6 +61,10 @@ class DownloadListAdapter(
     private val calendar = Calendar.getInstance()
     private val dateFormat = DateFormat.getLongDateFormat(context)
     private val timeFormatter = TimeFormatter()
+    private val themeData = ThemeDataResolver.resolve(context)
+    private val primaryTextColor = themeData?.contentTextColor ?: context.getColorFromThemeRes(android.R.attr.textColorPrimary)
+    private val secondaryTextColor = themeData?.contentSummaryColor ?: context.getColorFromThemeRes(android.R.attr.textColorSecondary)
+    private val iconColor = themeData?.contentIconColor ?: context.getColorFromThemeRes(UiR.attr.iconColor)
 
     var decoration: StickyHeaderDecoration? = null
 
@@ -71,7 +79,7 @@ class DownloadListAdapter(
     }
 
     private val itemSelected = SparseBooleanArray()
-    private val foregroundOverlay = ColorDrawable(context.getResColor(R.color.selected_overlay))
+    private val foregroundOverlay = ColorDrawable(context.getResColor(DownloadR.color.selected_overlay))
     var isMultiSelectMode = false
         set(value) {
             if (value != field) {
@@ -100,7 +108,9 @@ class DownloadListAdapter(
         val item = items[position]
 
         holder.binding.filenameTextView.text = item.name
+        holder.binding.filenameTextView.setTextColor(primaryTextColor)
         holder.binding.timeTextView.text = timeFormatter.format(item.startTime)
+        holder.binding.timeTextView.setTextColor(secondaryTextColor)
         holder.binding.foreground.background =
             if (isMultiSelectMode && isSelected(position)) foregroundOverlay else null
 
@@ -113,6 +123,14 @@ class DownloadListAdapter(
         } else {
             Uri.parse(item.url).host
         }
+        holder.binding.urlTextView.setTextColor(secondaryTextColor)
+        holder.binding.sizeTextView.setTextColor(secondaryTextColor)
+        holder.binding.splitTextView.setTextColor(secondaryTextColor)
+        holder.binding.statusTextView.setTextColor(secondaryTextColor)
+        holder.binding.overflowButton.imageTintList = ColorStateList.valueOf(iconColor)
+        holder.binding.progressBar.progressTintList = ColorStateList.valueOf(themeData?.progressColor ?: iconColor)
+        holder.binding.progressBar.secondaryProgressTintList = ColorStateList.valueOf(themeData?.progressIndeterminateColor ?: iconColor)
+        holder.binding.progressBar.indeterminateTintList = ColorStateList.valueOf(themeData?.progressIndeterminateColor ?: iconColor)
 
         updateState(holder, item)
 
@@ -150,9 +168,9 @@ class DownloadListAdapter(
         holder.binding.apply {
             when (info.state) {
                 DownloadFileInfo.STATE_DOWNLOADED -> {
-                    statusTextView.setText(R.string.download_success)
+                    statusTextView.setText(DownloadR.string.download_success)
                     if (info.size < 0) {
-                        sizeTextView.setText(R.string.unknown)
+                        sizeTextView.setText(DownloadR.string.unknown)
                     } else {
                         sizeTextView.text = Formatter.formatFileSize(context, info.size)
                     }
@@ -161,7 +179,7 @@ class DownloadListAdapter(
                     progressBar.visibility = View.GONE
                 }
                 DownloadFileInfo.STATE_CANCELED -> {
-                    statusTextView.setText(R.string.download_cancel)
+                    statusTextView.setText(DownloadR.string.download_cancel)
                     sizeTextView.visibility = View.GONE
                     splitTextView.visibility = View.GONE
                     progressBar.visibility = View.GONE
@@ -179,13 +197,13 @@ class DownloadListAdapter(
                     }
                 }
                 DownloadFileInfo.STATE_PAUSED, DownloadFileInfo.STATE_UNKNOWN_ERROR or DownloadFileInfo.STATE_PAUSED -> {
-                    statusTextView.setText(R.string.download_paused)
+                    statusTextView.setText(DownloadR.string.download_paused)
                     sizeTextView.visibility = View.GONE
                     splitTextView.visibility = View.GONE
                     progressBar.visibility = View.GONE
                 }
                 else -> {
-                    statusTextView.setText(R.string.download_fail)
+                    statusTextView.setText(DownloadR.string.download_fail)
                     sizeTextView.visibility = View.GONE
                     splitTextView.visibility = View.GONE
                     progressBar.visibility = View.GONE
@@ -282,7 +300,7 @@ class DownloadListAdapter(
     }
 
     override fun onCreateHeaderViewHolder(parent: ViewGroup): HeaderHolder {
-        return HeaderHolder(inflater.inflate(R.layout.recycler_view_header, parent, false))
+        return HeaderHolder(inflater.inflate(DownloadR.layout.recycler_view_header, parent, false))
     }
 
     override fun onBindHeaderViewHolder(viewholder: HeaderHolder, position: Int) {
@@ -291,6 +309,12 @@ class DownloadListAdapter(
 
     class HeaderHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var header: TextView = itemView as TextView
+
+        init {
+            val themeData = ThemeDataResolver.resolve(itemView.context)
+            header.setBackgroundColor(themeData?.historyHeaderBackgroundColor ?: itemView.context.getColorFromThemeRes(android.R.attr.colorBackground))
+            header.setTextColor(themeData?.historyHeaderTextColor ?: itemView.context.getColorFromThemeRes(android.R.attr.textColorPrimary))
+        }
     }
 
     companion object {

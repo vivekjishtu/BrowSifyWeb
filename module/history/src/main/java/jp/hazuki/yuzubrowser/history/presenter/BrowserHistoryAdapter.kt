@@ -37,9 +37,11 @@ import jp.hazuki.yuzubrowser.favicon.FaviconManager
 import jp.hazuki.yuzubrowser.history.repository.BrowserHistoryManager
 import jp.hazuki.yuzubrowser.history.repository.BrowserHistoryModel
 import jp.hazuki.yuzubrowser.historyModel.R
+import jp.hazuki.yuzubrowser.ui.R as UiR
 import jp.hazuki.yuzubrowser.ui.extensions.decodePunyCodeUrlHost
 import jp.hazuki.yuzubrowser.ui.extensions.getColorFromThemeRes
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.theme.ThemeDataResolver
 import jp.hazuki.yuzubrowser.ui.widget.recycler.OnRecyclerListener
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,8 +55,10 @@ constructor(
     private val listener: OnHistoryRecyclerListener
 ) : RecyclerView.Adapter<BrowserHistoryAdapter.HistoryHolder>(), StickyHeaderAdapter<BrowserHistoryAdapter.HeaderHolder> {
 
-    private val defaultColorFilter = PorterDuffColorFilter(
-        context.getColorFromThemeRes(R.attr.iconColor), PorterDuff.Mode.SRC_ATOP)
+    private val themeData = ThemeDataResolver.resolve(context)
+    private val primaryTextColor = themeData?.contentTextColor ?: context.getColorFromThemeRes(android.R.attr.textColorPrimary)
+    private val secondaryTextColor = themeData?.contentSummaryColor ?: context.getColorFromThemeRes(android.R.attr.textColorSecondary)
+    private val iconColor = themeData?.contentIconColor ?: context.getColorFromThemeRes(UiR.attr.iconColor)
 
     private val dateFormat = DateFormat.getLongDateFormat(context)
     @SuppressLint("SimpleDateFormat")
@@ -109,7 +113,7 @@ constructor(
 
         if (image == null) {
             holder.imageButton.setImageResource(R.drawable.ic_public_white_24dp)
-            holder.imageButton.colorFilter = defaultColorFilter
+            holder.imageButton.colorFilter = PorterDuffColorFilter(iconColor, PorterDuff.Mode.SRC_ATOP)
         } else {
             holder.imageButton.setImageBitmap(image)
             holder.imageButton.colorFilter = faviconColorFilter
@@ -121,8 +125,12 @@ constructor(
             holder.foreground.background = null
         }
         holder.titleTextView.text = item.title
+        holder.titleTextView.setTextColor(primaryTextColor)
         holder.urlTextView.text = url
+        holder.urlTextView.setTextColor(secondaryTextColor)
         holder.timeTextView.text = timeFormat.format(Date(item.time))
+        holder.timeTextView.setTextColor(secondaryTextColor)
+        holder.overflowButton.setColorFilter(iconColor)
 
         holder.itemView.setOnClickListener { v ->
             if (isMultiSelectMode) {
@@ -259,12 +267,15 @@ constructor(
 
     class HeaderHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val header: TextView = itemView as TextView
+        private val themeData = ThemeDataResolver.resolve(itemView.context)
 
         init {
             val fontSizeSetting = AppPrefs.fontSizeHistory.get()
             if (fontSizeSetting >= 0) {
                 header.textSize = FontUtils.getTextSize(fontSizeSetting).toFloat()
             }
+            header.setBackgroundColor(themeData?.historyHeaderBackgroundColor ?: itemView.context.getColorFromThemeRes(android.R.attr.colorBackground))
+            header.setTextColor(themeData?.historyHeaderTextColor ?: itemView.context.getColorFromThemeRes(android.R.attr.textColorPrimary))
         }
     }
 

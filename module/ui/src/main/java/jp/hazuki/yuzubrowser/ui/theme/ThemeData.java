@@ -42,6 +42,10 @@ public class ThemeData {
     public ShapeDrawable toolbarButtonBackgroundPress, toolbarTextButtonBackgroundPress;
     public int menuBackgroundColor, menuBorderColor, menuTextColor, menuIconColor, menuDividerColor, menuItemPressedColor;
     public int menuToolbarButtonColor, menuToolbarButtonPressedColor;
+    public int settingsBackgroundColor, settingsTextColor, settingsSummaryColor, settingsIconColor, settingsDividerColor, settingsCategoryColor;
+    public int settingsSwitchThumbColor, settingsSwitchTrackColor;
+    public int historyHeaderBackgroundColor, historyHeaderTextColor;
+    public int contentBackgroundColor, contentTextColor, contentSummaryColor, contentIconColor, contentDividerColor;
     public int qcItemBackgroundColorNormal, qcItemBackgroundColorSelect, qcItemColor;
     public int statusBarColor;
     private boolean statusBarDarkIcon;
@@ -90,6 +94,51 @@ public class ThemeData {
         menuItemPressedColor = theme.color("menuItemPressed");
         menuToolbarButtonColor = theme.color("menuToolbarButton");
         menuToolbarButtonPressedColor = theme.color("menuToolbarButtonPressed");
+        settingsBackgroundColor = theme.color("settingsBackground");
+        settingsTextColor = theme.color("settingsText");
+        settingsSummaryColor = theme.color("settingsSummary");
+        settingsIconColor = theme.color("settingsIcon");
+        settingsDividerColor = theme.color("settingsDivider");
+        settingsCategoryColor = theme.color("settingsCategory");
+        settingsSwitchThumbColor = theme.color("settingsSwitchThumb");
+        settingsSwitchTrackColor = theme.color("settingsSwitchTrack");
+        historyHeaderBackgroundColor = theme.color("historyHeaderBackground");
+        historyHeaderTextColor = theme.color("historyHeaderText");
+        contentBackgroundColor = theme.color("contentBackground");
+        contentTextColor = theme.color("contentText");
+        contentSummaryColor = theme.color("contentSummary");
+        contentIconColor = theme.color("contentIcon");
+        contentDividerColor = theme.color("contentDivider");
+        if (contentBackgroundColor == 0) {
+            contentBackgroundColor = settingsBackgroundColor != 0 ? settingsBackgroundColor : tabListBackgroundColor;
+        }
+        if (contentTextColor == 0) {
+            contentTextColor = settingsTextColor != 0 ? settingsTextColor : toolbarTextColor;
+        }
+        if (contentSummaryColor == 0) {
+            contentSummaryColor = settingsSummaryColor != 0 ? settingsSummaryColor : toolbarTextColor;
+        }
+        if (contentIconColor == 0) {
+            contentIconColor = settingsIconColor != 0 ? settingsIconColor : toolbarImageColor;
+        }
+        if (contentDividerColor == 0) {
+            contentDividerColor = settingsDividerColor != 0 ? settingsDividerColor : tabListDividerColor;
+        }
+        if (settingsCategoryColor == 0) {
+            settingsCategoryColor = settingsSummaryColor != 0 ? settingsSummaryColor : toolbarImageColor;
+        }
+        if (settingsSwitchThumbColor == 0) {
+            settingsSwitchThumbColor = tabAccentColor != 0 ? tabAccentColor : toolbarImageColor;
+        }
+        if (settingsSwitchTrackColor == 0) {
+            settingsSwitchTrackColor = tabDividerColor != 0 ? tabDividerColor : settingsDividerColor;
+        }
+        if (historyHeaderBackgroundColor == 0) {
+            historyHeaderBackgroundColor = toolbarBackgroundColor != 0 ? toolbarBackgroundColor : tabListBackgroundColor;
+        }
+        if (historyHeaderTextColor == 0) {
+            historyHeaderTextColor = toolbarTextColor != 0 ? toolbarTextColor : contentTextColor;
+        }
 
         Drawable toolbarButtonPressDrawable = theme.drawable("toolbarButtonPress");
         if (toolbarButtonPressDrawable != null) {

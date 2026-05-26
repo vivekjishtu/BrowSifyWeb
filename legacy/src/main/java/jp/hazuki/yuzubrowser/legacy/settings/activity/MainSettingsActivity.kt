@@ -33,6 +33,7 @@ import jp.hazuki.yuzubrowser.core.utility.extensions.getResColor
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.debug.DebugActivity
 import jp.hazuki.yuzubrowser.ui.app.ThemeActivity
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 
 @AndroidEntryPoint
 class MainSettingsActivity : ThemeActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback, ReplaceFragmentListener {
@@ -53,6 +54,8 @@ class MainSettingsActivity : ThemeActivity(), PreferenceFragmentCompat.OnPrefere
         setContentView(R.layout.activity_settings)
         setupActionBar()
 
+        findViewById<View>(R.id.container).setBackgroundColor(resolveSettingsBackgroundColor())
+
         val rootView = findViewById<View>(android.R.id.content)
         ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -71,9 +74,20 @@ class MainSettingsActivity : ThemeActivity(), PreferenceFragmentCompat.OnPrefere
      * Set up the [android.app.ActionBar], if the API is available.
      */
     private fun setupActionBar() {
+        val backgroundColor = resolveSettingsBackgroundColor()
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
-            setBackgroundDrawable(ColorDrawable(getResColor(R.color.primary)))
+            setBackgroundDrawable(ColorDrawable(backgroundColor))
+        }
+    }
+
+    private fun resolveSettingsBackgroundColor(): Int {
+        val themeData = ThemeData.getInstance()
+        return when {
+            themeData != null && themeData.settingsBackgroundColor != 0 -> themeData.settingsBackgroundColor
+            themeData != null && themeData.menuBackgroundColor != 0 -> themeData.menuBackgroundColor
+            themeData != null && themeData.toolbarBackgroundColor != 0 -> themeData.toolbarBackgroundColor
+            else -> getResColor(R.color.primary)
         }
     }
 

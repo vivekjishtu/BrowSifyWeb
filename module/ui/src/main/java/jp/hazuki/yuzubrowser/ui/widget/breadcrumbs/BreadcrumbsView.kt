@@ -30,9 +30,12 @@ class BreadcrumbsView @JvmOverloads constructor(context: Context, attrs: Attribu
         orientation = LinearLayoutManager.HORIZONTAL
     }
 
-    internal val currentTextColor: Int
-    internal val otherTextColor: Int
-    private val arrowColor: Int
+    var currentTextColor: Int
+        private set
+    var otherTextColor: Int
+        private set
+    private var arrowColor: Int
+    private var itemDecoration: BreadcrumbItemDecoration? = null
 
     var listener: OnBreadcrumbsViewClickListener? = null
 
@@ -45,7 +48,20 @@ class BreadcrumbsView @JvmOverloads constructor(context: Context, attrs: Attribu
         arrowColor = a.getColor(R.styleable.BreadcrumbsView_crumbsArrowColor, otherTextColor)
         a.recycle()
 
-        addItemDecoration(BreadcrumbItemDecoration(context, arrowColor))
+        itemDecoration = BreadcrumbItemDecoration(context, arrowColor)
+        addItemDecoration(itemDecoration!!)
+    }
+
+    fun setColors(currentTextColor: Int, otherTextColor: Int, arrowColor: Int = otherTextColor) {
+        this.currentTextColor = currentTextColor
+        this.otherTextColor = otherTextColor
+
+        if (this.arrowColor != arrowColor) {
+            itemDecoration?.let { removeItemDecoration(it) }
+            this.arrowColor = arrowColor
+            itemDecoration = BreadcrumbItemDecoration(context, arrowColor)
+            addItemDecoration(itemDecoration!!)
+        }
     }
 
 

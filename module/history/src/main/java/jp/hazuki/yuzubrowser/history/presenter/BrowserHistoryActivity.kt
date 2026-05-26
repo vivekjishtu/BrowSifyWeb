@@ -17,11 +17,17 @@
 package jp.hazuki.yuzubrowser.history.presenter
 
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.MenuItem
 import android.view.WindowInsets
 import android.view.WindowManager
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.DrawableCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hazuki.yuzubrowser.core.utility.extensions.convertDpToFloatPx
 import jp.hazuki.yuzubrowser.historyModel.R
@@ -29,6 +35,7 @@ import jp.hazuki.yuzubrowser.ui.INTENT_EXTRA_MODE_FULLSCREEN
 import jp.hazuki.yuzubrowser.ui.INTENT_EXTRA_MODE_ORIENTATION
 import jp.hazuki.yuzubrowser.ui.app.ThemeActivity
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 
 @AndroidEntryPoint
 class BrowserHistoryActivity : ThemeActivity() {
@@ -66,6 +73,38 @@ class BrowserHistoryActivity : ThemeActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, BrowserHistoryFragment(pickMode))
             .commit()
+    }
+
+    override fun onTitleChanged(title: CharSequence?, color: Int) {
+        super.onTitleChanged(title, color)
+        applyThemedActionBar(title)
+    }
+
+    private fun applyThemedActionBar(titleText: CharSequence?) {
+        val theme = ThemeData.getInstance() ?: return
+        supportActionBar?.run {
+            setBackgroundDrawable(ColorDrawable(theme.toolbarBackgroundColor))
+            setDisplayHomeAsUpEnabled(true)
+            AppCompatResources.getDrawable(
+                this@BrowserHistoryActivity,
+                androidx.appcompat.R.drawable.abc_ic_ab_back_material
+            )?.let { drawable ->
+                val wrapped = DrawableCompat.wrap(drawable).mutate()
+                DrawableCompat.setTint(wrapped, theme.toolbarTextColor)
+                setHomeAsUpIndicator(wrapped)
+            }
+            if (!titleText.isNullOrEmpty()) {
+                val styledTitle = SpannableString(titleText).apply {
+                    setSpan(
+                        ForegroundColorSpan(theme.toolbarTextColor),
+                        0,
+                        length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+                title = styledTitle
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
