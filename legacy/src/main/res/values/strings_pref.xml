@@ -467,4 +467,5 @@
         <item>1</item>
         <item>2</item>
     </integer-array>
+    <string name="open_link_in_private_tab">Open in a new Private Tab</string>
 </resources>
