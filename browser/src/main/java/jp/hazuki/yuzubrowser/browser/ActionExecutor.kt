@@ -116,19 +116,19 @@ class ActionExecutor(
                         return true
                     }
                     SingleAction.LPRESS_OPEN_NEW -> {
-                        controller.openInNewTab(url, TabType.WINDOW)
+                        controller.openInNewTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_BG -> {
-                        controller.openInBackground(url, TabType.WINDOW)
+                        controller.openInBackground(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_NEW_RIGHT -> {
-                        controller.openInRightNewTab(url, TabType.WINDOW)
+                        controller.openInRightNewTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_BG_RIGHT -> {
-                        controller.openInRightBgTab(url, TabType.WINDOW)
+                        controller.openInRightBgTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_SHARE -> {
@@ -204,19 +204,19 @@ class ActionExecutor(
                         return true
                     }
                     SingleAction.LPRESS_OPEN_IMAGE_NEW -> {
-                        controller.openInNewTab(url, TabType.WINDOW)
+                        controller.openInNewTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_IMAGE_BG -> {
-                        controller.openInBackground(url, TabType.WINDOW)
+                        controller.openInBackground(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT -> {
-                        controller.openInRightNewTab(url, TabType.WINDOW)
+                        controller.openInRightNewTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT -> {
-                        controller.openInRightBgTab(url, TabType.WINDOW)
+                        controller.openInRightBgTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_SHARE_IMAGE_URL -> {
@@ -247,7 +247,7 @@ class ActionExecutor(
                         return true
                     }
                     SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> {
-                        controller.openInNewTab(url.makeGoogleImageSearch(), TabType.WINDOW)
+                        controller.openInNewTab(url.makeGoogleImageSearch(), linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_IMAGE_RES_BLOCK -> {
@@ -350,19 +350,19 @@ class ActionExecutor(
                         return true
                     }
                     SingleAction.LPRESS_OPEN_IMAGE_NEW -> {
-                        controller.openInNewTab(url, TabType.WINDOW)
+                        controller.openInNewTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_IMAGE_BG -> {
-                        controller.openInBackground(url, TabType.WINDOW)
+                        controller.openInBackground(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT -> {
-                        controller.openInRightNewTab(url, TabType.WINDOW)
+                        controller.openInRightNewTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_OPEN_IMAGE_BG_RIGHT -> {
-                        controller.openInRightBgTab(url, TabType.WINDOW)
+                        controller.openInRightBgTab(url, linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_SHARE_IMAGE_URL -> {
@@ -393,7 +393,7 @@ class ActionExecutor(
                         return true
                     }
                     SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> {
-                        controller.openInNewTab(url.makeGoogleImageSearch(), TabType.WINDOW)
+                        controller.openInNewTab(url.makeGoogleImageSearch(), linkedTabType(target))
                         return true
                     }
                     SingleAction.LPRESS_IMAGE_RES_BLOCK -> {
@@ -1135,29 +1135,34 @@ class ActionExecutor(
     }
 
     private fun performNewTabLink(perform: Int, tab: MainTabData, url: String, @TabType type: Int): Boolean {
+        val actualType = if (tab.tabType == TabType.PRIVATE && type != TabType.INTENT) TabType.PRIVATE else type
         when (perform) {
             BrowserManager.LOAD_URL_TAB_CURRENT -> {
                 controller.loadUrl(tab, url)
                 return true
             }
             BrowserManager.LOAD_URL_TAB_NEW -> {
-                controller.openInNewTab(url, type)
+                controller.openInNewTab(url, actualType)
                 return true
             }
             BrowserManager.LOAD_URL_TAB_BG -> {
-                controller.openInBackground(url, type)
+                controller.openInBackground(url, actualType)
                 return true
             }
             BrowserManager.LOAD_URL_TAB_NEW_RIGHT -> {
-                controller.openInRightNewTab(url, type)
+                controller.openInRightNewTab(url, actualType)
                 return true
             }
             BrowserManager.LOAD_URL_TAB_BG_RIGHT -> {
-                controller.openInRightBgTab(url, type)
+                controller.openInRightBgTab(url, actualType)
                 return true
             }
             else -> throw IllegalArgumentException("Unknown perform:$perform")
         }
+    }
+
+    private fun linkedTabType(target: ActionController.HitTestResultTargetInfo): Int {
+        return if (controller.getTabOrNull(target.webView)?.tabType == TabType.PRIVATE) TabType.PRIVATE else TabType.WINDOW
     }
 
     private val takeCurrentTabScreen = Runnable {

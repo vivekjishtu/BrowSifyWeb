@@ -24,6 +24,7 @@ class WebSrcImageOpenRightNewTabHandler(controller: BrowserController) : WebSrcI
     private val mReference: WeakReference<BrowserController> = WeakReference(controller)
 
     override fun handleUrl(url: String) {
-        mReference.get()?.openInRightNewTab(url, TabType.WINDOW)
+        val controller = mReference.get() ?: return
+        controller.openInRightNewTab(url, if (controller.isPrivateMode) TabType.PRIVATE else TabType.WINDOW)
     }
 }
