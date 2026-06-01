@@ -22,7 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
@@ -111,6 +111,12 @@ class WebClient(
     private val webPermissionsDao: WebPermissionsDao,
     faviconManager: FaviconManager
 ) : WebViewUtility {
+    private val blackVideoPoster: Bitmap by lazy {
+        Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888).apply {
+            eraseColor(Color.BLACK)
+        }
+    }
+
     private val patternManager = PatternUrlManager(activity.applicationContext)
     private val speedDialManager = SpeedDialAsyncManager(activity.applicationContext)
     private val speedDialHtml = SpeedDialHtml(activity.applicationContext)
@@ -907,9 +913,7 @@ class WebClient(
             }
         }
 
-        override fun getDefaultVideoPoster(): Bitmap? {
-            return BitmapFactory.decodeResource(controller.resourcesByInfo, R.drawable.ic_movie_play_white)
-        }
+        override fun getDefaultVideoPoster(): Bitmap? = blackVideoPoster
     }
 
     private fun checkUrl(data: MainTabData, url: String, uri: Uri): Boolean {
