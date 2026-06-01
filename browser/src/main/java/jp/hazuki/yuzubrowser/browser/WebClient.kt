@@ -501,13 +501,14 @@ class WebClient(
 
         override fun doUpdateVisitedHistory(web: CustomWebView, url: String, isReload: Boolean) {
             val tab = controller.getTabOrNull(web) ?: return
-            if (tab.tabType == TabType.PRIVATE) return
             tab.url = url
             if (tab === controller.currentTabData) {
                 controller.notifyChangeWebState(tab)
             }
 
-            browserHistoryManager?.add(tab.url ?: url)
+            if (tab.tabType != TabType.PRIVATE) {
+                browserHistoryManager?.add(tab.url ?: url)
+            }
         }
 
         override fun onReceivedHttpAuthRequest(web: CustomWebView, handler: HttpAuthHandler, host: String, realm: String) {
