@@ -19,6 +19,8 @@ import jp.hazuki.yuzubrowser.legacy.action.ActionList
 import jp.hazuki.yuzubrowser.legacy.action.SingleAction
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionController
 import jp.hazuki.yuzubrowser.legacy.browser.BrowserController
+import jp.hazuki.yuzubrowser.legacy.webkit.TabType
+import jp.hazuki.yuzubrowser.legacy.webkit.handler.WebSrcOpenPrivateTabHandler
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 
 internal class HitTestContextMenuDialog(
@@ -37,14 +39,29 @@ internal class HitTestContextMenuDialog(
     private val menuDividerColor = themeData?.menuDividerColor.orFallback(adjustColor(menuBackgroundColor, if (themeData?.lightTheme == true) 0.82f else 1.18f))
     private val menuItemPressedColor = themeData?.menuItemPressedColor.orFallback(adjustColor(menuBackgroundColor, if (themeData?.lightTheme == true) 0.94f else 1.10f))
     private val cornerRadius = activity.resources.displayMetrics.density * 18f
+    private val sourceTabType = controller.getTabOrNull(target.webView)?.tabType ?: TabType.WINDOW
 
     fun show() {
-        val sections = splitActions(actionList, menuVariant)
+        val sections = splitActions(augmentActions(actionList), menuVariant)
         if (sections.primary.isEmpty() && sections.advanced.isNotEmpty()) {
             showDialog(sections.advanced, emptyList(), true)
         } else {
             showDialog(sections.primary, sections.advanced, false)
         }
+    }
+
+    private fun augmentActions(actions: ActionList): ActionList {
+        val copy = ActionList()
+        copy.addAll(actions)
+        if (sourceTabType != TabType.PRIVATE &&
+            (menuVariant == HitTestMenuVariant.LINK || menuVariant == HitTestMenuVariant.IMAGE || menuVariant == HitTestMenuVariant.LINKED_IMAGE)
+        ) {
+            val hasPrivateTab = copy.any { !it.isEmpty() && it[0].id == SingleAction.PRIVATE }
+            if (!hasPrivateTab) {
+                copy.add(SingleAction.makeInstance(SingleAction.PRIVATE))
+            }
+        }
+        return copy
     }
 
     private fun showDialog(primaryActions: List<Action>, advancedActions: List<Action>, advancedMode: Boolean) {
@@ -80,16 +97,14 @@ internal class HitTestContextMenuDialog(
 
         if (advancedMode) {
             addAdvancedSections(itemsContainer, allRows) { action ->
-                dialog?.dismiss()
-                onActionClick(action)
+                handleActionClick(action, dialog)
             }
         } else {
             allRows.forEachIndexed { index, action ->
                 val previous = allRows.getOrNull(index - 1)
                 val showDivider = previous != null && groupForAction(previous) != groupForAction(action)
                 itemsContainer.addView(createActionRow(action, showDivider) {
-                    dialog?.dismiss()
-                    onActionClick(action)
+                    handleActionClick(action, dialog)
                 })
             }
 
@@ -121,6 +136,24 @@ internal class HitTestContextMenuDialog(
             scrollView.requestLayout()
             root.requestLayout()
         }
+    }
+
+    private fun handleActionClick(action: Action, dialog: AlertDialog?) {
+        if (!action.isEmpty() && action[0].id == SingleAction.PRIVATE) {
+            dialog?.dismiss()
+            when (menuVariant) {
+                HitTestMenuVariant.LINKED_IMAGE -> {
+                    target.webView.requestFocusNodeHref(WebSrcOpenPrivateTabHandler(controller).obtainMessage())
+                }
+                else -> {
+                    val url = target.result.extra ?: return
+                    controller.openInNewTab(url, TabType.PRIVATE)
+                }
+            }
+            return
+        }
+        dialog?.dismiss()
+        onActionClick(action)
     }
 
     private fun createActionRow(action: Action, showDividerAbove: Boolean, onClick: () -> Unit): View {
@@ -293,6 +326,7 @@ internal class HitTestContextMenuDialog(
             SingleAction.LPRESS_OPEN_IMAGE,
             SingleAction.LPRESS_OPEN_IMAGE_OTHERS -> R.drawable.ic_arrow_forward_white_24dp
             SingleAction.LPRESS_OPEN_NEW,
+            SingleAction.PRIVATE,
             SingleAction.LPRESS_OPEN_IMAGE_NEW,
             SingleAction.LPRESS_OPEN_NEW_RIGHT,
             SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT -> R.drawable.ic_link_white_24dp
@@ -326,6 +360,7 @@ internal class HitTestContextMenuDialog(
         return when (action[0].id) {
             SingleAction.LPRESS_OPEN -> activity.getString(R.string.context_menu_open_here)
             SingleAction.LPRESS_OPEN_NEW -> activity.getString(R.string.context_menu_open_new_tab)
+            SingleAction.PRIVATE -> activity.getString(R.string.open_link_in_private_tab)
             SingleAction.LPRESS_OPEN_BG -> activity.getString(R.string.context_menu_open_background)
             SingleAction.LPRESS_OPEN_NEW_RIGHT -> activity.getString(R.string.context_menu_open_new_tab_right)
             SingleAction.LPRESS_OPEN_BG_RIGHT -> activity.getString(R.string.context_menu_open_background_right)
@@ -356,7 +391,8 @@ internal class HitTestContextMenuDialog(
         return when (menuVariant) {
             HitTestMenuVariant.LINK -> when (action[0].id) {
                 SingleAction.LPRESS_OPEN,
-                SingleAction.LPRESS_OPEN_NEW -> 0
+                SingleAction.LPRESS_OPEN_NEW,
+                SingleAction.PRIVATE -> 0
 
                 SingleAction.LPRESS_COPY_URL,
                 SingleAction.LPRESS_COPY_LINK_TEXT,
@@ -369,7 +405,8 @@ internal class HitTestContextMenuDialog(
 
             HitTestMenuVariant.IMAGE -> when (action[0].id) {
                 SingleAction.LPRESS_OPEN_IMAGE,
-                SingleAction.LPRESS_OPEN_IMAGE_NEW -> 0
+                SingleAction.LPRESS_OPEN_IMAGE_NEW,
+                SingleAction.PRIVATE -> 0
 
                 SingleAction.LPRESS_COPY_IMAGE_URL,
                 SingleAction.LPRESS_SHARE_IMAGE -> 1
@@ -382,7 +419,8 @@ internal class HitTestContextMenuDialog(
 
             HitTestMenuVariant.LINKED_IMAGE -> when (action[0].id) {
                 SingleAction.LPRESS_OPEN,
-                SingleAction.LPRESS_OPEN_NEW -> 0
+                SingleAction.LPRESS_OPEN_NEW,
+                SingleAction.PRIVATE -> 0
 
                 SingleAction.LPRESS_OPEN_IMAGE,
                 SingleAction.LPRESS_OPEN_IMAGE_NEW -> 1
@@ -466,10 +504,11 @@ internal class HitTestContextMenuDialog(
             HitTestMenuVariant.LINK -> when (action[0].id) {
                 SingleAction.LPRESS_OPEN -> 0
                 SingleAction.LPRESS_OPEN_NEW -> 1
-                SingleAction.LPRESS_COPY_URL -> 2
-                SingleAction.LPRESS_COPY_LINK_TEXT -> 3
-                SingleAction.LPRESS_SHARE -> 4
-                SingleAction.LPRESS_SAVE_PAGE -> 5
+                SingleAction.PRIVATE -> 2
+                SingleAction.LPRESS_COPY_URL -> 3
+                SingleAction.LPRESS_COPY_LINK_TEXT -> 4
+                SingleAction.LPRESS_SHARE -> 5
+                SingleAction.LPRESS_SAVE_PAGE -> 6
                 SingleAction.LPRESS_OPEN_BG,
                 SingleAction.LPRESS_OPEN_OTHERS,
                 SingleAction.LPRESS_OPEN_NEW_RIGHT,
@@ -484,10 +523,11 @@ internal class HitTestContextMenuDialog(
             HitTestMenuVariant.IMAGE -> when (action[0].id) {
                 SingleAction.LPRESS_OPEN_IMAGE -> 0
                 SingleAction.LPRESS_OPEN_IMAGE_NEW -> 1
-                SingleAction.LPRESS_COPY_IMAGE_URL -> 2
-                SingleAction.LPRESS_SHARE_IMAGE -> 3
-                SingleAction.LPRESS_SAVE_IMAGE -> 4
-                SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 5
+                SingleAction.PRIVATE -> 2
+                SingleAction.LPRESS_COPY_IMAGE_URL -> 3
+                SingleAction.LPRESS_SHARE_IMAGE -> 4
+                SingleAction.LPRESS_SAVE_IMAGE -> 5
+                SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 6
                 SingleAction.LPRESS_OPEN_IMAGE_BG,
                 SingleAction.LPRESS_OPEN_IMAGE_OTHERS,
                 SingleAction.LPRESS_OPEN_IMAGE_NEW_RIGHT,
@@ -504,16 +544,17 @@ internal class HitTestContextMenuDialog(
             HitTestMenuVariant.LINKED_IMAGE -> when (action[0].id) {
                 SingleAction.LPRESS_OPEN -> 0
                 SingleAction.LPRESS_OPEN_NEW -> 1
-                SingleAction.LPRESS_OPEN_IMAGE -> 2
-                SingleAction.LPRESS_OPEN_IMAGE_NEW -> 3
-                SingleAction.LPRESS_COPY_URL -> 4
-                SingleAction.LPRESS_COPY_LINK_TEXT -> 5
-                SingleAction.LPRESS_COPY_IMAGE_URL -> 6
-                SingleAction.LPRESS_SHARE -> 7
-                SingleAction.LPRESS_SHARE_IMAGE -> 8
-                SingleAction.LPRESS_SAVE_PAGE -> 9
-                SingleAction.LPRESS_SAVE_IMAGE -> 10
-                SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 11
+                SingleAction.PRIVATE -> 2
+                SingleAction.LPRESS_OPEN_IMAGE -> 3
+                SingleAction.LPRESS_OPEN_IMAGE_NEW -> 4
+                SingleAction.LPRESS_COPY_URL -> 5
+                SingleAction.LPRESS_COPY_LINK_TEXT -> 6
+                SingleAction.LPRESS_COPY_IMAGE_URL -> 7
+                SingleAction.LPRESS_SHARE -> 8
+                SingleAction.LPRESS_SHARE_IMAGE -> 9
+                SingleAction.LPRESS_SAVE_PAGE -> 10
+                SingleAction.LPRESS_SAVE_IMAGE -> 11
+                SingleAction.LPRESS_GOOGLE_IMAGE_SEARCH -> 12
                 SingleAction.LPRESS_OPEN_BG,
                 SingleAction.LPRESS_OPEN_OTHERS,
                 SingleAction.LPRESS_OPEN_NEW_RIGHT,
