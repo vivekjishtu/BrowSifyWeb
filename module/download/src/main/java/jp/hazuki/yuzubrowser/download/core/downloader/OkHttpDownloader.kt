@@ -46,7 +46,7 @@ class OkHttpDownloader(
         val requestBuilder = Request.Builder()
             .url(info.url)
             .get()
-            .setCookie(CookieManager.getInstance().getCookie(info.url))
+            .setCookie(downloadRequest.cookie ?: CookieManager.getInstance().getCookie(info.url))
             .setReferrer(downloadRequest.referrer)
             .setUserAgent(context, downloadRequest.userAgent)
 

@@ -37,13 +37,16 @@ class WebViewFactory(private val moshi: Moshi) {
             }
         }
 
-    fun create(context: Context, @WebViewType mode: Int): CustomWebView {
-        return when (mode) {
+    @JvmOverloads
+    fun create(context: Context, @WebViewType mode: Int, isPrivateProfile: Boolean = false): CustomWebView {
+        val web = when (mode) {
             MODE_NORMAL -> NormalWebView(context)
             MODE_CACHE -> CacheWebView(context)
             MODE_LIMIT_CACHE -> LimitCacheWebView(context, moshi)
             else -> NormalWebView(context)
         }
+        WebViewProfileManager.applyProfile(web.webView, isPrivateProfile)
+        return web
     }
 
     @WebViewType

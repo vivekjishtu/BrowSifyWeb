@@ -90,6 +90,7 @@ import jp.hazuki.yuzubrowser.ui.utils.checkStoragePermission
 import jp.hazuki.yuzubrowser.ui.utils.makeUrlFromQuery
 import jp.hazuki.yuzubrowser.ui.widget.ContextMenuTitleView
 import jp.hazuki.yuzubrowser.webview.CustomWebView
+import jp.hazuki.yuzubrowser.webview.WebViewProfileManager
 import jp.hazuki.yuzubrowser.webview.utility.WebViewUtils
 import jp.hazuki.yuzubrowser.webview.utility.getUserAgent
 import jp.hazuki.yuzubrowser.webview.utility.savePictureOverall
@@ -146,7 +147,11 @@ class ActionExecutor(
                         if (url.startsWith("blob:")) {
                             target.webView.saveBlob(url, 1)
                         } else {
-                            DownloadDialog(url, target.webView.webSettings.userAgentString)//TODO referer
+                            DownloadDialog(
+                                url,
+                                target.webView.webSettings.userAgentString,
+                                cookie = WebViewProfileManager.getCookieManager(target.webView.webView).getCookie(target.webView.url)
+                            )//TODO referer
                                 .show()
                         }
                         return true
@@ -155,7 +160,16 @@ class ActionExecutor(
                         if (url.startsWith("blob:")) {
                             target.webView.saveBlob(url, 2)
                         } else {
-                            val file = DownloadFile(url, null, DownloadRequest(null, target.webView.webSettings.userAgentString, null))
+                            val file = DownloadFile(
+                                url,
+                                null,
+                                DownloadRequest(
+                                    null,
+                                    target.webView.webSettings.userAgentString,
+                                    null,
+                                    WebViewProfileManager.getCookieManager(target.webView.webView).getCookie(target.webView.url)
+                                )
+                            )
                             file.download()
                         }
                         return true
@@ -221,7 +235,13 @@ class ActionExecutor(
                         if (url.startsWith("blob:")) {
                             target.webView.saveBlob(url, 1)
                         } else {
-                            DownloadDialog(url, target.webView.webSettings.userAgentString, target.webView.url, ".jpg")
+                            DownloadDialog(
+                                url,
+                                target.webView.webSettings.userAgentString,
+                                target.webView.url,
+                                ".jpg",
+                                WebViewProfileManager.getCookieManager(target.webView.webView).getCookie(target.webView.url)
+                            )
                                 .show()
                         }
                         return true
@@ -251,7 +271,8 @@ class ActionExecutor(
                                 controller.activity,
                                 url, target.webView.url,
                                 target.webView.getUserAgent(),
-                                ".jpg")
+                                ".jpg",
+                                WebViewProfileManager.getCookieManager(target.webView.webView).getCookie(target.webView.url))
                             controller.startActivity(intent, BrowserController.REQUEST_SHARE_IMAGE)
                         }
                         return true
@@ -261,7 +282,12 @@ class ActionExecutor(
                             target.webView.saveBlob(url, 2)
                         } else {
                             val file = DownloadFile(url, null,
-                                DownloadRequest(target.webView.url, target.webView.webView.settings.userAgentString, ".jpg"))
+                                DownloadRequest(
+                                    target.webView.url,
+                                    target.webView.webView.settings.userAgentString,
+                                    ".jpg",
+                                    WebViewProfileManager.getCookieManager(target.webView.webView).getCookie(target.webView.url)
+                                ))
                             file.download()
                         }
                         return true
@@ -355,7 +381,13 @@ class ActionExecutor(
                         if (url.startsWith("blob:")) {
                             target.webView.saveBlob(url, 1)
                         } else {
-                            DownloadDialog(url, target.webView.webSettings.userAgentString, target.webView.url, ".jpg")
+                            DownloadDialog(
+                                url,
+                                target.webView.webSettings.userAgentString,
+                                target.webView.url,
+                                ".jpg",
+                                WebViewProfileManager.getCookieManager(target.webView.webView).getCookie(target.webView.url)
+                            )
                                 .show()
                         }
                         return true
@@ -387,7 +419,8 @@ class ActionExecutor(
                                 url,
                                 webView.url,
                                 webView.getUserAgent(),
-                                ".jpg")
+                                ".jpg",
+                                WebViewProfileManager.getCookieManager(webView.webView).getCookie(webView.url))
                             controller.startActivity(intent, BrowserController.REQUEST_SHARE_IMAGE)
                         }
                         return true
@@ -397,7 +430,12 @@ class ActionExecutor(
                             target.webView.saveBlob(url, 2)
                         } else {
                             val file = DownloadFile(url, null,
-                                DownloadRequest(target.webView.url, target.webView.webView.settings.userAgentString, ".jpg"))
+                                DownloadRequest(
+                                    target.webView.url,
+                                    target.webView.webView.settings.userAgentString,
+                                    ".jpg",
+                                    WebViewProfileManager.getCookieManager(target.webView.webView).getCookie(target.webView.url)
+                                ))
                             file.download()
                         }
                         return true
@@ -538,6 +576,9 @@ class ActionExecutor(
                 val cookie = !AppPrefs.accept_cookie.get()
                 AppPrefs.accept_cookie.set(cookie)
                 AppPrefs.commit(controller.applicationContextInfo, AppPrefs.accept_cookie)
+                controller.currentTabData?.let {
+                    WebViewProfileManager.getCookieManager(it.mWebView.webView).setAcceptCookie(cookie)
+                }
                 CookieManager.getInstance().setAcceptCookie(cookie)
                 Toast.makeText(controller.applicationContextInfo, if (cookie) R.string.toggle_enable else R.string.toggle_disable, Toast.LENGTH_SHORT).show()
             }
@@ -1140,7 +1181,7 @@ class ActionExecutor(
             val userAgent = tab.mWebView.getUserAgent()
             withContext(Dispatchers.Default) {
                 controller.okHttpClient
-                    .getImage(iconUrl, userAgent, tab.url, CookieManager.getInstance().getCookie(tab.url))
+                    .getImage(iconUrl, userAgent, tab.url, WebViewProfileManager.getCookieManager(tab.mWebView.webView).getCookie(tab.url))
             }
                 ?: faviconManager[tab.originalUrl]
         }

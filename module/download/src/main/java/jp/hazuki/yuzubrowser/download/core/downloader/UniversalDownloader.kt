@@ -47,7 +47,7 @@ class UniversalDownloader(private val context: Context, private val info: Downlo
 
         conn.setRequestProperty("Connection", "close")
 
-        val cookie = CookieManager.getInstance().getCookie(info.url)
+        val cookie = request.cookie ?: CookieManager.getInstance().getCookie(info.url)
         if (!cookie.isNullOrEmpty()) {
             conn.setRequestProperty("Cookie", cookie)
         }

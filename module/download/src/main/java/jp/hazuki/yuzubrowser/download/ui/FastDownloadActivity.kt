@@ -84,7 +84,8 @@ class FastDownloadActivity : ThemeActivity() {
                 download(url,
                     intent.getStringExtra(EXTRA_FILE_REFERER),
                     intent.getStringExtra(EXTRA_USER_AGENT)!!,
-                    intent.getStringExtra(EXTRA_DEFAULT_EXTENSION)!!)
+                    intent.getStringExtra(EXTRA_DEFAULT_EXTENSION)!!,
+                    intent.getStringExtra(EXTRA_COOKIE))
             }
             dialog.dismiss()
             if (uri != null) {
@@ -109,9 +110,9 @@ class FastDownloadActivity : ThemeActivity() {
         }
     }
 
-    private fun download(url: String, referrer: String?, ua: String, defExt: String): Uri? {
+    private fun download(url: String, referrer: String?, ua: String, defExt: String, cookie: String?): Uri? {
         val root = applicationContext.getDownloadDocumentFile()
-        val file = DownloadFile(url, null, DownloadRequest(referrer, ua, defExt))
+        val file = DownloadFile(url, null, DownloadRequest(referrer, ua, defExt, cookie))
         val meta = MetaData(applicationContext, okHttpClient, root, file.url, file.request)
         val info = DownloadFileInfo(root.uri, file, meta)
 
@@ -180,14 +181,16 @@ class FastDownloadActivity : ThemeActivity() {
         private const val EXTRA_FILE_REFERER = "fileReferer"
         private const val EXTRA_DEFAULT_EXTENSION = "defExt"
         private const val EXTRA_USER_AGENT = "ua"
+        private const val EXTRA_COOKIE = "cookie"
         const val EXTRA_MINE_TYPE = "mineType"
 
-        fun intent(context: Context, url: String, referrer: String?, ua: String, defExt: String): Intent {
+        fun intent(context: Context, url: String, referrer: String?, ua: String, defExt: String, cookie: String? = null): Intent {
             return Intent(context, FastDownloadActivity::class.java).apply {
                 putExtra(EXTRA_FILE_URL, url)
                 putExtra(EXTRA_FILE_REFERER, referrer)
                 putExtra(EXTRA_USER_AGENT, ua)
                 putExtra(EXTRA_DEFAULT_EXTENSION, defExt)
+                putExtra(EXTRA_COOKIE, cookie)
             }
         }
     }

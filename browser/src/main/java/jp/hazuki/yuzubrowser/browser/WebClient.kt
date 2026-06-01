@@ -92,6 +92,7 @@ import jp.hazuki.yuzubrowser.ui.widget.longToast
 import jp.hazuki.yuzubrowser.webview.CustomWebChromeClient
 import jp.hazuki.yuzubrowser.webview.CustomWebView
 import jp.hazuki.yuzubrowser.webview.CustomWebViewClient
+import jp.hazuki.yuzubrowser.webview.WebViewProfileManager
 import jp.hazuki.yuzubrowser.webview.WebViewRenderingManager
 import jp.hazuki.yuzubrowser.webview.utility.WebViewUtility
 import jp.hazuki.yuzubrowser.webview.utility.getUserAgent
@@ -308,11 +309,8 @@ class WebClient(
         val enableCookie = AppPrefs.accept_cookie.get()
         tab.cookieMode = if (enableCookie) MainTabData.COOKIE_ENABLE else MainTabData.COOKIE_DISABLE
 
-        val cookieManager = CookieManager.getInstance()
-        if (tab == controller.currentTabData) {
-            cookieManager.setAcceptCookie(enableCookie)
-        }
-
+        val cookieManager = WebViewProfileManager.getCookieManager(tab.mWebView.webView)
+        cookieManager.setAcceptCookie(enableCookie)
         val setting = tab.mWebView.webSettings
         val enableStorage = !isPrivateTab
         tab.mWebView.setAcceptThirdPartyCookies(cookieManager, enableCookie && AppPrefs.accept_third_cookie.get())
@@ -447,7 +445,7 @@ class WebClient(
                         } else {
                             val userAgent = data.mWebView.getUserAgent()
                             activity.lifecycleScope.launch(Dispatchers.IO) {
-                                val cookie = CookieManager.getInstance().getCookie(url)
+                                val cookie = WebViewProfileManager.getCookieManager(web.webView).getCookie(url)
                                 val icon = controller.okHttpClient
                                     .getImage(iconUrl, userAgent, url, cookie)
                                 speedDialManager.updateAsync(data.originalUrl, icon)
@@ -693,12 +691,12 @@ class WebClient(
             PreferenceConstants.DOWNLOAD_DO_NOTHING -> {
             }
             PreferenceConstants.DOWNLOAD_AUTO -> if (WebDownloadUtils.shouldOpen(contentDisposition)) {
-                actionOpen(url, referrer, userAgent, contentDisposition, mimetype, contentLength)
+                actionOpen(url, referrer, userAgent, contentDisposition, mimetype, contentLength, WebViewProfileManager.getCookieManager(web.webView).getCookie(url))
             } else {
-                actionDownload(url, referrer, userAgent, contentDisposition, mimetype, contentLength)
+                actionDownload(url, referrer, userAgent, contentDisposition, mimetype, contentLength, WebViewProfileManager.getCookieManager(web.webView).getCookie(url))
             }
-            PreferenceConstants.DOWNLOAD_DOWNLOAD -> actionDownload(url, referrer, userAgent, contentDisposition, mimetype, contentLength)
-            PreferenceConstants.DOWNLOAD_OPEN -> actionOpen(url, referrer, userAgent, contentDisposition, mimetype, contentLength)
+            PreferenceConstants.DOWNLOAD_DOWNLOAD -> actionDownload(url, referrer, userAgent, contentDisposition, mimetype, contentLength, WebViewProfileManager.getCookieManager(web.webView).getCookie(url))
+            PreferenceConstants.DOWNLOAD_OPEN -> actionOpen(url, referrer, userAgent, contentDisposition, mimetype, contentLength, WebViewProfileManager.getCookieManager(web.webView).getCookie(url))
             PreferenceConstants.DOWNLOAD_SHARE -> actionShare(url)
             PreferenceConstants.DOWNLOAD_SELECT -> {
 
@@ -708,8 +706,8 @@ class WebClient(
                         arrayOf(getString(R.string.download), getString(R.string.open), getString(R.string.share))
                     ) { _, which ->
                         when (which) {
-                            0 -> actionDownload(url, referrer, userAgent, contentDisposition, mimetype, contentLength)
-                            1 -> actionOpen(url, referrer, userAgent, contentDisposition, mimetype, contentLength)
+                            0 -> actionDownload(url, referrer, userAgent, contentDisposition, mimetype, contentLength, WebViewProfileManager.getCookieManager(web.webView).getCookie(url))
+                            1 -> actionOpen(url, referrer, userAgent, contentDisposition, mimetype, contentLength, WebViewProfileManager.getCookieManager(web.webView).getCookie(url))
                             2 -> actionShare(url)
                         }
                     }
@@ -723,23 +721,23 @@ class WebClient(
         }
     }
 
-    private fun actionDownload(url: String, referrer: String?, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long) {
+    private fun actionDownload(url: String, referrer: String?, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long, cookie: String? = null) {
         if (controller.applicationContextInfo.checkStoragePermission()) {
-            activity.showDialog(DownloadDialog(url, userAgent, contentDisposition, mimetype, contentLength, referrer), "download")
+            activity.showDialog(DownloadDialog(url, userAgent, contentDisposition, mimetype, contentLength, referrer, cookie), "download")
         } else {
             ui {
                 if (controller.requestStoragePermission()) {
-                    activity.showDialog(DownloadDialog(url, userAgent, contentDisposition, mimetype, contentLength, referrer), "download")
+                    activity.showDialog(DownloadDialog(url, userAgent, contentDisposition, mimetype, contentLength, referrer, cookie), "download")
                 }
             }
         }
     }
 
-    private fun actionOpen(url: String, referrer: String?, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long) {
+    private fun actionOpen(url: String, referrer: String?, userAgent: String, contentDisposition: String, mimetype: String, contentLength: Long, cookie: String? = null) {
         if (!WebDownloadUtils.openFile(activity, url, mimetype)) {
             //application not found
             Toast.makeText(activity.applicationContext, R.string.app_notfound, Toast.LENGTH_SHORT).show()
-            actionDownload(url, referrer, userAgent, contentDisposition, mimetype, contentLength)
+            actionDownload(url, referrer, userAgent, contentDisposition, mimetype, contentLength, cookie)
         }
     }
 
@@ -1010,10 +1008,23 @@ class WebClient(
                         if (items.size == 3 && items[0] == controller.secretKey) {
                             when (items[1]) {
                                 "0" -> onDownloadStart(data.mWebView, items[2], "", "", "", -1)
-                                "1" -> DownloadDialog(items[2], data.mWebView.webSettings.userAgentString)//TODO referer
+                                "1" -> DownloadDialog(
+                                    items[2],
+                                    data.mWebView.webSettings.userAgentString,
+                                    cookie = WebViewProfileManager.getCookieManager(data.mWebView.webView).getCookie(data.mWebView.url)
+                                )//TODO referer
                                     .show(controller.activity.supportFragmentManager, "download")
                                 "2" -> {
-                                    val file = DownloadFile(items[2], null, DownloadRequest(null, data.mWebView.webSettings.userAgentString, null))
+                                    val file = DownloadFile(
+                                        items[2],
+                                        null,
+                                        DownloadRequest(
+                                            null,
+                                            data.mWebView.webSettings.userAgentString,
+                                            null,
+                                            WebViewProfileManager.getCookieManager(data.mWebView.webView).getCookie(data.mWebView.url)
+                                        )
+                                    )
                                     controller.activity.download(getDownloadFolderUri(controller.applicationContextInfo), file, null)
                                 }
                                 "3" -> {
@@ -1022,7 +1033,8 @@ class WebClient(
                                             items[2],
                                             data.mWebView.url,
                                             data.mWebView.getUserAgent(),
-                                            ".jpg")
+                                            ".jpg",
+                                            WebViewProfileManager.getCookieManager(data.mWebView.webView).getCookie(data.mWebView.url))
                                     controller.startActivity(downloader, BrowserController.REQUEST_SHARE_IMAGE)
                                 }
                             }

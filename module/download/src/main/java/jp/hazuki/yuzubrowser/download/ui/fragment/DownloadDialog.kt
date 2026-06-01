@@ -168,16 +168,16 @@ class DownloadDialog : DialogFragment() {
             }
         }
 
-        operator fun invoke(url: String, userAgent: String?, contentDisposition: String?, mimeType: String?, contentLength: Long, referrer: String?): DownloadDialog {
+        operator fun invoke(url: String, userAgent: String?, contentDisposition: String?, mimeType: String?, contentLength: Long, referrer: String?, cookie: String? = null): DownloadDialog {
             return invoke(DownloadDialogRequest(
                 url,
-                DownloadRequest(referrer, userAgent, null),
+                DownloadRequest(referrer, userAgent, null, cookie),
                 NameResolver(url, contentDisposition, mimeType, contentLength)
             ))
         }
 
-        operator fun invoke(url: String, userAgent: String?, referrer: String? = null, defaultExt: String? = null): DownloadDialog {
-            return invoke(DownloadDialogRequest(url, DownloadRequest(referrer, userAgent, defaultExt), null))
+        operator fun invoke(url: String, userAgent: String?, referrer: String? = null, defaultExt: String? = null, cookie: String? = null): DownloadDialog {
+            return invoke(DownloadDialogRequest(url, DownloadRequest(referrer, userAgent, defaultExt, cookie), null))
         }
     }
 }

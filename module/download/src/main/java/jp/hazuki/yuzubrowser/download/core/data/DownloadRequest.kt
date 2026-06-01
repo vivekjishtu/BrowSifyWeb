@@ -26,5 +26,6 @@ class DownloadRequest(
     val referrer: String?,
     val userAgent: String?,
     val defaultExt: String?,
+    val cookie: String? = null,
     var isScopedStorageMode: Boolean = false
 ) : Parcelable

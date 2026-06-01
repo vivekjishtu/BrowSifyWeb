@@ -41,7 +41,7 @@ class MetaData constructor(val name: String, val mineType: String, val size: Lon
                     val httpRequest = Request.Builder()
                             .url(url)
                             .head()
-                            .setCookie(CookieManager.getInstance().getCookie(url))
+                            .setCookie(request.cookie ?: CookieManager.getInstance().getCookie(url))
                             .setReferrer(request.referrer)
                             .setUserAgent(context, request.userAgent)
                             .build()

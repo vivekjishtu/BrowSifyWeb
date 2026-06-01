@@ -123,6 +123,7 @@ import jp.hazuki.yuzubrowser.ui.widget.PointerView
 import jp.hazuki.yuzubrowser.webview.CustomWebHistoryItem
 import jp.hazuki.yuzubrowser.webview.CustomWebView
 import jp.hazuki.yuzubrowser.webview.WebViewFactory
+import jp.hazuki.yuzubrowser.webview.WebViewProfileManager
 import jp.hazuki.yuzubrowser.webview.WebViewType
 import jp.hazuki.yuzubrowser.webview.listener.OnScrollChangedListener
 import jp.hazuki.yuzubrowser.webview.listener.OnScrollableChangeListener
@@ -456,6 +457,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
         onPreferenceReset()
         lastSpeedDialUpdateTime = getCurrentSpeedDialUpdateTime()
+        WebViewProfileManager.clearPrivateProfile()
 
         if (savedInstanceState != null) {
             restoreWebState()
@@ -613,6 +615,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         binding.webGestureOverlayView.removeAllViews()
         tabManagerIn.destroy()
         webClient.destroy()
+        WebViewProfileManager.clearPrivateProfile()
         isActivityDestroyed = true
     }
 
@@ -973,7 +976,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             userActionManager.setGestureDetector(it)
         }
         webClient.applyTabPrivacy(newTab)
-        CookieManager.getInstance().setAcceptCookie(newTab.isEnableCookie)
+        WebViewProfileManager.getCookieManager(newTab.mWebView.webView).setAcceptCookie(newTab.isEnableCookie)
 
         if (oldTab == null || oldTab.mWebView.isScrollable != newTab.mWebView.isScrollable) {
             adjustBrowserPadding(newTab)
@@ -1008,7 +1011,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         val oldWeb = oldData.mWebView
         oldWeb.onPause()
 
-        if (AppPrefs.save_closed_tab.get()) {
+        if (AppPrefs.save_closed_tab.get() && oldData.tabType != TabType.PRIVATE) {
             val outState = Bundle()
             oldWeb.saveState(outState)
             outState.putInt(TAB_TYPE, oldData.tabType)
@@ -1022,10 +1025,15 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         tabManagerIn.remove(target)
         toolbar.notifyChangeWebState()
 
-        if (destroy)
+        val shouldDestroy = destroy || oldData.tabType == TabType.PRIVATE
+        if (shouldDestroy)
             oldWeb.destroy()
 
-        if (showUndo) {
+        if (oldData.tabType == TabType.PRIVATE && !tabManagerIn.loadedData.any { it.tabType == TabType.PRIVATE }) {
+            WebViewProfileManager.clearPrivateProfile()
+        }
+
+        if (showUndo && oldData.tabType != TabType.PRIVATE) {
             val message = if (title.isNullOrEmpty()) {
                 getString(R.string.closed_tab, "")
             } else {
@@ -1300,6 +1308,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         }
         if (finish_clear and 0x02 != 0) {
             CookieManager.getInstance().removeAllCookies(null)
+            WebViewProfileManager.clearPrivateProfile()
         }
         if (finish_clear and 0x04 != 0) {
             BrowserManager.clearWebDatabase()
@@ -1344,7 +1353,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     private fun addNewTab(@WebViewType cacheType: Int, @TabType type: Int): MainTabData {
-        val web = makeWebView(cacheType)
+        val web = makeWebView(cacheType, type)
         // TODO: Restore this when Google fixes the bug where the WebView is blank after calling onPause followed by onResume.
         //        if (AppPrefs.pause_web_tab_change.get())
         //            web.onPause();
@@ -1365,7 +1374,11 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     }
 
     override fun makeWebView(@WebViewType cacheType: Int): CustomWebView {
-        val web = webViewFactory.create(this, cacheType)
+        return makeWebView(cacheType, TabType.DEFAULT)
+    }
+
+    fun makeWebView(@WebViewType cacheType: Int, @TabType type: Int): CustomWebView {
+        val web = webViewFactory.create(this, cacheType, type == TabType.PRIVATE)
         web.view.id = View.generateViewId()
         web.webView.isFocusableInTouchMode = true
         web.webView.isFocusable = true
@@ -1377,7 +1390,10 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         }
         webClient.initWebSetting(web)
         val enableCookie = AppPrefs.accept_cookie.get()
-        web.setAcceptThirdPartyCookies(CookieManager.getInstance(), enableCookie && AppPrefs.accept_third_cookie.get())
+        web.setAcceptThirdPartyCookies(
+            WebViewProfileManager.getCookieManager(web.webView),
+            enableCookie && AppPrefs.accept_third_cookie.get()
+        )
         return web
     }
 
