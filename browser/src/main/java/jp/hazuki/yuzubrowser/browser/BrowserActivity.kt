@@ -1030,7 +1030,9 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
             oldWeb.destroy()
 
         if (oldData.tabType == TabType.PRIVATE && !tabManagerIn.loadedData.any { it.tabType == TabType.PRIVATE }) {
-            WebViewProfileManager.clearPrivateProfile()
+            binding.root.post {
+                WebViewProfileManager.clearPrivateProfile()
+            }
         }
 
         if (showUndo && oldData.tabType != TabType.PRIVATE) {
