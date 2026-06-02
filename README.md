@@ -12,7 +12,7 @@ You can create your own browser using custom UI and custom buttons.
 Yuzu Browser in turn was based on Mikan Browser.
 
 ## Version
-Current major version: **7**
+Current major version: **7.1.0**
 
 BrowSifyWeb continues from where Yuzu Browser left off.
 Versioning is intentionally kept as a legacy continuation so users can understand this project as the line of the same browser family in a different fork.
