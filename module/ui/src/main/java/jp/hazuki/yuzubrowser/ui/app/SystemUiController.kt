@@ -33,7 +33,7 @@ sealed class SystemUiController(
         }
 
     @Suppress("DEPRECATION")
-    var statusBarColor = window.statusBarColor
+    var statusBarColor = if (Build.VERSION.SDK_INT >= 35) 0 else window.statusBarColor
         set(value) {
             val isUpdated = field != value
             field = value
@@ -50,7 +50,7 @@ sealed class SystemUiController(
         }
 
     @Suppress("DEPRECATION")
-    open var navigationBarColor = window.navigationBarColor
+    open var navigationBarColor = if (Build.VERSION.SDK_INT >= 35) 0 else window.navigationBarColor
         set(value) {
             val isUpdated = field != value
             field = value
@@ -104,8 +104,10 @@ sealed class SystemUiController(
             super.updateConfigure()
 
             window.also {
-                it.statusBarColor = statusBarColor
-                it.navigationBarColor = navigationBarColor
+                if (Build.VERSION.SDK_INT < 35) {
+                    it.statusBarColor = statusBarColor
+                    it.navigationBarColor = navigationBarColor
+                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     it.isNavigationBarContrastEnforced = false
                 }

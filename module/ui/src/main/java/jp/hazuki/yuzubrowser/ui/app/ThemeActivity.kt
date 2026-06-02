@@ -38,15 +38,14 @@ import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 import jp.hazuki.yuzubrowser.ui.theme.ThemeRepository
 
+import androidx.activity.enableEdgeToEdge
+
 @SuppressLint("Registered")
 open class ThemeActivity : AppCompatActivity() {
 
-    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         // Enable edge-to-edge display.
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
+        enableEdgeToEdge()
 
         if (isDynamicColorEnabled()) {
             DynamicColors.applyToActivityIfAvailable(this)

@@ -167,29 +167,6 @@ class SearchActivity : ThemeActivity(), SearchButton.Callback, SearchSuggestAdap
             }
             if (themeData.toolbarImageColor != 0)
                 searchButton.setColorFilter(themeData.toolbarImageColor)
-            if (themeData.statusBarColor != 0) {
-                window.run {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        val wic = decorView.windowInsetsController!!
-                        val appearance = if (ThemeData.isUseLightStatusBar()) {
-                            WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                        } else {
-                            0
-                        }
-                        wic.setSystemBarsAppearance(
-                            WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                            appearance
-                        )
-                    } else {
-                        @Suppress("DEPRECATION")
-                        clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                        @Suppress("DEPRECATION")
-                        decorView.systemUiVisibility = ThemeData.getSystemUiVisibilityFlag()
-                    }
-                    addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                    statusBarColor = themeData.statusBarColor
-                }
-            }
         }
 
         searchButton.setSense(AppPrefs.swipebtn_sensitivity.get())
