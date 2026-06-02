@@ -16,8 +16,8 @@
 
 package jp.hazuki.yuzubrowser.legacy.browser;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
@@ -27,6 +27,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
+import android.content.res.ColorStateList;
+import android.widget.Button;
+import androidx.appcompat.app.AlertDialog;
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData;
 
 import androidx.annotation.NonNull;
 import jp.hazuki.yuzubrowser.legacy.R;
@@ -143,17 +151,106 @@ public class FinishAlertDialog extends CustomDialogPreference {
             geoCheckBox.setChecked((def & 0x80) != 0);
             faviconCheckBox.setChecked((def & 0x100) != 0);
 
-            if (!AppPrefs.save_last_tabs.get())
+            if (!AppPrefs.save_last_tabs.get()) {
                 closeallCheckBox.setVisibility(View.GONE);
-            //else
-            //	closeallCheckBox.setChecked((def & 0x1000) != 0);
+                View sessionHeader = view.findViewById(R.id.sessionHeader);
+                View divider = view.findViewById(R.id.divider);
+                if (sessionHeader != null) {
+                    sessionHeader.setVisibility(View.GONE);
+                }
+                if (divider != null) {
+                    divider.setVisibility(View.GONE);
+                }
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 formdataCheckBox.setVisibility(View.GONE);
                 formdataCheckBox.setChecked(false);
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            ThemeData themeData = ThemeData.getInstance();
+            int backgroundColor = 0;
+            int textColor = 0;
+            int summaryColor = 0;
+            int categoryColor = 0;
+            int dividerColor = 0;
+            int accentColor = 0;
+
+            if (themeData != null) {
+                backgroundColor = themeData.settingsBackgroundColor != 0 ? themeData.settingsBackgroundColor :
+                        (themeData.menuBackgroundColor != 0 ? themeData.menuBackgroundColor :
+                        (themeData.toolbarBackgroundColor != 0 ? themeData.toolbarBackgroundColor : 0));
+                
+                textColor = themeData.settingsTextColor != 0 ? themeData.settingsTextColor :
+                        (themeData.menuTextColor != 0 ? themeData.menuTextColor :
+                        (themeData.toolbarTextColor != 0 ? themeData.toolbarTextColor : 0));
+
+                summaryColor = themeData.settingsSummaryColor != 0 ? themeData.settingsSummaryColor :
+                        (themeData.menuTextColor != 0 ? adjustAlpha(themeData.menuTextColor, 0.72f) : 0);
+
+                categoryColor = themeData.settingsCategoryColor != 0 ? themeData.settingsCategoryColor :
+                        (themeData.settingsSummaryColor != 0 ? themeData.settingsSummaryColor :
+                        (themeData.tabAccentColor != 0 ? themeData.tabAccentColor : 0));
+
+                dividerColor = themeData.settingsDividerColor != 0 ? themeData.settingsDividerColor :
+                        (themeData.menuDividerColor != 0 ? themeData.menuDividerColor : 0);
+
+                accentColor = themeData.tabAccentColor != 0 ? themeData.tabAccentColor :
+                        (themeData.settingsSwitchThumbColor != 0 ? themeData.settingsSwitchThumbColor : 0);
+            }
+
+            if (themeData != null) {
+                if (textColor != 0) {
+                    cacheCheckBox.setTextColor(textColor);
+                    cookieCheckBox.setTextColor(textColor);
+                    databaseCheckBox.setTextColor(textColor);
+                    passwordCheckBox.setTextColor(textColor);
+                    formdataCheckBox.setTextColor(textColor);
+                    faviconCheckBox.setTextColor(textColor);
+                    closeallCheckBox.setTextColor(textColor);
+                    historyCheckBox.setTextColor(textColor);
+                    searchCheckBox.setTextColor(textColor);
+                    geoCheckBox.setTextColor(textColor);
+                }
+
+                if (summaryColor != 0) {
+                    textView.setTextColor(summaryColor);
+                }
+
+                if (categoryColor != 0) {
+                    TextView sessionHeader = view.findViewById(R.id.sessionHeader);
+                    TextView privacyHeader = view.findViewById(R.id.privacyHeader);
+                    if (sessionHeader != null) {
+                        sessionHeader.setTextColor(categoryColor);
+                    }
+                    if (privacyHeader != null) {
+                        privacyHeader.setTextColor(categoryColor);
+                    }
+                }
+
+                if (dividerColor != 0) {
+                    View divider = view.findViewById(R.id.divider);
+                    if (divider != null) {
+                        divider.setBackgroundColor(dividerColor);
+                    }
+                }
+
+                if (accentColor != 0) {
+                    ColorStateList tintList = ColorStateList.valueOf(accentColor);
+                    cacheCheckBox.setButtonTintList(tintList);
+                    cookieCheckBox.setButtonTintList(tintList);
+                    databaseCheckBox.setButtonTintList(tintList);
+                    passwordCheckBox.setButtonTintList(tintList);
+                    formdataCheckBox.setButtonTintList(tintList);
+                    faviconCheckBox.setButtonTintList(tintList);
+                    closeallCheckBox.setButtonTintList(tintList);
+                    historyCheckBox.setButtonTintList(tintList);
+                    searchCheckBox.setButtonTintList(tintList);
+                    geoCheckBox.setButtonTintList(tintList);
+                }
+            }
+
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
 
             builder.setTitle((showMessage) ? R.string.confirm : R.string.pref_clear_data_at_finish)
                     .setView(view)
@@ -204,7 +301,45 @@ public class FinishAlertDialog extends CustomDialogPreference {
                         callBack.onFinishNeutralButtonClicked(clearTabNo, def);
                 });
 
-            return builder.create();
+            final AlertDialog dialog = builder.create();
+
+            if (themeData != null && backgroundColor != 0) {
+                float density = getResources().getDisplayMetrics().density;
+                GradientDrawable windowBg = new GradientDrawable();
+                windowBg.setShape(GradientDrawable.RECTANGLE);
+                windowBg.setColor(backgroundColor);
+                windowBg.setCornerRadius(density * 24f); // 24dp rounded corners
+                if (dividerColor != 0) {
+                    windowBg.setStroke((int) (density * 1.5f), dividerColor);
+                }
+
+                int inset = (int) (density * 16f); // 16dp margins
+                InsetDrawable insetDrawable = new InsetDrawable(windowBg, inset, inset, inset, inset);
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawable(insetDrawable);
+                }
+            }
+
+            final int finalAccentColor = accentColor;
+            dialog.setOnShowListener(d -> {
+                if (themeData != null && finalAccentColor != 0) {
+                    Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                    Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+                    Button neutralButton = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+
+                    if (positiveButton != null) positiveButton.setTextColor(finalAccentColor);
+                    if (negativeButton != null) negativeButton.setTextColor(finalAccentColor);
+                    if (neutralButton != null) neutralButton.setTextColor(finalAccentColor);
+                }
+            });
+
+            return dialog;
+        }
+
+        private static int adjustAlpha(int color, float alphaFactor) {
+            int alpha = Math.min(255, Math.max(0, (int) (Color.alpha(color) * alphaFactor)));
+            return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
         }
 
         @Override
