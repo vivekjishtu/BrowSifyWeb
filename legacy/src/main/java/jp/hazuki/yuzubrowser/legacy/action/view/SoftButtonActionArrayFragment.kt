@@ -30,6 +30,7 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.ActionIconMap
@@ -67,6 +68,17 @@ class SoftButtonActionArrayFragment : RecyclerFabFragment(), OnRecyclerListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val activity = activity ?: return
+
+        val actionTheme = resolveActionListUiTheme(requireContext())
+        styleActionListHost(
+            rootView,
+            rootView.findViewById(R.id.recyclerView),
+            rootView.findViewById(R.id.fab),
+            actionTheme
+        )
+        rootView.findViewById<RecyclerView>(R.id.recyclerView).apply {
+            overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS
+        }
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -201,11 +213,16 @@ class SoftButtonActionArrayFragment : RecyclerFabFragment(), OnRecyclerListener,
         private val actionIcons: ActionIconMap,
         listener: OnRecyclerListener
     ) : ArrayRecyclerAdapter<SoftButtonActionFile, ActionListAdapter.ViewHolder>(context, list, listener) {
+        private val actionTheme = resolveActionListUiTheme(context)
 
         override fun onBindViewHolder(holder: ViewHolder, item: SoftButtonActionFile, position: Int) {
             holder.apply {
+                val card = itemView as com.google.android.material.card.MaterialCardView
+                styleActionListCard(card, false, actionTheme)
                 textView.text = actionNames[item.press]
+                styleActionListItemText(textView, actionTheme)
                 imageView.setImageDrawable(actionIcons[item.press])
+                styleActionListItemIcon(imageView, actionTheme)
             }
         }
 

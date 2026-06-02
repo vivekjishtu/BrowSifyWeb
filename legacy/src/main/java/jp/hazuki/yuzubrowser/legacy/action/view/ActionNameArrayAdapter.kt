@@ -16,6 +16,7 @@
 
 package jp.hazuki.yuzubrowser.legacy.action.view
 
+import android.content.res.ColorStateList
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -25,6 +26,7 @@ import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.material.card.MaterialCardView
 import androidx.recyclerview.widget.RecyclerView
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.ActionIconMap
@@ -40,6 +42,7 @@ class ActionNameArrayAdapter(
     private val checked = BooleanArray(nameArray.actionList.size)
     private val inflater = LayoutInflater.from(context)
     private val icons = ActionIconMap(context.resources)
+    private val actionTheme = resolveActionListUiTheme(context)
     private var mListener: OnSettingButtonListener? = null
 
     private val listItems = mutableListOf<ListItem>()
@@ -130,22 +133,31 @@ class ActionNameArrayAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = listItems[position]) {
             is ListItem.Header -> {
-                (holder as HeaderViewHolder).headerText.text = item.title
+                (holder as HeaderViewHolder).apply {
+                    (itemView as MaterialCardView).let { card ->
+                        styleActionListHeader(card, headerText, actionTheme)
+                    }
+                    headerText.text = item.title
+                }
             }
             is ListItem.ActionItem -> {
                 val originalPosition = item.position
                 val h = holder as ViewHolder
+                val selected = isChecked(originalPosition)
+                val card = h.itemView as MaterialCardView
+                styleActionListCard(card, selected, actionTheme)
                 h.icon.setImageDrawable(getIcon(originalPosition))
+                styleActionListItemIcon(h.icon, actionTheme)
                 h.text.text = getName(originalPosition)
-
-                val checked = isChecked(originalPosition)
-
-                h.checkBox.isChecked = checked
+                styleActionListItemText(h.text, actionTheme)
+                h.checkBox.isChecked = selected
+                styleActionListItemSecondary(h.checkBox, actionTheme)
 
                 if (SingleAction.checkSubPreference(getItemValue(originalPosition))) {
                     h.setting.visibility = View.VISIBLE
-                    h.setting.isEnabled = checked
-                    h.setting.imageAlpha = if (checked) 0xff else 0x88
+                    h.setting.isEnabled = selected
+                    h.setting.imageAlpha = if (selected) 0xff else 0x88
+                    h.setting.imageTintList = ColorStateList.valueOf(actionTheme.iconColor)
                     h.setting.setOnClickListener { mListener?.invoke(originalPosition) }
                 } else {
                     h.setting.visibility = View.GONE

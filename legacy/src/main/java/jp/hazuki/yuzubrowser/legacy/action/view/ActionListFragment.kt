@@ -31,6 +31,8 @@ import androidx.core.os.BundleCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.*
@@ -101,6 +103,23 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val actionTheme = resolveActionListUiTheme(requireContext())
+        rootView.setBackgroundColor(actionTheme.backgroundColor)
+        rootView.findViewById<RecyclerView>(R.id.recyclerView).apply {
+            setBackgroundColor(actionTheme.backgroundColor)
+            clipToPadding = false
+            setPadding(
+                (resources.displayMetrics.density * 12f).toInt(),
+                (resources.displayMetrics.density * 12f).toInt(),
+                (resources.displayMetrics.density * 12f).toInt(),
+                (resources.displayMetrics.density * 12f).toInt()
+            )
+        }
+        rootView.findViewById<FloatingActionButton>(R.id.fab).apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(actionTheme.fabTintColor)
+            imageTintList = android.content.res.ColorStateList.valueOf(actionTheme.fabIconTintColor)
+        }
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -242,7 +261,7 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
     }
 
     override val isNeedDivider: Boolean
-        get() = true
+        get() = false
 
     override val isLongPressDragEnabled
         get() = adapter.isSortMode
@@ -254,11 +273,16 @@ class ActionListFragment : RecyclerFabFragment(), OnRecyclerListener, DeleteDial
         private val icons: ActionIconMap,
         recyclerListener: OnRecyclerListener
     ) : ArrayRecyclerAdapter<Action, ActionListAdapter.Holder>(context, actionList, recyclerListener) {
+        private val actionTheme = resolveActionListUiTheme(context)
 
         override fun onBindViewHolder(holder: Holder, item: Action, position: Int) {
             holder.apply {
+                val card = itemView as com.google.android.material.card.MaterialCardView
+                styleActionListCard(card, false, actionTheme)
                 textView.text = names[item]
+                styleActionListItemText(textView, actionTheme)
                 imageView.setImageDrawable(icons[item])
+                styleActionListItemIcon(imageView, actionTheme)
             }
         }
 

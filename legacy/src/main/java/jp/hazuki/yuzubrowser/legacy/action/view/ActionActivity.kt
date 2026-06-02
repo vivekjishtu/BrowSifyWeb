@@ -95,6 +95,23 @@ class ActionActivity : ThemeActivity(), OnRecyclerListener {
         binding = ActionActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val actionTheme = resolveActionListUiTheme(this)
+        binding.root.setBackgroundColor(actionTheme.backgroundColor)
+        binding.recyclerView.setBackgroundColor(actionTheme.backgroundColor)
+        binding.recyclerView.clipToPadding = false
+        binding.recyclerView.setPadding(
+            (resources.displayMetrics.density * 12f).toInt(),
+            (resources.displayMetrics.density * 12f).toInt(),
+            (resources.displayMetrics.density * 12f).toInt(),
+            (resources.displayMetrics.density * 12f).toInt()
+        )
+        binding.recyclerView.overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS
+        binding.divider.setBackgroundColor(actionTheme.dividerColor)
+        binding.okButton.backgroundTintList = android.content.res.ColorStateList.valueOf(actionTheme.accentColor)
+        binding.okButton.setTextColor(actionTheme.fabIconTintColor)
+        binding.cancelButton.setTextColor(actionTheme.textColor)
+        binding.resetButton.setTextColor(actionTheme.textColor)
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             binding.recyclerView.updatePadding(top = insets.top)
