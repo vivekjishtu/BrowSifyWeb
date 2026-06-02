@@ -22,8 +22,8 @@ object Build {
 }
 
 object AppVersions {
-    const val version_name = "7.1.0"
-    const val version_code = 700006
+    const val version_name = "7.1.1"
+    const val version_code = 700007
 }
 
 object Versions {
