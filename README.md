@@ -18,12 +18,12 @@ BrowSifyWeb continues from where Yuzu Browser left off.
 Versioning is intentionally kept as a legacy continuation so users can understand this project as the line of the same browser family in a different fork.
 
 ## New in BrowSifyWeb
-- Private tab workflow improvements with clear private tab markers and private-start-page handling.
-- Private tabs are excluded from session restore after app relaunch.
-- New tabs opened from private tabs stay private.
-- Speed dial pages now refresh live after add/edit/delete/reorder actions.
-- Snackbar/theme behavior has been aligned for more reliable day/night color consistency.
-- Ongoing updates for modern Android/Gradle/Kotlin toolchains while preserving legacy browser behavior.
+- Private tabs should work a lot better now
+- Menus as more compact and look more like the material UI menus
+- Updated theming engine
+- 2 new themes to test out the new theming engine
+- Quite a few of the bugs and quirks have been fixed
+
 
 ## Download and install
 **Android 6.0 or higher is required.**
