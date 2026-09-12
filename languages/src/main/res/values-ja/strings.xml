@@ -266,7 +266,7 @@
 
     <string name="not_bookmark_file">このファイルはHTMLブックマークファイルではありません。</string>
 
-    <string name="open_in_browser">Yuzu Browserで開く</string>
+    <string name="open_in_browser">ブラウザで開く</string>
     <string name="enable_share">共有にこのアプリを表示する</string>
 
     <string name="closed_tab">%1$s を閉じました</string>
@@ -276,7 +276,7 @@
     <string name="theme_import">テーマをインポート</string>
     <string name="theme_management">テーマ管理</string>
     <string name="delete_theme">テーマを削除</string>
-    <string name="theme_importer">Yuzu Browserテーマ インポート</string>
+    <string name="theme_importer">ブラウザテーマ インポート</string>
     <string name="theme_imported">\"%1$s\"をインポートしました</string>
     <string name="theme_installed_version">このバージョンのテーマはインポート済みです</string>
     <string name="theme_unknown_error">不明なエラー</string>

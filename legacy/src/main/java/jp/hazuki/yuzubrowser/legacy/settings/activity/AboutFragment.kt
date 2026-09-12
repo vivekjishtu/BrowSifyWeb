@@ -62,7 +62,7 @@ class AboutFragment : YuzuPreferenceFragment() {
             startActivity(Intent().apply {
                 setClassName(requireContext(), Constants.activity.MAIN_BROWSER)
                 action = Constants.intent.ACTION_OPEN_DEFAULT
-                data = Uri.parse("https://browsifyweb.vivekjishtu.com/privacy/")
+                data = Uri.parse(getString(R.string.vendor_privacy_url))
             })
             true
         }

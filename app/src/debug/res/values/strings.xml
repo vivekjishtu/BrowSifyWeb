@@ -16,5 +16,10 @@
   -->
 
 <resources>
-    <string name="browser_app_name">Browsify[debug]</string>
+    <!--
+        Debug app name override is now the vendor's responsibility.
+        Add a vendor/<vendorName>/debug/res/values/strings.xml with:
+            <string name="browser_app_name">YourApp[debug]</string>
+        See VENDOR_GUIDE.md for details.
+    -->
 </resources>

@@ -256,14 +256,14 @@
 
     <string name="not_bookmark_file">Este arquivo não é um arquivo html de marcador.</string>
 
-    <string name="open_in_browser">Abrir com Yuzu Browser</string>
+    <string name="open_in_browser">Abrir com navegador</string>
     <string name="enable_share">Ativar compartilhamento desde outro app</string>
 
     <string name="closed_tab">Fechada %1$s</string>
     <string name="unknown">Desconhecido</string>
     <string name="delete_mf_gesture">Excluir gesto multitoque</string>
     <string name="confirm_delete_mf_gesture">Excluir este gesto?</string>
-    <string name="theme_importer">Importador de tema do Yuzu Browser</string>
+    <string name="theme_importer">Importador de tema do navegador</string>
     <string name="theme_imported">%1$s foi importado.</string>
     <string name="theme_installed_version">Esta versão do tema já está instalada.</string>
     <string name="theme_unknown_error">Erro desconhecido</string>

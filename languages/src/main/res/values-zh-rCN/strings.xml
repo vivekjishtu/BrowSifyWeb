@@ -257,14 +257,14 @@
 
     <string name="not_bookmark_file">此文件不是书签 html 文件。</string>
 
-    <string name="open_in_browser">在柚子浏览器中打开</string>
+    <string name="open_in_browser">在浏览器中打开</string>
     <string name="enable_share">允许从其他应用中分享</string>
 
     <string name="closed_tab">已关闭 %1$s</string>
     <string name="unknown">未知</string>
     <string name="delete_mf_gesture">删除多点触控手势</string>
     <string name="confirm_delete_mf_gesture">删除此手势？</string>
-    <string name="theme_importer">柚子浏览器主题导入界面</string>
+    <string name="theme_importer">浏览器主题导入界面</string>
     <string name="theme_imported">%1$s 已导入。</string>
     <string name="theme_installed_version">已经安装过此版本的主题。</string>
     <string name="theme_unknown_error">未知错误</string>

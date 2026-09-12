@@ -255,14 +255,14 @@
 
     <string name="not_bookmark_file">Этот файл не является HTML-файлом закладок.</string>
 
-    <string name="open_in_browser">Открыть в Yuzu Browser</string>
+    <string name="open_in_browser">Открыть в браузере</string>
     <string name="enable_share">В общем доступе из других приложений</string>
 
     <string name="closed_tab">Закрыто %1$s</string>
     <string name="unknown">Неизвестно</string>
     <string name="delete_mf_gesture">Удалить жесты с несколькими касаниями</string>
     <string name="confirm_delete_mf_gesture">Удалить этот жест?</string>
-    <string name="theme_importer">Импорт темы Yuzu Browser</string>
+    <string name="theme_importer">Импорт темы браузера</string>
     <string name="theme_imported">%1$s импортировано.</string>
     <string name="theme_installed_version">Эта версия темы уже установлена.</string>
     <string name="theme_unknown_error">Неизвестная ошибка</string>

@@ -256,14 +256,14 @@
 
     <string name="not_bookmark_file">Diese Datei ist keine Lesezeichen-HTML-Datei.</string>
 
-    <string name="open_in_browser">Im Yuzu Browser öffnen</string>
+    <string name="open_in_browser">Im Browser öffnen</string>
     <string name="enable_share">Teilen von anderen Anwendungen aktivieren</string>
 
     <string name="closed_tab">%1$s geschlossen</string>
     <string name="unknown">Unbekannt</string>
     <string name="delete_mf_gesture">Gesten mit mehreren Berührungen löschen</string>
     <string name="confirm_delete_mf_gesture">Diese Geste löschen?</string>
-    <string name="theme_importer">Yuzu Browser Design-Importeur</string>
+    <string name="theme_importer">Browser-Design-Importeur</string>
     <string name="theme_imported">%1$s wurde importiert.</string>
     <string name="theme_installed_version">Diese Design-Version ist bereits installiert.</string>
     <string name="theme_unknown_error">Unbekannter Fehler</string>

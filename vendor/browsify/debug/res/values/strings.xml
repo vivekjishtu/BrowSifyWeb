@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Debug app name override for the Browsify vendor.
+    This is loaded only for debug builds (the Gradle source set in app/build.gradle
+    includes vendor/<vendorName>/debug/res/ when it exists).
+-->
+<resources>
+    <string name="browser_app_name" translatable="false">Browsify[debug]</string>
+</resources>

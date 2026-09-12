@@ -6,13 +6,24 @@
           content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <link rel="stylesheet" type="text/css" href="base.css">
     <link rel="stylesheet" type="text/css" href="custom.css">
-    <title>Browsify</title>
+    <title>Browser</title>
+    <script>
+        // The native code injects the real app name after load via:
+        // webView.evaluateJavascript("BrowserBranding.setAppName('...');", null)
+        var BrowserBranding = {
+            setAppName: function(name) {
+                document.title = name;
+                var el = document.querySelector('.browserName');
+                if (el) el.textContent = name;
+            }
+        };
+    </script>
 </head>
 
 <body>
 <div class="outer">
     <div class="browserName">
-      Browsify
+      Browser
     </div>
     <a href="bsw:search" id="searchBox">
         <div class="search">

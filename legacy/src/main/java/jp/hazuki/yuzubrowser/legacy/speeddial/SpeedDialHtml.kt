@@ -96,7 +96,10 @@ class SpeedDialHtml(context: Context) {
         val time = System.currentTimeMillis()
         val index = manager.indexData
         val builder = StringBuilder(8000)
+        // Replace the {{APP_NAME}} token in the HTML template with the vendor's app name
+        val appName = context.getString(R.string.browser_app_name)
         val start = getResourceString(context, R.raw.speeddial_start)
+            .replace(APP_NAME_TOKEN, appName)
         builder.append(start)
 
         for ((id, url, title, updateTime) in index) {
@@ -179,6 +182,9 @@ class SpeedDialHtml(context: Context) {
 
     companion object {
         private const val FOLDER = "speeddial"
+
+        /** Token in speeddial_start raw resource replaced at runtime with the vendor app name. */
+        private const val APP_NAME_TOKEN = "{{APP_NAME}}"
 
         private const val DARK_THEME = "body{background-color:#2a2a2a}.browserName{color:#f0f0f0}" +
                 ".search{color:#fff;box-shadow:2px 2px 6px rgba(0,0,0,.4);background-color:#707070}" +

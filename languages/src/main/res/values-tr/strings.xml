@@ -257,14 +257,14 @@
 
     <string name="not_bookmark_file">Bu dosya yer imi html dosyası değil.</string>
 
-    <string name="open_in_browser">Yuzu Tarayıcısında Aç</string>
+    <string name="open_in_browser">Tarayıcıda Aç</string>
     <string name="enable_share">Diğer uygulamalardan paylaşımı etkinleştir</string>
 
     <string name="closed_tab">%1$s kapalı</string>
     <string name="unknown">Bilinmeyen</string>
     <string name="delete_mf_gesture">Çoklu dokunma hareketini sil</string>
     <string name="confirm_delete_mf_gesture">Bu hareket silinsin mi?</string>
-    <string name="theme_importer">Yuzu Tarayıcı tema aktarıcı</string>
+    <string name="theme_importer">Tarayıcı tema aktarıcı</string>
     <string name="theme_imported">%1$s aktarıldı.</string>
     <string name="theme_installed_version">Temanın bu sürümü zaten kurulu.</string>
     <string name="theme_unknown_error">Bilinmeyen hata</string>

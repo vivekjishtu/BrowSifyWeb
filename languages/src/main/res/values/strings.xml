@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="browser_app_name">Browsify</string>
+
     <string name="omnibox_placeholder">Search or type URL</string>
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
@@ -328,7 +328,7 @@
 
     <string name="not_bookmark_file">This file is not bookmark html file.</string>
 
-    <string name="open_in_browser">Open in Yuzu Browser</string>
+    <string name="open_in_browser">Open in browser</string>
     <string name="enable_share">Enable share from other app</string>
 
     <string name="closed_tab">Closed %1$s</string>
@@ -339,7 +339,7 @@
     <string name="theme_management">Theme management</string>
     <string name="delete_theme">Delete themes</string>
     <string name="theme_delete">Delete theme</string>
-    <string name="theme_importer">Yuzu Browser theme importer</string>
+    <string name="theme_importer">Browser theme importer</string>
     <string name="theme_imported">%1$s is imported.</string>
     <string name="theme_installed_version">This version of theme is already installed.</string>
     <string name="theme_unknown_error">Unknown error</string>

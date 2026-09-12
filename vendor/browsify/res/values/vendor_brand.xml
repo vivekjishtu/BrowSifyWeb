@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Vendor Branding Contract for BrowSifyWeb
+  =========================================
+  This file is the ONLY place where brand identity is defined.
+  To white-label this browser, create your own vendor folder and
+  override every resource listed here. See VENDOR_GUIDE.md for details.
+
+  Required resources (all vendors MUST provide these):
+    - browser_app_name   : Displayed app name (launcher, about screen, share sheet)
+    - copyright          : Shown on the About screen under the app name
+    - vendor_privacy_url : URL opened when user taps "Privacy Policy" in About
+    - vendor_accent      : Primary accent / highlight color
+    - ic_launcher_background : Background color for adaptive launcher icon (API 26+)
+-->
+<resources>
+
+    <!-- ================================================================ -->
+    <!-- App Identity Strings                                             -->
+    <!-- ================================================================ -->
+
+    <!-- The name shown in the launcher, About screen, and task switcher -->
+    <string name="browser_app_name" translatable="false">Browsify</string>
+
+    <!-- Copyright line shown on the About screen under the app name -->
+    <string name="copyright" translatable="false">©2024-2026 Vivek Jishtu</string>
+
+    <!-- URL opened when user taps "Privacy Policy" in Settings → About -->
+    <string name="vendor_privacy_url" translatable="false">https://browsifyweb.vivekjishtu.com/privacy/</string>
+
+    <!-- Label shown in Android's share sheet when the user shares text from another app -->
+    <string name="open_in_browser" translatable="false">Open in Browsify</string>
+
+    <!-- Label shown in the theme file importer activity picker -->
+    <string name="theme_importer" translatable="false">Browsify theme importer</string>
+
+    <!-- ================================================================ -->
+    <!-- Brand Colors                                                     -->
+    <!-- ================================================================ -->
+
+    <!-- Primary accent color: used for links, active states, highlights -->
+    <color name="vendor_accent">#33b5e5</color>
+
+    <!-- Launcher icon background color (used by adaptive icon on API 26+) -->
+    <color name="ic_launcher_background">#FFFFFF</color>
+
+</resources>

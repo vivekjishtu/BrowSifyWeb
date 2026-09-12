@@ -257,14 +257,14 @@
 
     <string name="not_bookmark_file">Ez a fájl nem egy html könyvjelző fájl.</string>
 
-    <string name="open_in_browser">Megnyitás Yuzu Böngészőben</string>
+    <string name="open_in_browser">Megnyitás böngészőben</string>
     <string name="enable_share">Megosztás engedélyezése másik alkalmazásból</string>
 
     <string name="closed_tab">%1$s bezárva</string>
     <string name="unknown">Ismeretlen</string>
     <string name="delete_mf_gesture">Többérintéses kézmozdulat törlése</string>
     <string name="confirm_delete_mf_gesture">Törli ezt a kézmozdulatot?</string>
-    <string name="theme_importer">Yuzu Böngésző téma importáló</string>
+    <string name="theme_importer">Böngésző téma importáló</string>
     <string name="theme_imported">%1$s importálva.</string>
     <string name="theme_installed_version">A téma ezen verziója már telepítve van.</string>
     <string name="theme_unknown_error">Ismeretlen hiba</string>

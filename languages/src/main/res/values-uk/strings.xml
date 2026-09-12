@@ -257,14 +257,14 @@
 
     <string name="not_bookmark_file">Цей файл не є HTML-файлом закладок.</string>
 
-    <string name="open_in_browser">Відкрити в Yuzu Browser</string>
+    <string name="open_in_browser">Відкрити в браузері</string>
     <string name="enable_share">Увімкнути спільний доступ</string>
 
     <string name="closed_tab">Закрито %1$s</string>
     <string name="unknown">Невідомий</string>
     <string name="delete_mf_gesture">Видалити жест кількома дотиками</string>
     <string name="confirm_delete_mf_gesture">Видалити цей жест?</string>
-    <string name="theme_importer">Імпорт тем Yuzu Browser</string>
+    <string name="theme_importer">Імпорт тем браузера</string>
     <string name="theme_imported">Імпортується: %1$s</string>
     <string name="theme_installed_version">Ця версія теми вже встановлена.</string>
     <string name="theme_unknown_error">Невідома помилка</string>

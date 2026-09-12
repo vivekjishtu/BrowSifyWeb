@@ -133,7 +133,7 @@
 <body>
    <div class="browserName">
        <div class="logo-wrap">
-         <span class="brand-main">BrowSify</span><span class="brand-sub">Web</span>
+         <span class="brand-name">{{APP_NAME}}</span>
        </div>
 
        <style>
@@ -146,19 +146,9 @@
            user-select: none;
          }
 
-         .brand-main {
-          /* color: #2d3436; */
+         .brand-name {
+           /* Color is controlled by the active theme / dark mode */
          }
-
-         .brand-sub {
-           color: #0984e3;
-           margin-left: 2px;
-         }
-         /*
-         .logo-wrap:hover .brand-sub {
-           color: #00cec9;
-           border-color: #00cec9;
-         }*/
        </style>
    </div>
    <div class="search-container">

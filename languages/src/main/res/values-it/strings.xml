@@ -252,14 +252,14 @@
 
     <string name="not_bookmark_file">Questo file non è un file segnalibro html</string>
 
-    <string name="open_in_browser">Apri in Yuzu Browser</string>
+    <string name="open_in_browser">Apri nel browser</string>
     <string name="enable_share">Abilita la condivisione da un\'altra app</string>
 
     <string name="closed_tab">Chiuso %1$s</string>
     <string name="unknown">Sconosciuto</string>
     <string name="delete_mf_gesture">Elimina la gestualità multi touch</string>
     <string name="confirm_delete_mf_gesture">Eliminare questa gestualità?</string>
-    <string name="theme_importer">Importatore del tema Yuzu Browser</string>
+    <string name="theme_importer">Importatore del tema browser</string>
     <string name="theme_imported">%1$s è importato</string>
     <string name="theme_installed_version">Questa versione del tema è già installata.</string>
     <string name="theme_unknown_error">Errore sconosciuto</string>

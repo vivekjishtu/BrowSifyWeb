@@ -16,7 +16,11 @@
   -->
 
 <resources>
-    <string name="copyright" translatable="false">©2024-2026 Vivek Jishtu</string>
+    <!--
+        NOTE: 'copyright', 'browser_app_name', and 'vendor_privacy_url' are intentionally
+        NOT defined here. They are supplied by the active vendor's vendor_brand.xml file.
+        See vendor/<vendorName>/res/values/vendor_brand.xml and VENDOR_GUIDE.md.
+    -->
 
     <integer-array name="pref_tab_type_values">
         <item>0</item>

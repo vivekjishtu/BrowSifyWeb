@@ -42,10 +42,35 @@ plugins {
 def gitHash = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm:ssXXX")
 
+// =============================================================================
+// Vendor Branding Resolution
+// =============================================================================
+// Read the active vendor from gradle.properties (vendorName=browsify)
+// The vendor folder must exist at: <rootProject>/vendor/<vendorName>/
+def vendorName = project.findProperty("vendorName") ?: "browsify"
+def vendorDir = "${rootProject.projectDir}/vendor/${vendorName}"
+def vendorResDir = "${vendorDir}/res"
+
+// Read the applicationId from the vendor's brand.properties file
+def brandProps = new Properties()
+def brandPropsFile = file("${vendorDir}/brand.properties")
+if (brandPropsFile.exists()) {
+    brandPropsFile.withReader('UTF-8') { brandProps.load(it) }
+} else {
+    throw new GradleException(
+        "Vendor brand.properties not found at: ${vendorDir}/brand.properties\n" +
+        "Ensure vendorName='${vendorName}' matches a folder under vendor/.\n" +
+        "See VENDOR_GUIDE.md for setup instructions."
+    )
+}
+def vendorApplicationId = brandProps['applicationId'] ?: "com.vivekjishtu.bswbrowser"
+
+logger.lifecycle("[Vendor] Building with vendor: ${vendorName} (applicationId: ${vendorApplicationId})")
+
 android {
     compileSdk = Build.compile_sdk_version
     defaultConfig {
-        applicationId = "com.vivekjishtu.bswbrowser"
+        applicationId = vendorApplicationId
         minSdk = Build.min_sdk_version
         targetSdk = Build.target_sdk_version
         versionCode AppVersions.version_code
@@ -84,6 +109,21 @@ android {
     packaging {
         resources {
             excludes += ['META-INF/LICENSE', 'META-INF/CHANGES', 'META-INF/README.md']
+        }
+    }
+
+    sourceSets {
+        // Merge vendor resources into the main source set.
+        // Vendor resources take precedence over module defaults when there is a conflict.
+        main {
+            res.srcDirs += [vendorResDir]
+        }
+        debug {
+            // Optional: vendor can provide a debug-specific override folder
+            def vendorDebugRes = "${vendorDir}/debug/res"
+            if (file(vendorDebugRes).exists()) {
+                res.srcDirs += [vendorDebugRes]
+            }
         }
     }
 
@@ -142,4 +182,36 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-oss-licenses:17.1.0'
 
+}
+
+// =============================================================================
+// Vendor Firebase Config Staging
+// =============================================================================
+// Copies the vendor's google-services.json to app/ before the build starts.
+// The file is gitignored — each vendor provides their own from Firebase Console.
+// If the file is missing, the build continues (Firebase features may be disabled).
+def vendorGoogleServices = file("${vendorDir}/google-services.json")
+def appGoogleServices = file("${projectDir}/google-services.json")
+
+task copyVendorGoogleServices {
+    description = "Copies vendor-specific google-services.json to the app directory."
+    group = "Vendor"
+    doLast {
+        if (vendorGoogleServices.exists()) {
+            copy {
+                from vendorGoogleServices
+                into projectDir
+            }
+            logger.lifecycle("[Vendor] Copied google-services.json from vendor/${vendorName}/")
+        } else {
+            logger.warn("[Vendor] WARNING: No google-services.json found at ${vendorGoogleServices}. Firebase features may not work.")
+        }
+    }
+}
+
+// Run before every build variant
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith("process") && task.name.endsWith("GoogleServices")) {
+        task.dependsOn copyVendorGoogleServices
+    }
 }
