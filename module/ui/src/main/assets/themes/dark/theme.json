@@ -35,6 +35,7 @@
     "tabTextLock": "#FF00B53C",
     "tabTextPin": "#FF8EA0FF",
     "tabTextSelected": "#FFFFFFFF",
+    "tabAccent": "#FF8AB4F8",
     "statusBar": "#FF101010"
   },
   "flags": {
