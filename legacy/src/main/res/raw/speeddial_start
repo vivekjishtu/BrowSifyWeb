@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="bsw:speeddial/custom.css">
 
     <style>
-     :root {
+    :root {
         --bg-color: #f1f3f4;
         --text-color: #202124;
         --item-bg: white;
@@ -15,6 +15,10 @@
         --search-bg: white;
         --search-border: 1px solid #dfe1e5;
         --search-shadow: 0 1px 6px rgba(32,33,36,0.28);
+        --footer-text: #5f6368;
+        --footer-hover: #202124;
+        --footer-focus-bg: rgba(32,33,36,0.10);
+        --footer-focus-border: rgba(32,33,36,0.18);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -26,6 +30,10 @@
             --search-bg: #303134;
             --search-border: 1px solid #5f6368;
             --search-shadow: none;
+            --footer-text: #c1c6d0;
+            --footer-hover: #ffffff;
+            --footer-focus-bg: rgba(255,255,255,0.12);
+            --footer-focus-border: rgba(255,255,255,0.22);
         }
     }
 
@@ -65,7 +73,7 @@
     .grid-container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-        gap: 16px;
+        gap: 14px;
         width: 100%;
         max-width: 600px;
         padding: 0;
@@ -73,11 +81,11 @@
 
     .grid-item {
         background-color: var(--item-bg);
-        padding: 16px;
-        border-radius: 8px;
+        padding: 14px;
+        border-radius: 16px;
         text-align: center;
         box-shadow: var(--item-shadow);
-        transition: transform 0.2s;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.15s ease;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -102,10 +110,10 @@
     }
 
     .favicon {
-        width: 32px;
-        height: 32px;
-        margin-bottom: 8px;
-        border-radius: 4px;
+        width: 36px;
+        height: 36px;
+        margin-bottom: 10px;
+        border-radius: 8px;
     }
 
 
@@ -113,19 +121,31 @@
       position: fixed;
       width: calc(100% - 20px);
       bottom: 0;
-      height: 30px;
-      padding: 0 10px 5px;
+      height: 34px;
+      padding: 0 8px 6px;
       text-align: right;
     }
     footer a {
-      color: #555;
-      margin: 0 3px;
-      text-decoration: auto;
+      display: inline-block;
+      color: var(--footer-text);
+      margin: 0 2px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      text-decoration: none;
       -webkit-touch-callout: auto;
       font: caption;
+      transition: background-color 0.15s ease, color 0.15s ease, outline-color 0.15s ease;
     }
     footer a:hover {
-      color: #222;
+      color: var(--footer-hover);
+    }
+    footer a:focus,
+    footer a:focus-visible,
+    footer a:active {
+      color: var(--footer-hover);
+      background-color: var(--footer-focus-bg);
+      outline: 1px solid var(--footer-focus-border);
+      outline-offset: 1px;
     }
     </style>
 
@@ -140,9 +160,9 @@
          .logo-wrap {
            display: inline-block;
            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-           font-size: 36px;
+           font-size: 34px;
            letter-spacing: -1.5px;
-           padding: 10px;
+           padding: 8px 10px 6px;
            user-select: none;
          }
 
@@ -151,7 +171,7 @@
          }
 
          .brand-sub {
-           color: #0984e3;
+           color: var(--accent-color);
            margin-left: 2px;
          }
          /*
