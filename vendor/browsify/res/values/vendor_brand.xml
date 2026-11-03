@@ -22,6 +22,10 @@
     <!-- The name shown in the launcher, About screen, and task switcher -->
     <string name="browser_app_name" translatable="false">Browsify</string>
 
+    <!-- Speed Dial brand label, independent of build type; accent segment gets the theme accent color -->
+    <string name="speed_dial_brand_name" translatable="false">BrowSify</string>
+    <string name="speed_dial_brand_accent" translatable="false">Web</string>
+
     <!-- Copyright line shown on the About screen under the app name -->
     <string name="copyright" translatable="false">©2024-2026 Vivek Jishtu</string>
 

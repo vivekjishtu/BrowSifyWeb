@@ -16,11 +16,11 @@
   -->
 
 <resources>
-    <!--
-        NOTE: 'copyright', 'browser_app_name', and 'vendor_privacy_url' are intentionally
-        NOT defined here. They are supplied by the active vendor's vendor_brand.xml file.
-        See vendor/<vendorName>/res/values/vendor_brand.xml and VENDOR_GUIDE.md.
-    -->
+    <!-- Fallbacks for legacy's R class; app-level vendor resources override these. -->
+    <string name="browser_app_name" translatable="false">BrowSifyWeb</string>
+    <string name="speed_dial_brand_name" translatable="false">BrowSify</string>
+    <string name="speed_dial_brand_accent" translatable="false">Web</string>
+    <string name="vendor_privacy_url" translatable="false">https://browsifyweb.vivekjishtu.com/privacy/</string>
 
     <integer-array name="pref_tab_type_values">
         <item>0</item>

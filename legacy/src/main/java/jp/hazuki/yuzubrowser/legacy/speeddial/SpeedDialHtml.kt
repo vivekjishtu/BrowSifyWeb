@@ -102,10 +102,12 @@ class SpeedDialHtml(context: Context) {
         val time = System.currentTimeMillis()
         val index = manager.indexData
         val builder = StringBuilder(8000)
-        // Replace the {{APP_NAME}} token in the HTML template with the vendor's app name
-        val appName = context.getString(R.string.browser_app_name)
+        // Keep the vendor's brand split independent of the debug app name.
+        val brandName = HtmlUtils.sanitize(context.getString(R.string.speed_dial_brand_name))
+        val brandAccent = HtmlUtils.sanitize(context.getString(R.string.speed_dial_brand_accent))
         val start = getResourceString(context, R.raw.speeddial_start)
-            .replace(APP_NAME_TOKEN, appName)
+            .replace(BRAND_NAME_TOKEN, brandName)
+            .replace(BRAND_ACCENT_TOKEN, brandAccent)
         builder.append(start)
 
         for ((id, url, title, updateTime) in index) {
@@ -133,7 +135,8 @@ class SpeedDialHtml(context: Context) {
         }
 
         try {
-            FileOutputStream(cacheIndex).use { fos -> fos.write(time.toString().toByteArray(StandardCharsets.UTF_8)) }
+            val cacheInfo = "$CACHE_VERSION:$time"
+            FileOutputStream(cacheIndex).use { fos -> fos.write(cacheInfo.toByteArray(StandardCharsets.UTF_8)) }
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -145,12 +148,12 @@ class SpeedDialHtml(context: Context) {
 
         if (cacheIndex.exists() && cache.exists()) {
             try {
-                val time = IOUtils.readFile(cacheIndex, "UTF-8").toLong()
-                if (manager.listUpdateTime < time) {
+                val cacheInfo = IOUtils.readFile(cacheIndex, "UTF-8").split(':')
+                val cacheVersion = cacheInfo.getOrNull(0)?.toIntOrNull()
+                val time = cacheInfo.getOrNull(1)?.toLongOrNull()
+                if (cacheVersion == CACHE_VERSION && time != null && manager.listUpdateTime < time) {
                     return getNoCacheResponse("text/html", FileInputStream(cache))
                 }
-            } catch (e: NumberFormatException) {
-                e.printStackTrace()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -245,7 +248,7 @@ class SpeedDialHtml(context: Context) {
             append(":root{")
             append("--bg-color:").append(cssColor(background)).append(';')
             append("--text-color:").append(cssColor(text)).append(';')
-            append("--accent-color:").append(cssColor(accent)).append(';')
+            append("--theme-accent-color:").append(cssColor(accent)).append(';')
             append("--item-bg:").append(cssColor(itemBg)).append(';')
             append("--item-shadow:").append(itemShadow).append(';')
             append("--search-bg:").append(cssColor(searchBg)).append(';')
@@ -257,8 +260,8 @@ class SpeedDialHtml(context: Context) {
             append("--footer-focus-border:").append(cssColor(footerFocusBorder)).append(';')
             append("}")
             append(".browserName{color:").append(cssColor(text)).append("}")
-            append(".brand-main{color:").append(cssColor(text)).append("}")
-            append(".brand-sub{color:").append(cssColor(accent)).append("}")
+            append(".brand-name{color:").append(cssColor(text)).append("}")
+            append(".brand-accent{color:").append(cssColor(accent)).append("}")
             append(".grid-item{background-color:").append(cssColor(itemBg))
                 .append(";box-shadow:").append(itemShadow)
                 .append(";border:1px solid ").append(cssColor(itemBorder)).append("}")
@@ -307,9 +310,11 @@ class SpeedDialHtml(context: Context) {
 
     companion object {
         private const val FOLDER = "speeddial"
+        private const val CACHE_VERSION = 3
 
-        /** Token in speeddial_start raw resource replaced at runtime with the vendor app name. */
-        private const val APP_NAME_TOKEN = "{{APP_NAME}}"
+        /** Tokens in speeddial_start replaced with vendor-defined brand segments. */
+        private const val BRAND_NAME_TOKEN = "{{BRAND_NAME}}"
+        private const val BRAND_ACCENT_TOKEN = "{{BRAND_ACCENT}}"
 
         private const val DARK_THEME = "body{background-color:#2a2a2a}.browserName{color:#f0f0f0}" +
                 ".search{color:#fff;box-shadow:2px 2px 6px rgba(0,0,0,.4);background-color:#707070}" +

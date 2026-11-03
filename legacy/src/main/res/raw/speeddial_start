@@ -10,6 +10,7 @@
     :root {
         --bg-color: #f1f3f4;
         --text-color: #202124;
+        --accent-color: var(--theme-accent-color, #1a73e8);
         --item-bg: white;
         --item-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
         --search-bg: white;
@@ -25,6 +26,7 @@
         :root {
             --bg-color: #202124;
             --text-color: #e8eaed;
+            --accent-color: var(--theme-accent-color, #8ab4f8);
             --item-bg: #303134;
             --item-shadow: none;
             --search-bg: #303134;
@@ -153,7 +155,7 @@
 <body>
    <div class="browserName">
        <div class="logo-wrap">
-         <span class="brand-name">{{APP_NAME}}</span>
+         <span class="brand-name">{{BRAND_NAME}}</span><span class="brand-accent">{{BRAND_ACCENT}}</span>
        </div>
 
        <style>
@@ -166,8 +168,9 @@
            user-select: none;
          }
 
-         .brand-name {
-           /* Color is controlled by the active theme / dark mode */
+         .brand-accent {
+           color: var(--accent-color);
+           margin-left: 2px;
          }
        </style>
    </div>
