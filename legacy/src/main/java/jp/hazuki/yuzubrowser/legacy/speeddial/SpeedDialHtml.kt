@@ -17,6 +17,7 @@
 package jp.hazuki.yuzubrowser.legacy.speeddial
 
 import android.content.Context
+import android.graphics.Color
 import android.webkit.WebResourceResponse
 import jp.hazuki.yuzubrowser.core.utility.extensions.getNoCacheResponse
 import jp.hazuki.yuzubrowser.core.utility.utils.FileUtils
@@ -24,6 +25,8 @@ import jp.hazuki.yuzubrowser.core.utility.utils.IOUtils
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.utils.HtmlUtils
 import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
+import jp.hazuki.yuzubrowser.ui.theme.ThemeData
+import jp.hazuki.yuzubrowser.ui.theme.ThemeDataResolver
 import java.io.*
 import java.nio.charset.StandardCharsets
 
@@ -81,7 +84,10 @@ class SpeedDialHtml(context: Context) {
                 builder.append(".name{font-size:").append(getFontSize(fontSize)).append("}")
             }
 
-            if (AppPrefs.speeddial_dark_theme.get()) {
+            val themeData = ThemeDataResolver.resolve(context)
+            if (themeData != null) {
+                builder.append(buildThemeCss(themeData))
+            } else if (AppPrefs.speeddial_dark_theme.get()) {
                 builder.append(DARK_THEME)
             }
 
@@ -178,6 +184,125 @@ class SpeedDialHtml(context: Context) {
             6 -> "120%"
             else -> "75%"
         }
+    }
+
+    private fun buildThemeCss(themeData: ThemeData): String {
+        val light = themeData.lightTheme
+        val background = themeData.tabListBackgroundColor.takeIf { it != 0 }
+            ?: themeData.contentBackgroundColor.takeIf { it != 0 }
+            ?: themeData.settingsBackgroundColor.takeIf { it != 0 }
+            ?: if (light) 0xFFF1F3F4.toInt() else 0xFF202124.toInt()
+        val text = themeData.contentTextColor.takeIf { it != 0 }
+            ?: themeData.settingsTextColor.takeIf { it != 0 }
+            ?: themeData.toolbarTextColor.takeIf { it != 0 }
+            ?: if (light) 0xFF202124.toInt() else 0xFFE8EAED.toInt()
+        val summary = themeData.contentSummaryColor.takeIf { it != 0 }
+            ?: themeData.settingsSummaryColor.takeIf { it != 0 }
+            ?: adjustAlpha(text, 0.72f)
+        val accent = themeData.tabAccentColor.takeIf { it != 0 }
+            ?: themeData.toolbarImageColor.takeIf { it != 0 }
+            ?: if (light) 0xFF1A73E8.toInt() else 0xFF8AB4F8.toInt()
+        val itemBg = themeData.tabListItemBackgroundNormalColor.takeIf { it != 0 }
+            ?: themeData.contentBackgroundColor.takeIf { it != 0 }
+            ?: adjustColor(background, if (light) 1.04f else 1.10f)
+        val searchBg = themeData.tabListItemBackgroundSelectedColor.takeIf { it != 0 }
+            ?: themeData.menuToolbarButtonColor.takeIf { it != 0 }
+            ?: adjustColor(background, if (light) 1.10f else 1.18f)
+        val divider = themeData.contentDividerColor.takeIf { it != 0 }
+            ?: themeData.settingsDividerColor.takeIf { it != 0 }
+            ?: themeData.tabDividerColor.takeIf { it != 0 }
+            ?: adjustAlpha(text, if (light) 0.14f else 0.22f)
+        val itemShadow = if (light) {
+            "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)"
+        } else {
+            "none"
+        }
+        val itemBorder = adjustAlpha(accent, if (light) 0.10f else 0.18f)
+        val itemHoverShadow = if (light) {
+            "0 6px 18px rgba(0,0,0,0.12)"
+        } else {
+            "0 0 0 1px rgba(255,255,255,0.10)"
+        }
+        val searchShadow = if (light) {
+            "0 1px 6px rgba(32,33,36,0.28)"
+        } else {
+            "none"
+        }
+        val searchFocusShadow = if (light) {
+            "0 1px 10px rgba(26,115,232,0.22)"
+        } else {
+            "0 0 0 1px rgba(255,255,255,0.12)"
+        }
+        val surfaceLine = adjustAlpha(divider, if (light) 0.75f else 0.9f)
+        val footerText = themeData.contentSummaryColor.takeIf { it != 0 }
+            ?: themeData.settingsSummaryColor.takeIf { it != 0 }
+            ?: summary
+        val footerHover = text
+        val footerFocusBg = adjustAlpha(accent, if (light) 0.14f else 0.18f)
+        val footerFocusBorder = adjustAlpha(accent, if (light) 0.28f else 0.36f)
+
+        return buildString {
+            append(":root{")
+            append("--bg-color:").append(cssColor(background)).append(';')
+            append("--text-color:").append(cssColor(text)).append(';')
+            append("--accent-color:").append(cssColor(accent)).append(';')
+            append("--item-bg:").append(cssColor(itemBg)).append(';')
+            append("--item-shadow:").append(itemShadow).append(';')
+            append("--search-bg:").append(cssColor(searchBg)).append(';')
+            append("--search-border:1px solid ").append(cssColor(divider)).append(';')
+            append("--search-shadow:").append(searchShadow).append(';')
+            append("--footer-text:").append(cssColor(footerText)).append(';')
+            append("--footer-hover:").append(cssColor(footerHover)).append(';')
+            append("--footer-focus-bg:").append(cssColor(footerFocusBg)).append(';')
+            append("--footer-focus-border:").append(cssColor(footerFocusBorder)).append(';')
+            append("}")
+            append(".browserName{color:").append(cssColor(text)).append("}")
+            append(".brand-main{color:").append(cssColor(text)).append("}")
+            append(".brand-sub{color:").append(cssColor(accent)).append("}")
+            append(".grid-item{background-color:").append(cssColor(itemBg))
+                .append(";box-shadow:").append(itemShadow)
+                .append(";border:1px solid ").append(cssColor(itemBorder)).append("}")
+            append(".grid-item:hover,.grid-item:focus-within{box-shadow:").append(itemHoverShadow)
+                .append(";border-color:").append(cssColor(accent)).append("}")
+            append(".grid-item a{color:").append(cssColor(text)).append("}")
+            append("#search-bar{background-color:").append(cssColor(searchBg))
+                .append(";color:").append(cssColor(text))
+                .append(";border:1px solid ").append(cssColor(surfaceLine))
+                .append(";box-shadow:").append(searchShadow).append("}")
+            append("#search-bar:focus,#search-bar:focus-visible{border-color:").append(cssColor(accent))
+                .append(";box-shadow:").append(searchFocusShadow).append("}")
+            append("footer a{color:").append(cssColor(footerText)).append("}")
+            append("footer a:hover,footer a:focus,footer a:focus-visible,footer a:active{color:")
+                .append(cssColor(footerHover))
+                .append(";background-color:").append(cssColor(footerFocusBg))
+                .append(";outline:1px solid ").append(cssColor(footerFocusBorder))
+                .append("}")
+        }
+    }
+
+    private fun cssColor(color: Int): String {
+        val alpha = Color.alpha(color)
+        val red = Color.red(color)
+        val green = Color.green(color)
+        val blue = Color.blue(color)
+        return if (alpha >= 255) {
+            String.format("#%02X%02X%02X", red, green, blue)
+        } else {
+            String.format("rgba(%d,%d,%d,%.3f)", red, green, blue, alpha / 255f)
+        }
+    }
+
+    private fun adjustAlpha(color: Int, alphaFactor: Float): Int {
+        val alpha = (Color.alpha(color) * alphaFactor).toInt().coerceIn(0, 255)
+        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color))
+    }
+
+    private fun adjustColor(color: Int, factor: Float): Int {
+        val alpha = Color.alpha(color)
+        val red = (Color.red(color) * factor).toInt().coerceIn(0, 255)
+        val green = (Color.green(color) * factor).toInt().coerceIn(0, 255)
+        val blue = (Color.blue(color) * factor).toInt().coerceIn(0, 255)
+        return Color.argb(alpha, red, green, blue)
     }
 
     companion object {
