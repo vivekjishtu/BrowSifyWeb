@@ -520,6 +520,15 @@ class WebClient(
         }
 
         override fun onReceivedSslError(web: CustomWebView, handler: SslErrorHandler, error: SslError) {
+            // WebView also reports SSL failures for subresources. Those should not
+            // interrupt the user with a page-level certificate warning.
+            val failedUrl = Uri.parse(error.url).buildUpon().fragment(null).build()
+            val currentPageUrl = web.url?.let { Uri.parse(it).buildUpon().fragment(null).build() }
+            if (currentPageUrl == null || failedUrl != currentPageUrl) {
+                handler.cancel()
+                return
+            }
+
             if (!AppPrefs.ssl_error_alert.get()) {
                 handler.cancel()
                 return
