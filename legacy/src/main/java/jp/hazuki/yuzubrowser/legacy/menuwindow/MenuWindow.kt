@@ -46,7 +46,7 @@ import jp.hazuki.yuzubrowser.ui.theme.ThemeData
 
 typealias OnMenuCloseListener = () -> Unit
 
-class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: ActionController, private val iconManager: ActionIconManager) : PopupWindow.OnDismissListener {
+class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: ActionController, private val iconManager: ActionIconManager, private val adBlockStatus: () -> Pair<Boolean, Int>, private val onAdBlockClick: () -> Unit) : PopupWindow.OnDismissListener {
 
     private val windowMargin = context.convertDpToPx(4)
     private val cornerRadius = context.convertDpToPx(8).toFloat()
@@ -57,6 +57,10 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
     private var locking = false
     private var mListener: OnMenuCloseListener? = null
     private var menuCustomToolbar: MenuCustomToolbar? = null
+    private var adBlockRow: View? = null
+    private var adBlockDivider: View? = null
+    private var adBlockCountView: TextView? = null
+    private var adBlockIconView: ImageView? = null
     private val themeData = ThemeData.getInstance()
     private val menuBackgroundColor = themeData?.menuBackgroundColor.orFallback(themeData?.toolbarBackgroundColor ?: 0xFF303134.toInt())
     private val menuBorderColor = themeData?.menuBorderColor.orFallback(themeData?.menuDividerColor ?: adjustColor(menuBackgroundColor, if (themeData?.lightTheme == true) 0.78f else 1.22f))
@@ -111,7 +115,29 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
         }
 
         var lastGroup = Int.MIN_VALUE
-        for (action in actionList) {
+        fun addAdBlockRow() {
+            val divider = createDivider(v.context)
+            val row = inflater.inflate(R.layout.menu_list_item, v, false)
+            row.background = createMenuItemBackground()
+            adBlockIconView = row.findViewById<ImageView>(R.id.iconImageView).apply {
+                imageTintList = ColorStateList.valueOf(menuIconColor)
+                if (!AppPrefs.menu_icon.get()) visibility = View.GONE
+            }
+            row.findViewById<TextView>(R.id.actionNameTextView).apply {
+                text = context.getString(R.string.ad_blocker_menu)
+                setTextColor(menuTextColor)
+                if (fontSize >= 0) textSize = fontSize.toFloat()
+            }
+            adBlockCountView = row.findViewById(R.id.adBlockCountTextView)
+            row.setOnClickListener { onAdBlockClick(); window.dismiss() }
+            adBlockDivider = divider
+            adBlockRow = row
+            layout.addView(divider)
+            layout.addView(row)
+            refreshAdBlockCount(context)
+        }
+
+        for ((index, action) in actionList.withIndex()) {
             val group = getMenuGroup(action)
             if (lastGroup != Int.MIN_VALUE && group != lastGroup) {
                 layout.addView(createDivider(v.context))
@@ -137,7 +163,9 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
             }
             name.text = action.toString(array)
             layout.addView(child)
+            if (index == 1) addAdBlockRow()
         }
+        if (adBlockRow == null) addAdBlockRow()
         if (AppPrefs.fullscreen.get()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 window.contentView.windowInsetsController?.apply {
@@ -157,6 +185,7 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
     fun show(root: View, gravity: Int) {
         if (!locking) {
             refreshCustomToolbar()
+            refreshAdBlockCount(root.context)
 
             //This is a magic!
             window.isFocusable = false
@@ -171,6 +200,7 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
     fun showAsDropDown(anchor: View) {
         if (!locking) {
             refreshCustomToolbar()
+            refreshAdBlockCount(anchor.context)
 
             //This is a magic!
             window.isFocusable = false
@@ -293,6 +323,20 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
 
     private fun refreshCustomToolbar() {
         menuCustomToolbar?.notifyChangeWebState(iconManager.info.currentTabData)
+    }
+
+    private fun refreshAdBlockCount(context: Context) {
+        adBlockCountView?.let { badge ->
+            val (enabled, count) = adBlockStatus()
+            adBlockRow?.visibility = if (enabled) View.VISIBLE else View.GONE
+            adBlockDivider?.visibility = if (enabled) View.VISIBLE else View.GONE
+            badge.visibility = View.VISIBLE
+            badge.text = if (enabled) count.toString() else context.getString(R.string.ad_blocker_off)
+            badge.setTextColor(menuTextColor)
+            adBlockIconView?.setImageResource(
+                if (enabled) R.drawable.ic_ad_block_enable_white_24dp else R.drawable.ic_ad_block_disable_white_24dp
+            )
+        }
     }
 
     val isShowing: Boolean

@@ -18,6 +18,7 @@ package jp.hazuki.yuzubrowser.adblock.core
 
 import android.net.Uri
 import jp.hazuki.yuzubrowser.adblock.filter.unified.element.ElementContainer
+import org.json.JSONObject
 
 class CosmeticFiltering(
     private val disables: FilterContainer,
@@ -26,6 +27,7 @@ class CosmeticFiltering(
     private var cacheUrl: Uri? = null
     private var cache: String? = null
 
+    @Synchronized
     fun loadScript(url: Uri): String? {
         if (cacheUrl == url) return cache
 
@@ -47,9 +49,12 @@ class CosmeticFiltering(
 
         builder.append("(function(){const b=[")
         selector.forEach {
-            builder.append('\'').append(it.selector).append("',")
+            builder.append(JSONObject.quote(it.selector)).append(',')
         }
-        builder.append("];b.forEach(a=>{document.querySelectorAll(a)?.forEach(n=>{n.remove()})})})()")
+        builder.append("];const s=document.createElement('style');s.setAttribute('data-bsw-adblock','cosmetic');")
+        builder.append("s.textContent=b.map(a=>a+'{display:none!important}').join('\\n');")
+        builder.append("(document.head||document.documentElement).appendChild(s);")
+        builder.append("})()")
 
         val script = builder.toString()
 

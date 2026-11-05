@@ -288,6 +288,10 @@ class AbpUpdateWorker(
         val call = okHttpClient.newCall(request.build())
         try {
             val response = call.execute()
+            if (!response.isSuccessful && response.code != 304) {
+                response.close()
+                return false
+            }
 
             if (response.code == 304) {
                 entity.lastLocalUpdate = System.currentTimeMillis()

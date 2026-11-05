@@ -42,7 +42,7 @@ class AbpEntityAdapter(private val context: Context, val items: MutableList<AbpE
                     getRelativeTimeSpanString(item.lastLocalUpdate,
                             System.currentTimeMillis(), MINUTE_IN_MILLIS, FORMAT_NUMERIC_DATE))
         } else {
-            context.getString(R.string.unknown)
+            context.getString(R.string.not_downloaded)
         }
         holder.enable.isChecked = item.enabled
     }

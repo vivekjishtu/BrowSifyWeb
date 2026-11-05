@@ -198,7 +198,8 @@
     <string name="userjs_delete">Delete UserScript</string>
     <string name="userjs_delete_confirm">Delete this UserScript?</string>
     <string name="userjs_info">UserScript info</string>
-    <string name="pref_summary_browser">Tabs, search, downloads, adblock, new tab</string>
+    <string name="pref_summary_browser">Tabs, search, downloads, new tab</string>
+    <string name="pref_summary_ad_block">Manage filter lists and blocked content</string>
     <string name="pref_summary_page">User agent, text size, encoding, night mode</string>
     <string name="pref_summary_privacy">Permissions, history, security, data</string>
     <string name="pref_summary_ui">Theme, toolbar, menus, layout</string>
@@ -209,6 +210,7 @@
     <string name="pref_summary_help">Tips and usage help</string>
     <string name="pref_summary_about">Version, credits, licenses</string>
     <string name="pref_main_browsing">Browsing</string>
+    <string name="pref_main_ad_block">Ad blocker</string>
     <string name="pref_main_content">Content &amp; Sites</string>
     <string name="pref_main_privacy">Privacy &amp; Security</string>
     <string name="pref_main_appearance">Appearance</string>
@@ -222,6 +224,7 @@
     <string name="pref_category_home_tabs">Home &amp; Tabs</string>
     <string name="pref_category_session">Session &amp; Background</string>
     <string name="pref_category_downloads">Downloads</string>
+    <string name="pref_category_external_sharing">External app sharing</string>
     <string name="pref_category_content_filters">Content Filters</string>
     <string name="pref_category_user_scripts">User Scripts</string>
     <string name="pref_category_network">Network</string>

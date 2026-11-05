@@ -33,6 +33,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import jp.hazuki.yuzubrowser.adblock.*
+import jp.hazuki.yuzubrowser.adblock.PageBlockingStats
 import jp.hazuki.yuzubrowser.adblock.filter.mining.MiningProtector
 import jp.hazuki.yuzubrowser.adblock.repository.abp.AbpDatabase
 import jp.hazuki.yuzubrowser.adblock.ui.abp.AbpFilterSubscribeDialog
@@ -169,6 +170,8 @@ class WebClient(
     fun updateAdBlockList() {
         adBlockController?.update()
     }
+
+    internal fun getAdBlockPageStats(tabId: Long): PageBlockingStats.Snapshot = PageBlockingStats.snapshot(tabId)
 
     fun destroy() {
         browserHistoryManager?.destroy()
@@ -370,6 +373,7 @@ class WebClient(
 
         override fun onPageStarted(web: CustomWebView, url: String, favicon: Bitmap?) {
             val data = controller.getTabOrNull(web) ?: return
+            PageBlockingStats.reset(web.identityId)
 
             if (AppPrefs.toolbar_auto_open.get()) {
                 controller.expandToolbar()
@@ -466,8 +470,12 @@ class WebClient(
             }
             val adBlockController = adBlockController
             if (adBlockController != null) {
-                adBlockController.loadScript(Uri.parse(url))?.let {
-                    web.evaluateJavascript(it, null)
+                val pageUri = Uri.parse(url)
+                adBlockController.loadScript(pageUri) { script ->
+                    val currentHost = Uri.parse(web.url.orEmpty()).host
+                    if (script != null && currentHost.equals(pageUri.host, ignoreCase = true)) {
+                        web.evaluateJavascript(script, null)
+                    }
                 }
             }
 
@@ -588,8 +596,12 @@ class WebClient(
                     }
 
                     if (web.isBlock) {
-                        val filter = isBlock(request.getContentRequest(uri ?: Uri.parse("")))
+                        val contentRequest = request.getContentRequest(uri ?: Uri.parse(""))
+                        val filter = isBlock(contentRequest)
                         if (filter != null) {
+                            request.url.host?.let { blockedHost ->
+                                PageBlockingStats.record(web.identityId, blockedHost, filter.pattern)
+                            }
                             return if (request.isForMainFrame) {
                                 createMainFrameDummy(activity, request.url, filter.pattern)
                             } else {

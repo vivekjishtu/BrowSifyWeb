@@ -52,10 +52,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.hazuki.asyncpermissions.AsyncPermissions
 import jp.hazuki.asyncpermissions.PermissionResult
 import jp.hazuki.yuzubrowser.adblock.BROADCAST_ACTION_UPDATE_AD_BLOCK_DATA
+import jp.hazuki.yuzubrowser.adblock.PageBlockingStats
 import jp.hazuki.yuzubrowser.adblock.filter.abp.checkNeedUpdate
 import jp.hazuki.yuzubrowser.adblock.repository.abp.AbpDatabase
 import jp.hazuki.yuzubrowser.adblock.service.AbpUpdateService
 import jp.hazuki.yuzubrowser.adblock.ui.original.AddAdBlockDialog
+import jp.hazuki.yuzubrowser.adblock.ui.page.AdBlockPageSummary
 import jp.hazuki.yuzubrowser.bookmark.view.showAddBookmarkDialog
 import jp.hazuki.yuzubrowser.browser.behavior.BottomBarBehavior
 import jp.hazuki.yuzubrowser.browser.behavior.WebViewBehavior
@@ -402,6 +404,7 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
         userActionManager = UserActionManager(this, this, actionController, iconManager)
         tabManagerIn = BrowserTabManager(TabManagerFactory.newInstance(this, webViewFactory, faviconManager), this)
         webClient = WebClient(this, this, abpDatabase, webPermissionsDao, faviconManager)
+        webClient.isEnableAdBlock = AppPrefs.ad_block.get()
 
         toolbar = Toolbar(this, binding, this, actionController, iconManager)
         toolbar.addToolbarView(resources)
@@ -906,7 +909,17 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
 
         binding.superFrameLayout.setWhiteBackgroundMode(AppPrefs.whiteBackground.get())
 
-        menuWindow = MenuWindow(this, MenuActionManager.getInstance(applicationContext).browser_activity.list, actionController, iconManager)
+        menuWindow = MenuWindow(
+            this,
+            MenuActionManager.getInstance(applicationContext).browser_activity.list,
+            actionController,
+            iconManager,
+            {
+                val tab = tabManagerIn.currentTabData
+                AppPrefs.ad_block.get() to (tab?.let { webClient.getAdBlockPageStats(it.id).total } ?: 0)
+            },
+            { showAdBlockSummary() }
+        )
 
         webClient.onPreferenceReset()
         isEnableQuickControl = AppPrefs.qc_enable.get()
@@ -1808,8 +1821,21 @@ class BrowserActivity : BrowserBaseActivity(), BrowserController, FinishAlertDia
     override var isEnableAdBlock: Boolean
         get() = webClient.isEnableAdBlock
         set(value) {
+            AppPrefs.ad_block.set(value)
+            AppPrefs.commit(applicationContext, AppPrefs.ad_block)
             webClient.isEnableAdBlock = value
         }
+
+    private fun showAdBlockSummary() {
+        val tab = tabManagerIn.currentTabData
+        val host = tab?.url?.let { android.net.Uri.parse(it).host }.orEmpty()
+        val snapshot = tab?.let { webClient.getAdBlockPageStats(it.id) }
+            ?: PageBlockingStats.Snapshot(0, emptyList())
+        AdBlockPageSummary.show(this, host, AppPrefs.ad_block.get(), snapshot) { enabled ->
+            isEnableAdBlock = enabled
+            tab?.mWebView?.reload()
+        }
+    }
 
     override var isEnableGesture: Boolean
         get() = binding.webGestureOverlayView.isEnabled

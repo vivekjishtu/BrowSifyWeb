@@ -24,8 +24,9 @@
 
     <TextView
         android:id="@+id/actionNameTextView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_marginStart="18dp"
         android:layout_marginEnd="6dp"
         android:gravity="center_vertical"
@@ -33,5 +34,19 @@
         android:textColor="#E8EAED"
         android:textSize="14sp"
         android:fontFamily="sans-serif"/>
+
+    <TextView
+        android:id="@+id/adBlockCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:background="@drawable/menu_list_item_background"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif-medium"
+        tools:text="12" />
 
 </LinearLayout>
