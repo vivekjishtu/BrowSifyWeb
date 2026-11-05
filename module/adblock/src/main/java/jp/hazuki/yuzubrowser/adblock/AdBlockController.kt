@@ -43,9 +43,9 @@ class AdBlockController(private val context: Context, private val abpDao: AbpDao
 
     private val manager: AdBlockManager = AdBlockManager(context)
     private var adBlocker: Blocker? = null
-    private var elementBlocker: CosmeticFiltering? = null
+    @Volatile private var elementBlocker: CosmeticFiltering? = null
     private var isAbpIgnoreGenericElement = false
-    private var waitForLoading: CountDownLatch? = null
+    @Volatile private var waitForLoading: CountDownLatch? = null
 
     init {
         update()
@@ -135,10 +135,13 @@ class AdBlockController(private val context: Context, private val abpDao: AbpDao
         return getNoCacheResponse("text/html", builder)
     }
 
-    fun loadScript(url: Uri): String? {
-        val cosmetic = elementBlocker ?: return null
-
-        return cosmetic.loadScript(url)
+    fun loadScript(url: Uri, onLoaded: (String?) -> Unit) {
+        val loading = waitForLoading
+        scope.launch(Dispatchers.IO) {
+            loading?.await()
+            val script = elementBlocker?.loadScript(url)
+            withContext(Dispatchers.Main) { onLoaded(script) }
+        }
     }
 
     fun destroy() {

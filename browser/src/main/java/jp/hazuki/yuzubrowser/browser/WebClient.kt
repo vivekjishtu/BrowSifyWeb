@@ -470,8 +470,12 @@ class WebClient(
             }
             val adBlockController = adBlockController
             if (adBlockController != null) {
-                adBlockController.loadScript(Uri.parse(url))?.let {
-                    web.evaluateJavascript(it, null)
+                val pageUri = Uri.parse(url)
+                adBlockController.loadScript(pageUri) { script ->
+                    val currentHost = Uri.parse(web.url.orEmpty()).host
+                    if (script != null && currentHost.equals(pageUri.host, ignoreCase = true)) {
+                        web.evaluateJavascript(script, null)
+                    }
                 }
             }
 
