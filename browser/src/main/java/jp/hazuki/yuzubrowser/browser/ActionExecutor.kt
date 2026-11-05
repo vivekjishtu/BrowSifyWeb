@@ -88,7 +88,6 @@ import jp.hazuki.yuzubrowser.ui.settings.AppPrefs
 import jp.hazuki.yuzubrowser.ui.utils.PackageUtils
 import jp.hazuki.yuzubrowser.ui.utils.checkStoragePermission
 import jp.hazuki.yuzubrowser.ui.utils.makeUrlFromQuery
-import jp.hazuki.yuzubrowser.ui.widget.ContextMenuTitleView
 import jp.hazuki.yuzubrowser.webview.CustomWebView
 import jp.hazuki.yuzubrowser.webview.WebViewProfileManager
 import jp.hazuki.yuzubrowser.webview.utility.WebViewUtils
@@ -987,7 +986,6 @@ class ActionExecutor(
             SingleAction.TOGGLE_FULL_SCREEN -> controller.isFullscreenMode = !controller.isFullscreenMode
             SingleAction.OPEN_OPTIONS_MENU -> controller.showMenu(button, action as OpenOptionsMenuAction)
             SingleAction.CUSTOM_MENU -> {
-                val tab = controller.getTab(actionTarget)
                 val actionList = (action as CustomMenuSingleAction).actionList
 
                 if (target is ActionController.HitTestResultTargetInfo) {
@@ -996,7 +994,7 @@ class ActionExecutor(
                     }.show()
                 } else {
                     val builder = AlertDialog.Builder(controller.activity)
-                    builder.setCustomTitle(ContextMenuTitleView(controller.activity, tab.url ?: ""))
+                    builder.setTitle(R.string.menu_more)
                             .setAdapter(
                                     ActionListViewAdapter(controller.activity, actionList, null)
                             ) { _, which -> checkAndRun(actionList[which], target) }

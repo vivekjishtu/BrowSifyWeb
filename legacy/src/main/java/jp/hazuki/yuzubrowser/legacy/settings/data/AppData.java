@@ -34,7 +34,6 @@ import jp.hazuki.yuzubrowser.legacy.R;
 import jp.hazuki.yuzubrowser.legacy.action.ActionList;
 import jp.hazuki.yuzubrowser.legacy.action.SingleAction;
 import jp.hazuki.yuzubrowser.legacy.action.item.CustomMenuSingleAction;
-import jp.hazuki.yuzubrowser.legacy.action.item.FinishSingleAction;
 import jp.hazuki.yuzubrowser.legacy.action.manager.HardButtonActionManager;
 import jp.hazuki.yuzubrowser.legacy.action.manager.LongPressActionManager;
 import jp.hazuki.yuzubrowser.legacy.action.manager.MenuActionManager;
@@ -90,13 +89,12 @@ public class AppData {
             hardBtnManager.save(context);
 
             ToolbarActionManager toolbarManager = ToolbarActionManager.getInstance(context);
-           // toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.GO_BACK));
+            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.GO_HOME));
             toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.GO_FORWARD));
             toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.WEB_RELOAD_STOP));
             toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.ADD_BOOKMARK));
-            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.SHOW_DOWNLOADS));
-            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.SHOW_BOOKMARK), SingleAction.makeInstance(SingleAction.SHOW_HISTORY));
             toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.ALL_ACTION));
+            toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.TAB_HISTORY));
             //toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.TAB_LIST));
             //toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.OPEN_OPTIONS_MENU));
             toolbarManager.save(context);
@@ -108,18 +106,7 @@ public class AppData {
             MenuActionManager menuManager = MenuActionManager.getInstance(context);
             {
                 ActionList list = menuManager.browser_activity.getList();
-                list.add(SingleAction.makeInstance(SingleAction.GO_HOME));
-                list.add(SingleAction.makeInstance(SingleAction.SHOW_BOOKMARK));
-                list.add(SingleAction.makeInstance(SingleAction.SHOW_HISTORY));
-                list.add(SingleAction.makeInstance(SingleAction.SHOW_DOWNLOADS));
-                list.add(SingleAction.makeInstance(SingleAction.SHARE_WEB));
-                list.add(SingleAction.makeInstance(SingleAction.FIND_ON_PAGE));
-                list.add(SingleAction.makeInstance(SingleAction.READ_IT_LATER));
-                list.add(SingleAction.makeInstance(SingleAction.READ_IT_LATER_LIST));
-                list.add(SingleAction.makeInstance(SingleAction.READER_MODE));
-                list.add(SingleAction.makeInstance(SingleAction.ALL_ACTION));
-                list.add(SingleAction.makeInstance(SingleAction.SHOW_SETTINGS));
-                list.add(new FinishSingleAction(SingleAction.FINISH, true, false));
+                addDefaultMainMenuItems(list);
                 menuManager.save(context);
             }
 
@@ -249,6 +236,9 @@ public class AppData {
             DefaultFilterListsKt.initializeDefaultFilterLists(context, abpDatabase);
         }
 
+        updateUncustomizedMainMenu(context);
+        updateUncustomizedToolbarActions(context);
+
 
         int prefVersionCode = AppPrefs.lastLaunchPrefVersion.get();
 
@@ -299,5 +289,85 @@ public class AppData {
         AppPrefs.load(context);
         settingInitialValue(context, AppPrefs.getPreference(context), moshi, abpDatabase);
         return true;
+    }
+
+    private static void addDefaultMainMenuItems(ActionList list) {
+        list.add(SingleAction.makeInstance(SingleAction.PRIVATE));
+        list.add(SingleAction.makeInstance(SingleAction.SHOW_BOOKMARK));
+        list.add(SingleAction.makeInstance(SingleAction.SHOW_HISTORY));
+        list.add(SingleAction.makeInstance(SingleAction.SHOW_DOWNLOADS));
+        list.add(SingleAction.makeInstance(SingleAction.FIND_ON_PAGE));
+        list.add(SingleAction.makeInstance(SingleAction.SHARE_WEB));
+
+        CustomMenuSingleAction more = (CustomMenuSingleAction) SingleAction.makeInstance(SingleAction.CUSTOM_MENU);
+        ActionList moreItems = more.getActionList();
+        moreItems.add(SingleAction.makeInstance(SingleAction.READ_IT_LATER));
+        moreItems.add(SingleAction.makeInstance(SingleAction.READ_IT_LATER_LIST));
+        moreItems.add(SingleAction.makeInstance(SingleAction.READER_MODE));
+        moreItems.add(SingleAction.makeInstance(SingleAction.ALL_ACTION));
+        list.add(more);
+
+        list.add(SingleAction.makeInstance(SingleAction.SHOW_SETTINGS));
+    }
+
+    private static void updateUncustomizedMainMenu(Context context) {
+        MenuActionManager menuManager = MenuActionManager.getInstance(context);
+        ActionList list = menuManager.browser_activity.getList();
+        int[] oldDefault = {
+                SingleAction.GO_HOME,
+                SingleAction.SHOW_BOOKMARK,
+                SingleAction.SHOW_HISTORY,
+                SingleAction.SHOW_DOWNLOADS,
+                SingleAction.SHARE_WEB,
+                SingleAction.FIND_ON_PAGE,
+                SingleAction.READ_IT_LATER,
+                SingleAction.READ_IT_LATER_LIST,
+                SingleAction.READER_MODE,
+                SingleAction.ALL_ACTION,
+                SingleAction.SHOW_SETTINGS,
+                SingleAction.FINISH
+        };
+        if (list.size() != oldDefault.length) return;
+        for (int index = 0; index < oldDefault.length; index++) {
+            if (list.get(index).isEmpty() || list.get(index).get(0).getId() != oldDefault[index]) return;
+        }
+
+        list.clear();
+        addDefaultMainMenuItems(list);
+        menuManager.save(context);
+    }
+
+    private static void updateUncustomizedToolbarActions(Context context) {
+        ToolbarActionManager toolbarManager = ToolbarActionManager.getInstance(context);
+        java.util.List<jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionFile> actions =
+                toolbarManager.custombar1.getList();
+        int[] oldDefault = {
+                SingleAction.GO_FORWARD,
+                SingleAction.WEB_RELOAD_STOP,
+                SingleAction.ADD_BOOKMARK,
+                SingleAction.SHOW_DOWNLOADS,
+                SingleAction.SHOW_BOOKMARK,
+                SingleAction.ALL_ACTION
+        };
+        if (actions.size() != oldDefault.length) return;
+        for (int index = 0; index < oldDefault.length; index++) {
+            jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionFile item = actions.get(index);
+            if (item.press.size() != 1 || item.press.get(0).getId() != oldDefault[index]) return;
+            if (index == 4) {
+                if (item.lpress.size() != 1 || item.lpress.get(0).getId() != SingleAction.SHOW_HISTORY) return;
+            } else if (!item.lpress.isEmpty()) {
+                return;
+            }
+            if (!item.up.isEmpty() || !item.down.isEmpty() || !item.left.isEmpty() || !item.right.isEmpty()) return;
+        }
+
+        actions.clear();
+        toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.GO_HOME));
+        toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.GO_FORWARD));
+        toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.WEB_RELOAD_STOP));
+        toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.ADD_BOOKMARK));
+        toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.ALL_ACTION));
+        toolbarManager.custombar1.add(SingleAction.makeInstance(SingleAction.TAB_HISTORY));
+        toolbarManager.save(context);
     }
 }
