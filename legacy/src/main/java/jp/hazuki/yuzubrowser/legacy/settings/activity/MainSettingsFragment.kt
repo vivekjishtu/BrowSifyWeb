@@ -20,6 +20,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.preference.Preference
+import jp.hazuki.yuzubrowser.adblock.ui.original.AdBlockActivity
 import jp.hazuki.yuzubrowser.legacy.Constants
 import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.help.BROWSER_HELP_URL
@@ -31,6 +32,10 @@ class MainSettingsFragment : YuzuPreferenceFragment() {
 
         findPreference<Preference>("fragment_browser")!!.setOnPreferenceClickListener {
             openFragment(BrowserSettingsFragment())
+            true
+        }
+        findPreference<Preference>("fragment_adblock")!!.setOnPreferenceClickListener {
+            startActivity(Intent(requireContext(), AdBlockActivity::class.java))
             true
         }
         findPreference<Preference>("fragment_page")!!.setOnPreferenceClickListener {
@@ -51,10 +56,6 @@ class MainSettingsFragment : YuzuPreferenceFragment() {
         }
         findPreference<Preference>("fragment_speseddial")!!.setOnPreferenceClickListener {
             openFragment(SpeeddialFragment())
-            true
-        }
-        findPreference<Preference>("fragment_application")!!.setOnPreferenceClickListener {
-            openFragment(ApplicationSettingsFragment())
             true
         }
         findPreference<Preference>("fragment_import_export")!!.setOnPreferenceClickListener {

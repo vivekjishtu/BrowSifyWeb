@@ -26,6 +26,13 @@
         app:iconSpaceReserved="true" />
 
     <Preference
+        android:key="fragment_adblock"
+        android:title="@string/pref_main_ad_block"
+        android:summary="@string/pref_summary_ad_block"
+        android:icon="@drawable/ic_ad_block_enable_white_24dp"
+        app:iconSpaceReserved="true" />
+
+    <Preference
         android:key="fragment_page"
         android:title="@string/pref_main_content"
         android:summary="@string/pref_summary_page"
@@ -58,13 +65,6 @@
         android:title="@string/pref_main_speed_dial"
         android:summary="@string/pref_summary_speed_dial"
         android:icon="@drawable/ic_speed_dial_white_24dp"
-        app:iconSpaceReserved="true" />
-
-    <Preference
-        android:key="fragment_application"
-        android:title="@string/pref_main_app"
-        android:summary="@string/pref_summary_app"
-        android:icon="@drawable/ic_android_white_24dp"
         app:iconSpaceReserved="true" />
 
     <Preference

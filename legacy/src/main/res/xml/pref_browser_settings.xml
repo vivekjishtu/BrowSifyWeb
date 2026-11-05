@@ -200,6 +200,15 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/pref_category_external_sharing"
+        app:iconSpaceReserved="false">
+        <SwitchPreference
+            android:key="enable_share"
+            android:title="@string/enable_share"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/pref_category_content_filters"
         app:iconSpaceReserved="false">
         <Preference

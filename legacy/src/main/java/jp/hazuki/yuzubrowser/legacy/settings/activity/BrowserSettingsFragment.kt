@@ -19,7 +19,9 @@ package jp.hazuki.yuzubrowser.legacy.settings.activity
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -62,6 +64,22 @@ class BrowserSettingsFragment : YuzuPreferenceFragment() {
 
         findPreference<Preference>("ad_block_settings")!!.setOnPreferenceClickListener {
             startActivity(Intent(activity, AdBlockActivity::class.java))
+            true
+        }
+
+        val sharePreference = findPreference<SwitchPreference>("enable_share")!!
+        val packageName = requireContext().packageName
+        val shareActivity = ComponentName(packageName, "$packageName.ShareActivity")
+        val packageManager = requireContext().packageManager
+        sharePreference.isChecked = packageManager.getComponentEnabledSetting(shareActivity) !=
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+        sharePreference.setOnPreferenceChangeListener { _, newValue ->
+            packageManager.setComponentEnabledSetting(
+                shareActivity,
+                if (newValue as Boolean) PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
+            )
             true
         }
 
