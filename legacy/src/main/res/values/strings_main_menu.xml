@@ -1,0 +1,5 @@
+<resources>
+    <string name="menu_new_private_tab">New private tab</string>
+    <string name="menu_downloads">Downloads</string>
+    <string name="menu_more">More tools</string>
+</resources>

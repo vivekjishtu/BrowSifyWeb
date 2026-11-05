@@ -34,6 +34,7 @@ import jp.hazuki.yuzubrowser.legacy.R
 import jp.hazuki.yuzubrowser.legacy.action.Action
 import jp.hazuki.yuzubrowser.legacy.action.ActionList
 import jp.hazuki.yuzubrowser.legacy.action.ActionNameArray
+import jp.hazuki.yuzubrowser.legacy.action.SingleAction
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionController
 import jp.hazuki.yuzubrowser.legacy.action.manager.ActionIconManager
 import jp.hazuki.yuzubrowser.legacy.action.manager.SoftButtonActionFile
@@ -137,8 +138,15 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
             refreshAdBlockCount(context)
         }
 
-        for ((index, action) in actionList.withIndex()) {
+        for (action in actionList) {
+            val actionId = action.firstOrNull()?.id
             val group = getMenuGroup(action)
+
+            if (actionId == SingleAction.SHOW_SETTINGS && adBlockRow == null) {
+                addAdBlockRow()
+                lastGroup = group
+            }
+
             if (lastGroup != Int.MIN_VALUE && group != lastGroup) {
                 layout.addView(createDivider(v.context))
             }
@@ -156,14 +164,22 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
                 window.dismiss()
             }
             if (AppPrefs.menu_icon.get()) {
-                icon.setImageDrawable(iconManager[action])
+                if (actionId == SingleAction.CUSTOM_MENU) {
+                    icon.setImageResource(R.drawable.ic_build_white_24dp)
+                } else {
+                    icon.setImageDrawable(iconManager[action])
+                }
                 icon.imageTintList = ColorStateList.valueOf(menuIconColor)
             } else {
                 icon.visibility = View.GONE
             }
-            name.text = action.toString(array)
+            name.text = when (actionId) {
+                SingleAction.PRIVATE -> context.getString(R.string.menu_new_private_tab)
+                SingleAction.SHOW_DOWNLOADS -> context.getString(R.string.menu_downloads)
+                SingleAction.CUSTOM_MENU -> context.getString(R.string.menu_more)
+                else -> action.toString(array)
+            }
             layout.addView(child)
-            if (index == 1) addAdBlockRow()
         }
         if (adBlockRow == null) addAdBlockRow()
         if (AppPrefs.fullscreen.get()) {
@@ -278,6 +294,13 @@ class MenuWindow(context: ThemeActivity, actionList: ActionList, controller: Act
         if (action.isEmpty()) return 999
         val id = action[0].id
         return when {
+            id == SingleAction.PRIVATE -> 0
+            id == SingleAction.SHOW_BOOKMARK ||
+                id == SingleAction.SHOW_HISTORY ||
+                id == SingleAction.SHOW_DOWNLOADS -> 1
+            id == SingleAction.FIND_ON_PAGE || id == SingleAction.SHARE_WEB -> 2
+            id == SingleAction.CUSTOM_MENU -> 3
+            id == SingleAction.SHOW_SETTINGS || id == SingleAction.TOGGLE_AD_BLOCK -> 4
             id in 1000..1999 -> 0 // navigation
             id in 5000..5999 -> 1 // page info / page actions
             id in 10000..10999 -> 2 // tab actions
