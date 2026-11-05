@@ -118,10 +118,15 @@ class AbpFilterDecoder {
             }
         }
 
+        val isProcedural = type == "?"
         val isHide = when (type) {
             "@" -> false
-            null -> true
+            null, "?" -> true
             else -> return
+        }
+
+        val selector = body.sanitizeSelector().let {
+            if (isProcedural) PROCEDURAL_SELECTOR_PREFIX + it else it
         }
 
         domainList.forEach {
@@ -133,14 +138,14 @@ class AbpFilterDecoder {
 
             elementFilterList += if (domain.endsWith('*')) {
                 domain = domain.substring(0, it.length - 1)
-                TldRemovedElementFilter(domain, isHide, isNot, body.sanitizeSelector())
+                TldRemovedElementFilter(domain, isHide, isNot, selector)
             } else {
-                PlaneElementFilter(domain, isHide, isNot, body.sanitizeSelector())
+                PlaneElementFilter(domain, isHide, isNot, selector)
             }
         }
     }
 
-    private fun String.sanitizeSelector() = trim().replace("\\", "\\\\").replace("'", "\'")
+    private fun String.sanitizeSelector() = trim()
 
     private fun String.decodeFilter(
         blackList: MutableList<UnifiedFilter>,
@@ -383,6 +388,7 @@ class AbpFilterDecoder {
 
     companion object {
         const val HEADER = "[Adblock Plus"
+        const val PROCEDURAL_SELECTOR_PREFIX = "\u0001bsw-procedural:"
 
         private const val CONTENT_FILTER_REGEX = "^([^/*|@\"!]*?)#([@?\$])?#(.+)\$"
     }
