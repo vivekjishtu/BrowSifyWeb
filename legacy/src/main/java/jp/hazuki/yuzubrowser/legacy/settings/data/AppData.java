@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 import jp.hazuki.yuzubrowser.adblock.repository.abp.AbpDatabase;
 import jp.hazuki.yuzubrowser.adblock.service.AbpUpdateService;
+import jp.hazuki.yuzubrowser.adblock.settings.DefaultFilterListsKt;
 import jp.hazuki.yuzubrowser.core.utility.extensions.ContextExtensionsKt;
 import jp.hazuki.yuzubrowser.core.utility.log.Logger;
 import jp.hazuki.yuzubrowser.core.utility.storage.DocumentFileKt;
@@ -245,7 +246,7 @@ public class AppData {
                 speedDialManager.update(sd);
             }
 
-            AdBlockInitSupportKt.initAbpFilter(context, abpDatabase);
+            DefaultFilterListsKt.initializeDefaultFilterLists(context, abpDatabase);
         }
 
 

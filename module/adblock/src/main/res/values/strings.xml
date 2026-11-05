@@ -16,6 +16,7 @@
   -->
 
 <resources>
+    <string name="not_downloaded">Not downloaded</string>
     <string-array name="pref_ad_block_menu">
         <item>@string/pref_edit</item>
         <item>@string/pref_delete</item>

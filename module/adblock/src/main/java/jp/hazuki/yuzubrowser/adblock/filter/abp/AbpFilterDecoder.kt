@@ -60,8 +60,8 @@ class AbpFilterDecoder {
         val elementDisableFilter = mutableListOf<UnifiedFilter>()
         val elementFilter = mutableListOf<ElementFilter>()
         reader.forEachLine { line ->
-            if (line.isEmpty()) return@forEachLine
             val trimmedLine = line.trim()
+            if (trimmedLine.isEmpty()) return@forEachLine
             when {
                 trimmedLine[0] == '!' -> trimmedLine.decodeComment(url, info)?.let {
                     throw OnRedirectException(it)

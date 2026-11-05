@@ -1,0 +1,12 @@
+<resources>
+    <string name="adblock_page_title">Ad blocker</string>
+    <string name="adblock_no_site">No page selected</string>
+    <string name="adblock_enable">Block ads on this browser</string>
+    <string name="adblock_blocked_count">%1$d blocked requests on this page</string>
+    <string name="adblock_empty_state">No blocked requests recorded for this page yet.</string>
+    <string name="adblock_host_count">%1$s · %2$d requests</string>
+    <string name="adblock_manage_lists">Manage filter lists</string>
+    <string name="adblock_pause_site">Pause on this site</string>
+    <dimen name="adblock_sheet_padding">20dp</dimen>
+    <dimen name="adblock_sheet_list_height">240dp</dimen>
+</resources>

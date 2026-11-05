@@ -51,6 +51,12 @@ private fun WebResourceRequest.getContentType(pageUri: Uri): Int {
     val scheme = url.scheme
     var isPage = false
 
+    // Fetch API and XMLHttpRequest use an empty fetch destination. Preserve
+    // that information so filters scoped to $xmlhttprequest can match them.
+    if (requestHeaders["Sec-Fetch-Dest"].equals("empty", ignoreCase = true)) {
+        type = type or ContentRequest.TYPE_XHR
+    }
+
     if (isForMainFrame) {
         if (url == pageUri) {
             isPage = true
